@@ -11,6 +11,8 @@ import {
   FileText,
   Award,
   Sparkles,
+  ArrowRight,
+  BookOpen,
 } from "lucide-react";
 import { api, ExtractedContent, BackgroundJob } from "@/lib/api";
 
@@ -87,22 +89,26 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6 w-full">
-      <div>
-        <h1 className="text-2xl font-extrabold text-slate-800">
-          Upload & Multimodal Analysis
+    <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-8 w-full">
+      {/* Header */}
+      <div className="border-b border-slate-200 dark:border-slate-800 pb-5">
+        <span className="text-[11px] font-mono uppercase tracking-wider text-scholar-emerald font-semibold">
+          Multimodal Ingestion
+        </span>
+        <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100 mt-1">
+          Manuscript & Image Analysis
         </h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Upload textbook pages, handwritten notes, whiteboard diagrams, or slides to extract structured knowledge.
+        <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
+          Upload textbook excerpts, handwritten proofs, whiteboard diagrams, or problem sets for OCR extraction.
         </p>
       </div>
 
-      {/* Drag & Drop Zone (WEB-004) */}
+      {/* Drag & Drop Zone */}
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-2xl p-8 text-center cursor-pointer bg-white transition hover:bg-slate-50 flex flex-col items-center justify-center space-y-3"
+        className="border-2 border-dashed border-slate-300 dark:border-slate-800 hover:border-scholar-emerald dark:hover:border-scholar-emerald rounded-2xl p-8 md:p-12 text-center cursor-pointer bg-white dark:bg-midnight-900 transition flex flex-col items-center justify-center space-y-3 shadow-sm group"
       >
         <input
           type="file"
@@ -111,15 +117,15 @@ export default function UploadPage() {
           accept="image/png,image/jpeg,image/webp"
           className="hidden"
         />
-        <div className="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-midnight-800 text-scholar-emerald flex items-center justify-center group-hover:scale-105 transition">
           <UploadCloud className="w-6 h-6" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-slate-700">
-            {file ? file.name : "Click to upload or drag and drop an image"}
+          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+            {file ? file.name : "Select an academic image or drag and drop file"}
           </p>
-          <p className="text-xs text-slate-400 mt-1">
-            Supported: PNG, JPEG, WEBP (Max 10MB)
+          <p className="text-xs text-slate-400 mt-1 font-mono">
+            Accepted: PNG, JPEG, WEBP (Maximum 10MB)
           </p>
         </div>
       </div>
@@ -128,28 +134,28 @@ export default function UploadPage() {
         <div className="flex justify-end">
           <button
             onClick={handleUpload}
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition flex items-center gap-2"
+            className="px-6 py-2.5 bg-slate-900 dark:bg-scholar-emerald hover:bg-slate-800 dark:hover:bg-emerald-600 text-white dark:text-slate-950 rounded-xl text-xs font-semibold transition flex items-center gap-2 shadow-sm"
           >
-            <span>Analyze Image</span>
+            <span>Execute OCR & Structural Parsing</span>
             <Sparkles className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* Processing Status Indicator (WEB-004) */}
+      {/* Processing Status Indicator */}
       {loading && job && (
-        <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-xs space-y-2">
-          <div className="flex items-center justify-between text-indigo-800 font-semibold">
+        <div className="p-5 bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs space-y-3 shadow-sm">
+          <div className="flex items-center justify-between text-slate-800 dark:text-slate-200 font-medium">
             <span className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
-              <span>Analyzing image structure and text...</span>
+              <Loader2 className="w-4 h-4 animate-spin text-scholar-emerald" />
+              <span>Parsing layout, mathematical expressions, and visual tokens...</span>
             </span>
-            <span className="capitalize">{job.status}</span>
+            <span className="font-mono text-[11px] uppercase text-scholar-emerald">{job.status}</span>
           </div>
-          <div className="w-full bg-indigo-100 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-slate-100 dark:bg-midnight-950 rounded-full h-1.5 overflow-hidden">
             <div
-              className="bg-indigo-600 h-full transition-all duration-300"
-              style={{ width: `${Math.max(job.progress || 25, 20)}%` }}
+              className="bg-scholar-emerald h-full transition-all duration-300"
+              style={{ width: `${Math.max(job.progress || 35, 25)}%` }}
             />
           </div>
         </div>
@@ -157,23 +163,25 @@ export default function UploadPage() {
 
       {/* Error Banner */}
       {errorMsg && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs flex items-center gap-2">
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded-xl text-xs flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 flex-shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
 
-      {/* Extracted Content Result (WEB-004) */}
+      {/* Extracted Content Result */}
       {extracted && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
             <div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-indigo-600 mb-1">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>Extracted Context Ready</span>
+              <div className="flex items-center gap-2 text-xs font-semibold text-scholar-emerald mb-1">
+                <CheckCircle2 className="w-4 h-4 text-scholar-emerald" />
+                <span>Extracted Structural Context Ready</span>
               </div>
-              <h2 className="text-lg font-bold text-slate-800">{extracted.title}</h2>
-              <p className="text-xs text-slate-500">
+              <h2 className="text-xl font-serif font-bold text-slate-900 dark:text-slate-100">
+                {extracted.title}
+              </h2>
+              <p className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-0.5">
                 {extracted.subject} → {extracted.topic}
               </p>
             </div>
@@ -181,35 +189,29 @@ export default function UploadPage() {
             {/* Quick Actions for Reusable Context */}
             <div className="flex items-center gap-2">
               <Link
-                href={`/summaries?source_id=${extracted.id}`}
-                className="px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+                href={`/solve`}
+                className="px-3.5 py-1.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
               >
-                <FileText className="w-3.5 h-3.5" />
-                <span>Summarize</span>
-              </Link>
-              <Link
-                href={`/quizzes?source_id=${extracted.id}`}
-                className="px-3 py-1.5 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
-              >
-                <Award className="w-3.5 h-3.5" />
-                <span>Quiz</span>
+                <span>Solve in Workspace</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
 
           {/* Uncertainty Warnings */}
           {extracted.uncertainties && extracted.uncertainties.length > 0 && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
-              <span className="font-semibold">⚠️ Attention:</span> {extracted.uncertainties.join("; ")}
+            <div className="p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-600 dark:text-amber-400 space-y-1">
+              <span className="font-semibold uppercase tracking-wider font-mono">Attention (Low OCR Confidence):</span>
+              <p>{extracted.uncertainties.join("; ")}</p>
             </div>
           )}
 
           {/* Extracted Text */}
           <div>
-            <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              Extracted Notes / Content
+            <h3 className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-2">
+              Extracted Manuscript / Problem Text
             </h3>
-            <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
+            <div className="p-4 bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs md:text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap leading-relaxed font-sans">
               {extracted.extracted_text}
             </div>
           </div>
@@ -217,11 +219,11 @@ export default function UploadPage() {
           {/* Key Concepts & Equations */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {extracted.key_concepts && extracted.key_concepts.length > 0 && (
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                  Key Concepts
+              <div className="p-4 bg-slate-50 dark:bg-midnight-950 rounded-xl border border-slate-200 dark:border-slate-800">
+                <h4 className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-2">
+                  Identified Concepts
                 </h4>
-                <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
+                <ul className="list-disc list-inside text-xs text-slate-700 dark:text-slate-300 space-y-1">
                   {extracted.key_concepts.map((kc, i) => (
                     <li key={i}>{kc}</li>
                   ))}
@@ -230,11 +232,11 @@ export default function UploadPage() {
             )}
 
             {extracted.equations && extracted.equations.length > 0 && (
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                  Formulas & Equations
+              <div className="p-4 bg-slate-50 dark:bg-midnight-950 rounded-xl border border-slate-200 dark:border-slate-800">
+                <h4 className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-2">
+                  Formulas & Expressions
                 </h4>
-                <ul className="list-disc list-inside text-xs text-slate-700 space-y-1 font-mono">
+                <ul className="list-disc list-inside text-xs text-slate-700 dark:text-slate-300 space-y-1 font-mono">
                   {extracted.equations.map((eq, i) => (
                     <li key={i}>{eq}</li>
                   ))}
@@ -247,4 +249,3 @@ export default function UploadPage() {
     </div>
   );
 }
-
