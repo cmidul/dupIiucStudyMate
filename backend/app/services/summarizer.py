@@ -28,6 +28,12 @@ class SummarizerService:
         source_text = ""
         if data.source_text and data.source_text.strip():
             source_text = data.source_text.strip()
+        elif data.source_content_id:
+            from app.repositories.upload_repo import upload_repo
+            ext_content = await upload_repo.get_extracted_content(db, data.source_content_id, user_id)
+            if not ext_content:
+                raise AppException(code="NOT_FOUND", message="Source extracted content not found or access denied.", status_code=404)
+            source_text = ext_content.extracted_text
         elif data.conversation_id:
             from app.repositories.chat_repo import chat_repo
             conv = await chat_repo.get_conversation(db, data.conversation_id, user_id, include_messages=True)
@@ -38,7 +44,7 @@ class SummarizerService:
         if not source_text:
             raise AppException(
                 code="INVALID_INPUT",
-                message="Source text or conversation ID is required to generate a summary.",
+                message="Source text, source_content_id, or conversation ID is required to generate a summary.",
                 status_code=422,
             )
 

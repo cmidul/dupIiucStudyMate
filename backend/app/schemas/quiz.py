@@ -41,6 +41,7 @@ class QuizDeliveryResponse(BaseModel):
     """Public quiz representation for taking the quiz."""
     id: str
     user_id: str
+    source_content_id: Optional[str] = None
     title: str
     topic: str
     difficulty: str

@@ -21,11 +21,11 @@ Use this file together with:
 | Project name | AI Learning Assistant |
 | Current phase | Phase 2 — Multimodal & Advanced Intelligence |
 | Overall status | In progress |
-| Current milestone | M6 — Image understanding & Background jobs |
-| Current feature | F-04 (Image Extraction & Vision) |
+| Current milestone | M2 — Telegram Account Linking / M12 — Telegram Bot |
+| Current feature | F-02 (Telegram Account Linking) |
 | Last updated | 2026-11-03 |
 | Current branch | main |
-| Latest commit | M9 & M10 implementation (ready for review) |
+| Latest commit | M6 implementation (ready for review) |
 
 ### Status definitions
 
@@ -48,7 +48,7 @@ Do not use **Passed** just because code has been written.
 | M3 | Shared conversation system | Conversations, messages, context, and history | Passed | 2026-11-03 | Conversations & messages tables, cross-user isolation, CHAT-001..007 pass. |
 | M4 | AI provider foundation | Provider abstraction, free-provider integration, validation and error handling | Passed | 2026-11-03 | BaseAIProvider, AIRouter, Mock, Gemini, Groq adapters, AI-001..007 pass. |
 | M5 | Text question answering | Text input, intent/topic handling, answer generation | Passed | 2026-11-03 | TopicDetector, ambiguity prompts, context window, TOPIC-001..002 pass (25/25 total). |
-| M6 | Image understanding | Upload validation, image processing/OCR or vision workflow | Not started | | F-04, IMG-001..013 |
+| M6 | Image understanding | Upload validation, image processing/OCR or vision workflow | Passed | 2026-11-03 | F-04 complete, private unguessable storage, jobs engine, IMG-001..013, JOB-001..007 pass. |
 | M7 | Summarization | Summary generation and display | Passed | 2026-11-03 | F-06 complete, short/detailed/exam_notes styles, SUM-001..007 pass. |
 | M8 | Quiz system | Quiz generation, attempts, scoring, and answer review | Passed | 2026-11-03 | F-07 complete, safe delivery, authoritative scoring, QUIZ-001..010 pass. |
 | M9 | Math solver | Mathematical question solving and verification | Passed | 2026-11-03 | F-08 complete, safe AST parser, SymPy verification, MATH-001..010 pass. |
@@ -74,19 +74,20 @@ Do not use **Passed** just because code has been written.
 | F-07 | Quiz Generation & Scoring | M8 | Passed | Complete | Passed | Passed | Safe answer key secrecy, scoring, QUIZ-001..010 pass |
 | F-08 | Math Problem Solver | M9 | Passed | Complete | Passed | Passed | Safe SymPy AST parsing (zero eval), MATH-001..010 pass |
 | F-09 | Logical Reasoning Solver | M10 | Passed | Complete | Passed | Passed | Truth tables, Barbara syllogism, LOGIC-001..006 pass |
-| F-04 | Image Understanding & Vision | M6 | Not started | Not started | Not run | Not evaluated | Next priority |
+| F-04 | Image Understanding & Vision | M6 | Passed | Complete | Passed | Passed | Magic bytes, private storage, background jobs, IMG-001..013 pass |
+| F-02 | Telegram Account Linking | M2 | In progress | In progress | Not run | Not evaluated | Deep links, token expiry, identity consolidation |
 
 ## 4. Current work
 
-- **Current milestone:** M6 — Image Understanding & Background Jobs
-- **Current feature ID and name:** F-04: Image Understanding & Vision Extraction
-- **Objective:** Implement secure image file validation (magic bytes, MIME type verification, file size limits), private storage management, background job processing, and vision model extraction.
-- **Work completed:** M0, M1, M3, M4, M5, M7, M8, M9, M10 passed. 57 automated tests passing with zero errors. Math solver (zero eval, AST security, SymPy verification) and logic solver (propositional truth tables, syllogistic deduction, sequence rules) fully verified.
-- **Work remaining:** Implement image upload endpoint, private storage manager, extraction worker/job queue, and vision prompt handling.
-- **Files/modules being changed:** `backend/app/services/image_service.py`, `backend/app/storage/`, `backend/app/api/v1/uploads.py`.
-- **Current test status:** 57 passed in 27.22s.
+- **Current milestone:** M2 — Telegram Account Linking & M12 — Telegram Bot Integration
+- **Current feature ID and name:** F-02: Telegram Account Linking & F-12: Telegram Bot Integration
+- **Objective:** Implement secure deep-link linking token generation, token verification, Telegram user identity mapping, account linking routes, and verify with tests `LINK-001..007`.
+- **Work completed:** M0, M1, M3, M4, M5, M6, M7, M8, M9, M10 passed. 77 automated tests passing with zero errors. Multimodal image understanding, magic bytes inspection, private storage isolation, and background jobs lifecycle fully verified.
+- **Work remaining:** Implement linking tokens, Telegram webhook/bot handlers, and linked user authentication.
+- **Files/modules being changed:** `backend/app/services/telegram_link_service.py`, `backend/app/api/v1/auth.py`, `telegram-bot/`.
+- **Current test status:** 77 passed in 37.67s.
 - **Current blockers:** None.
-- **Next action:** Build Image Upload & Vision Extraction service.
+- **Next action:** Build Telegram Account Linking service and routes.
 
 ## 5. Completed work log
 
@@ -98,6 +99,7 @@ Do not use **Passed** just because code has been written.
 | 2026-11-03 | M3 & M5: Shared Chat & Topic Detection (F-03, F-05) | f8c2740 | `pytest -v` (25 passed in 7.29s) | Passed | CHAT-001..007, TOPIC-001..002, Alembic migration 0002 |
 | 2026-11-03 | M7 & M8: Summaries & Quizzes (F-06, F-07) | Pending | `pytest -v` (41 passed in 17.79s) | Passed | SUM-001..007, QUIZ-001..010, Alembic migration 0003 |
 | 2026-11-03 | M9 & M10: Math & Logic Solvers (F-08, F-09) | Pending | `pytest -v` (57 passed in 27.22s) | Passed | MATH-001..010, LOGIC-001..006, Zero eval AST check |
+| 2026-11-03 | M6: Image Understanding & Jobs (F-04) | Pending | `pytest -v` (77 passed in 37.67s) | Passed | IMG-001..013, JOB-001..007, Alembic migration 0004 |
 
 ## 6. Blockers and risks
 

@@ -41,7 +41,16 @@ class QuizService:
                 status_code=422,
             )
 
-        source_material = data.source_text or data.topic or "Computer Science fundamentals"
+        source_material = data.source_text or data.topic
+        if data.source_content_id:
+            from app.repositories.upload_repo import upload_repo
+            ext_content = await upload_repo.get_extracted_content(db, data.source_content_id, user_id)
+            if not ext_content:
+                raise AppException(code="NOT_FOUND", message="Source extracted content not found or access denied.", status_code=404)
+            source_material = ext_content.extracted_text
+
+        if not source_material:
+            source_material = "Computer Science fundamentals"
         prompt = (
             f"Generate a {data.difficulty} difficulty multiple-choice quiz with exactly {data.question_count} questions.\n"
             f"Topic/Material: {source_material}\n\n"
@@ -246,6 +255,7 @@ class QuizService:
         return QuizDeliveryResponse(
             id=quiz.id,
             user_id=quiz.user_id,
+            source_content_id=quiz.source_content_id,
             title=quiz.title,
             topic=quiz.topic,
             difficulty=quiz.difficulty,

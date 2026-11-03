@@ -53,6 +53,8 @@ class Settings(BaseSettings):
     # Telegram Integration
     TELEGRAM_BOT_TOKEN: Optional[str] = None
     TELEGRAM_WEBHOOK_SECRET: Optional[str] = None
+    TELEGRAM_BOT_USERNAME: str = "ai_learning_assistant_bot"
+    TELEGRAM_BOT_SECRET: Optional[str] = None
 
     # Storage & Cache
     STORAGE_LOCAL_DIR: str = str(BACKEND_DIR / "storage" / "uploads")

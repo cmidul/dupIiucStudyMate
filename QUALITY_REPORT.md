@@ -7,21 +7,21 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 
 - Last updated: 2026-11-03
 - Current branch: main
-- Evaluated commit: M9 & M10 implementation
-- Overall status: Passed (M0, M1, M3, M4, M5, M7, M8, M9, M10 Passed)
+- Evaluated commit: M6 implementation
+- Overall status: Passed (M0, M1, M3, M4, M5, M6, M7, M8, M9, M10 Passed)
 
 ## Latest evaluation summary
 
 | Dimension | Score (0–5) | Status | Evidence / Notes |
 |---|---:|---|---|
-| Functional correctness | 5 | Passed | Math solver (arithmetic, linear, quadratic, infinite/no solution, verification) and logic solver (truth table, syllogisms, sequence pattern) pass; 57/57 tests pass. |
-| Test quality | 5 | Passed | Deterministic test cases covering MATH-001..010 and LOGIC-001..006 alongside all prior test suites. |
-| Architecture and maintainability | 5 | Passed | Clean service boundaries: `SafeMathParser`, `MathSolverService`, `PropositionalLogicEngine`, and `LogicSolverService`. |
-| AI answer quality | 5 | Passed | AI explanations cross-verified against deterministic SymPy outputs; failed verification accurately flagged (never labeled passed). |
-| Security and privacy | 5 | Passed | Zero `eval()` in mathematical parsing. AST node whitelist strictly blocks imports, attributes, builtins, and arbitrary code execution (`MATH-009`). |
-| Performance and reliability | 5 | Passed | All 57 automated tests execute in 27.22 seconds. |
-| User experience and accessibility | 5 | Passed | Clear pedagogical step breakdown, explicit assumption disclosure, and proactive ambiguity resolution (`1/2x`). |
-| Documentation and operations | 5 | Passed | PROGRESS.md and QUALITY_REPORT.md maintained in lockstep. |
+| Functional correctness | 5 | Passed | Multimodal image extraction, magic bytes validation, diagram/equation analysis, and background job lifecycle pass; 77/77 tests pass. |
+| Test quality | 5 | Passed | Deterministic test cases covering IMG-001..013, JOB-001..007 alongside all prior test suites. |
+| Architecture and maintainability | 5 | Passed | Secure storage abstraction `SecureFileStorage`, `ImageService`, `JobService`, and safe public DTOs. |
+| AI answer quality | 5 | Passed | Structured vision schemas, clear distinction of diagram interpretations from visible text, and explicit uncertainty reporting for blurry images. |
+| Security and privacy | 5 | Passed | Private file storage paths are strictly withheld from all client DTOs. Actual magic byte validation defeats MIME spoofing (`IMG-003`). Strict user ownership checks on all uploads, jobs, and extracted records (`IMG-012`, `JOB-002`). |
+| Performance and reliability | 5 | Passed | All 77 automated tests execute in 37.67 seconds. |
+| User experience and accessibility | 5 | Passed | Clear upload errors, progress job inspection, seamless reuse of extracted content across summaries and quizzes. |
+| Documentation and operations | 5 | Passed | Alembic migration 0004 recorded, PROGRESS.md and QUALITY_REPORT.md maintained in lockstep. |
 
 ## Feature evaluation history
 
@@ -33,6 +33,7 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 | 2026-11-03 | F-03 & F-05 Chat & Topic Detection | f8c2740 | `pytest -v` (25 tests) | Passed | CHAT-001..007, TOPIC-001..002 pass; cross-user conversation isolation verified |
 | 2026-11-03 | F-06 & F-07 Summaries & Quizzes | Pending | `pytest -v` (41 tests) | Passed | SUM-001..007, QUIZ-001..010 pass; answer-key secrecy and scoring verified |
 | 2026-11-03 | F-08 & F-09 Math & Logic Solvers | Pending | `pytest -v` (57 tests) | Passed | MATH-001..010, LOGIC-001..006 pass; zero-eval AST security, SymPy verification |
+| 2026-11-03 | F-04 Image Understanding & Jobs | Pending | `pytest -v` (77 tests) | Passed | IMG-001..013, JOB-001..007 pass; magic bytes check, private storage, job lifecycles |
 
 ## Failed checks and known issues
 
@@ -54,20 +55,25 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
   - Zero Python `eval()` in mathematical expressions; AST parser with strict node/attribute whitelist rejects code execution (`MATH-009`).
   - Proactive ambiguity detection for expressions like `1/2x` (`MATH-007`).
   - Verification discrepancies flagged strictly as `failed` (never masked as passed) (`MATH-008`).
+  - Private storage paths completely omitted from public API representations (`IMG-001`, `IMG-012`).
+  - Actual magic byte validation defeats client MIME spoofing (`IMG-003`).
+  - Corrupt or oversized images rejected safely prior to AI model invocation (`IMG-004`, `IMG-005`).
+  - Strict user ownership checks on uploaded files and extracted contents (`IMG-012`).
+  - Strict cross-user isolation for background jobs (`JOB-002`).
 - Open findings: None.
 - Release blockers: None.
 
 ## Performance observations
 
 - Environment: Windows, Python 3.14.7, SQLite async in-memory test harness
-- Workload: 57 async unit and integration tests
-- Measurements: 57 tests completed in 27.22 seconds
+- Workload: 77 async unit and integration tests
+- Measurements: 77 tests completed in 37.67 seconds
 - Limitations: In-memory test provider for CI; live adapters for external smoke tests
 
 ## Release decision
 
-- Decision: In development (M1, M3, M4, M5, M7, M8, M9, M10 passed; proceeding to M6 Image Understanding & Background Jobs)
-- Conditions: M2 (Telegram linking), M6, M11-M15 completion
+- Decision: In development (M0, M1, M3, M4, M5, M6, M7, M8, M9, M10 passed; proceeding to M2 Telegram Account Linking & M12 Telegram Bot)
+- Conditions: M2 (Telegram linking), M11-M15 completion
 - Evaluated by: Coding Agent
 - Date: 2026-11-03
 
