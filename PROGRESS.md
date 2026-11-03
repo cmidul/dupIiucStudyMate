@@ -21,11 +21,11 @@ Use this file together with:
 | Project name | AI Learning Assistant |
 | Current phase | Phase 1 — Core Backend & AI Foundation |
 | Overall status | In progress |
-| Current milestone | M7 — Summarization / M8 — Quiz system |
-| Current feature | F-06 (Summaries) & F-07 (Quiz Engine) |
+| Current milestone | M9 — Math solver / M10 — Logical reasoning |
+| Current feature | F-08 (Math Solver) & F-09 (Logic Solver) |
 | Last updated | 2026-11-03 |
 | Current branch | main |
-| Latest commit | M3 & M5 implementation (ready for review) |
+| Latest commit | M7 & M8 implementation (ready for review) |
 
 ### Status definitions
 
@@ -49,8 +49,8 @@ Do not use **Passed** just because code has been written.
 | M4 | AI provider foundation | Provider abstraction, free-provider integration, validation and error handling | Passed | 2026-11-03 | BaseAIProvider, AIRouter, Mock, Gemini, Groq adapters, AI-001..007 pass. |
 | M5 | Text question answering | Text input, intent/topic handling, answer generation | Passed | 2026-11-03 | TopicDetector, ambiguity prompts, context window, TOPIC-001..002 pass (25/25 total). |
 | M6 | Image understanding | Upload validation, image processing/OCR or vision workflow | Not started | | F-04, IMG-001..013 |
-| M7 | Summarization | Summary generation and display | Not started | | F-06, SUM-001..007 |
-| M8 | Quiz system | Quiz generation, attempts, scoring, and answer review | Not started | | F-07, QUIZ-001..010 |
+| M7 | Summarization | Summary generation and display | Passed | 2026-11-03 | F-06 complete, short/detailed/exam_notes styles, SUM-001..007 pass. |
+| M8 | Quiz system | Quiz generation, attempts, scoring, and answer review | Passed | 2026-11-03 | F-07 complete, safe delivery, authoritative scoring, QUIZ-001..010 pass. |
 | M9 | Math solver | Mathematical question solving and verification | Not started | | F-08, MATH-001..010 |
 | M10 | Logical reasoning solver | Logic question handling and explanation | Not started | | F-09, LOGIC-001..006 |
 | M11 | Website experience | Responsive interface and integration with shared backend | Not started | | F-13, WEB-001..010 |
@@ -70,20 +70,20 @@ Do not use **Passed** just because code has been written.
 | F-03 | Text Questions & AI Chat | M3/M5 | Passed | Complete | Passed | Passed | CHAT-001 through CHAT-007 all pass |
 | F-05 | Topic & Intent Detection | M5 | Passed | Complete | Passed | Passed | TOPIC-001 and TOPIC-002 pass |
 | F-02 | Telegram Account Linking | M2 | Not started | Not started | Not run | Not evaluated | Depends on Telegram bot integration (M12) |
-| F-06 | Summarization Engine | M7 | Not started | Not started | Not run | Not evaluated | Next priority |
-| F-07 | Quiz Generation & Scoring | M8 | Not started | Not started | Not run | Not evaluated | Next priority |
+| F-06 | Summarization Engine | M7 | Passed | Complete | Passed | Passed | Short, detailed, exam_notes, SUM-001..007 pass |
+| F-07 | Quiz Generation & Scoring | M8 | Passed | Complete | Passed | Passed | Safe answer key secrecy, scoring, QUIZ-001..010 pass |
 
 ## 4. Current work
 
-- **Current milestone:** M7 — Summarization & M8 — Quiz System
-- **Current feature ID and name:** F-06: Summarization Engine & F-07: Quiz Generation and Attempts
-- **Objective:** Implement summary styles (short, detailed, exam_notes), quiz question bank generation, safe quiz delivery (answer keys stripped), server-side attempt grading, and verify with tests `SUM-001..007` and `QUIZ-001..010`.
-- **Work completed:** M0, M1, M3, M4, M5 passed. 25 automated tests passing with zero errors. Conversations, messages, topic detection, and follow-up context verified.
-- **Work remaining:** Implement summary and quiz models, services, endpoints, and scoring engine.
-- **Files/modules being changed:** `backend/app/models/summary.py`, `backend/app/models/quiz.py`, `backend/app/services/summarizer.py`, `backend/app/services/quiz_service.py`.
-- **Current test status:** 25 passed in 7.29s.
+- **Current milestone:** M9 — Math Solver & M10 — Logical Reasoning Solver
+- **Current feature ID and name:** F-08: Math Problem Solver & F-09: Logical Reasoning Engine
+- **Objective:** Implement SymPy AST parser, step-by-step math solver (with strictly no eval), logic truth table and syllogism solvers, and verify with tests `MATH-001..010` and `LOGIC-001..006`.
+- **Work completed:** M0, M1, M3, M4, M5, M7, M8 passed. 41 automated tests passing with zero errors. Safe quiz delivery (answer key stripping), authoritative scoring, and multi-format summarization verified.
+- **Work remaining:** Implement math and logic services, AST verification, and endpoints.
+- **Files/modules being changed:** `backend/app/services/math_solver.py`, `backend/app/services/logic_solver.py`, `backend/app/api/v1/solvers.py`.
+- **Current test status:** 41 passed in 17.79s.
 - **Current blockers:** None.
-- **Next action:** Build summarization and quiz generation engine.
+- **Next action:** Build Math Solver with safe SymPy AST evaluation.
 
 ## 5. Completed work log
 
@@ -92,7 +92,8 @@ Do not use **Passed** just because code has been written.
 | 2026-11-03 | M0: Reconnaissance & Setup | fed8e84 | Repository & environment checks | Passed | Initial report approved; .gitignore created |
 | 2026-11-03 | M1: Backend Foundation & Auth (F-01, F-14) | fed8e84 | `pytest -v` (9 passed) | Passed | AUTH-001..007, Health check, Alembic migration |
 | 2026-11-03 | M4: AI Provider Foundation (F-16) | c7ca976 | `pytest -v` (16 passed) | Passed | AI-001..007, Router, Mock/Gemini/Groq adapters |
-| 2026-11-03 | M3 & M5: Shared Chat & Topic Detection (F-03, F-05) | Pending | `pytest -v` (25 passed in 7.29s) | Passed | CHAT-001..007, TOPIC-001..002, Alembic migration 0002 |
+| 2026-11-03 | M3 & M5: Shared Chat & Topic Detection (F-03, F-05) | f8c2740 | `pytest -v` (25 passed in 7.29s) | Passed | CHAT-001..007, TOPIC-001..002, Alembic migration 0002 |
+| 2026-11-03 | M7 & M8: Summaries & Quizzes (F-06, F-07) | Pending | `pytest -v` (41 passed in 17.79s) | Passed | SUM-001..007, QUIZ-001..010, Alembic migration 0003 |
 
 ## 6. Blockers and risks
 
