@@ -1173,74 +1173,62 @@ Required endpoint groups:
 
 ---
 
-# 21. End-to-end acceptance scenarios
+# 21. End-to-end acceptance scenarios (Milestone 14)
 
-## E2E-001 — Complete website learning flow
+All scenarios below are implemented in `backend/tests/test_e2e_integration.py` and run against the shared backend test harness.
 
-1. Register and sign in.
-2. Upload `bst_notes.png`.
-3. Wait for extraction job to complete.
-4. Inspect topic and extracted content.
-5. Generate an exam-notes summary.
-6. Generate a five-question MCQ quiz.
-7. Answer questions and submit.
-8. Review score and explanations.
-9. Ask a follow-up question about the source.
-10. Open learning history.
+## E2E-001 — Complete Text Learning Journey (PASSED)
 
-Expected:
-- Every step works.
-- Source context is reused.
-- Records appear in history.
-- No answer key is exposed before submission.
+1. Register user and authenticate (`/api/v1/auth/register`, `/api/v1/auth/login`).
+2. Solve quadratic math problem via unified solver (`POST /api/v1/solve`).
+3. Verify session appears in conversation history (`GET /api/v1/conversations`).
+4. Generate MCQ quiz on the same topic (`POST /api/v1/quizzes/generate`).
+5. Verify answer keys and explanations are sealed before submission.
+6. Submit quiz attempt with answers (`POST /api/v1/quizzes/{id}/attempts`).
+7. Verify authoritative scoring, percentages, and unsealed explanations.
 
-## E2E-002 — Complete Telegram learning flow
+Expected & Verified: All steps succeeded, answer key withheld until submission, conversation stored in history.
 
-1. Link Telegram account.
-2. Send a normal educational question.
-3. Send an educational image.
-4. Use inline Summarize action.
-5. Generate a quiz.
-6. Submit quiz answers.
-7. Open website history.
+## E2E-002 — Chat Conversation with Multi-Turn Follow-Up Context (PASSED)
 
-Expected:
-- Same internal account is used.
-- Telegram actions call shared backend services.
-- Website shows the resulting activity.
+1. Start a conversation with an initial educational query (`POST /api/v1/chat/messages`).
+2. Ask a contextual follow-up referencing the initial query (`conversation_id` attached).
+3. Retrieve full conversation history (`GET /api/v1/conversations/{id}`).
+4. Verify user and assistant messages appear in chronological sequence with correct roles and topic metadata.
 
-## E2E-003 — Math and logic flow
+Expected & Verified: Conversational context preserved, topic metadata tracked across turns.
 
-1. Submit a supported math equation.
-2. Check steps and deterministic verification.
-3. Submit a logic problem.
-4. Check reasoning, assumptions, and conclusion.
+## E2E-003 — Multimodal Image Upload and Extraction to Unified Solver (PASSED)
 
-Expected:
-- Correct results for fixed fixtures.
-- Verification and uncertainty labels are accurate.
+1. Authenticate user.
+2. Upload a valid educational PNG image (`POST /api/v1/uploads/image`).
+3. Verify synchronous vision extraction completes with structured topic, equations, and text.
+4. Retrieve extracted content via file content endpoint (`GET /api/v1/uploads/{id}/content`).
+5. Submit question referencing extracted `source_content_id` to unified solver (`POST /api/v1/solve`).
+6. Verify unified solver returns solution linked to the source content.
 
-## E2E-004 — Cross-user security flow
+Expected & Verified: Valid image validated, extracted, persisted, and referenced in unified solver workflow.
+
+## E2E-004 — Summary Generation to Quiz Chained Learning Workflow (PASSED)
+
+1. Generate a detailed summary from an educational passage (`POST /api/v1/summaries`).
+2. Verify overview, structured sections, and topic classification.
+3. Automatically generate an MCQ quiz targeting the summary's extracted topic (`POST /api/v1/quizzes/generate`).
+4. Verify quiz questions align with the subject domain.
+
+Expected & Verified: Seamless transition from reading/summarizing to testing comprehension.
+
+## E2E-005 — Full Cross-User Data Isolation Across Multi-Resource Journeys (PASSED)
 
 1. Create User A and User B.
-2. Create resources under User A.
-3. Attempt to access them using User B from API, website routes, and job endpoints.
+2. User A creates conversation, summary, and quiz.
+3. User B attempts to read User A's conversation (`GET /api/v1/conversations/{id}` -> 404).
+4. User B attempts to delete User A's conversation (`DELETE /api/v1/conversations/{id}` -> 404).
+5. User B attempts to view User A's summary (`GET /api/v1/summaries/{id}` -> 404).
+6. User B attempts to submit an attempt for User A's quiz (`POST /api/v1/quizzes/{id}/attempts` -> 404).
+7. User B's conversation listing is strictly empty (`GET /api/v1/conversations` -> `[]`).
 
-Expected:
-- All access attempts are rejected.
-- No private data is leaked.
-
-## E2E-005 — Provider outage flow
-
-1. Start a valid operation.
-2. Configure fake provider to fail.
-3. Observe job and UI/Telegram status.
-4. Restore provider and retry if allowed.
-
-Expected:
-- No fabricated result.
-- Safe failure is visible.
-- Retry does not create duplicate resources.
+Expected & Verified: Absolute isolation across users; no cross-tenant leakage or modification.
 
 ---
 

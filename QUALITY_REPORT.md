@@ -7,8 +7,8 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 
 - Last updated: 2026-11-03
 - Current branch: main
-- Evaluated commit: F-19 Unified Solve Questions implementation
-- Overall status: Passed (M0 through M13, F-19 Passed)
+- Evaluated commit: M14 System Integration & F-13 Academic Redesign
+- Overall status: Passed (M0 through M14 Passed, 118/118 tests, 11/11 routes)
 
 ## Latest evaluation summary
 
@@ -37,8 +37,10 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 | 2026-11-03 | F-02 Telegram Account Linking | 2ffac73 | `pytest -v` (84 tests) | Passed | LINK-001..007 pass; single-use hashed tokens, expiration, duplicate link prevention |
 | 2026-11-03 | F-12 Telegram Bot Integration | f342ddc | `pytest -v` (95 tests) | Passed | TG-001..011 pass; aiogram bot client, webhook token verification, message chunking |
 | 2026-11-03 | F-13 Website User Interface | 42483ea | Typecheck & Next.js build | Passed | WEB-001..010 pass; 9 core views, accessible responsive layout, sealed quiz keys |
-| 2026-11-03 | F-17 & F-18 Reliability and Security | Pending | `pytest -v` (103 tests) | Passed | SEC-001..008 pass; token bucket rate limiter, daily quotas, path traversal check, CSP headers |
-| 2026-11-03 | F-19 Unified Solve Questions | Pending | `pytest -v` (113 tests) | Passed | SOLVE-001..010 pass; automatic routing into math, logic, summary, educational QA; image inputs, follow-ups |
+| 2026-11-03 | F-17 & F-18 Reliability and Security | 28db37a | `pytest -v` (103 tests) | Passed | SEC-001..008 pass; token bucket rate limiter, daily quotas, path traversal check, CSP headers |
+| 2026-11-03 | F-19 Unified Solve Questions | d5b32ab | `pytest -v` (113 tests) | Passed | SOLVE-001..010 pass; automatic routing into math, logic, summary, educational QA; image inputs, follow-ups |
+| 2026-11-03 | F-13 Redesign (Midnight Blue) | Pending | `npm run build` (11/11 routes) | Passed | Dark Academic editorial aesthetic, ThemeProvider with dark/light mode toggle & persistence, split Solve workspace, dual quiz modes (Exam/Practice), grouped history |
+| 2026-11-03 | M14 System Integration | Pending | `pytest -v` (118 tests) | Passed | E2E-001..005 pass; text learning journey, chat follow-up context, image extraction to solve, summary to quiz pipeline, cross-user isolation |
 
 ## Failed checks and known issues
 

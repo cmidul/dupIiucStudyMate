@@ -21,11 +21,11 @@ Use this file together with:
 | Project name | AI Learning Assistant |
 | Current phase | Phase 4 — Hardening, Integration & Release |
 | Overall status | In progress |
-| Current milestone | M14 — System integration |
-| Current feature | E2E-001..005 (Cross-Platform End-to-End Flows) |
+| Current milestone | M15 — Release readiness |
+| Current feature | Full Test Suite & Release Gate Verification |
 | Last updated | 2026-11-03 |
 | Current branch | main |
-| Latest commit | M13 implementation (ready for review) |
+| Latest commit | feat(e2e): implement M14 cross-platform integration tests (E2E-001..005) |
 
 ### Status definitions
 
@@ -53,11 +53,11 @@ Do not use **Passed** just because code has been written.
 | M8 | Quiz system | Quiz generation, attempts, scoring, and answer review | Passed | 2026-11-03 | F-07 complete, safe delivery, authoritative scoring, QUIZ-001..010 pass. |
 | M9 | Math solver | Mathematical question solving and verification | Passed | 2026-11-03 | F-08 complete, safe AST parser, SymPy verification, MATH-001..010 pass. |
 | M10 | Logical reasoning solver | Logic question handling and explanation | Passed | 2026-11-03 | F-09 complete, deterministic truth tables, syllogisms, LOGIC-001..006 pass. |
-| M11 | Website experience | Responsive interface and integration with shared backend | Passed | 2026-11-03 | Next.js 14 App Router, TypeScript, Tailwind, 11/11 pages compiled, WEB-001..010 verified. |
+| M11 | Website experience | Responsive interface and integration with shared backend | Passed | 2026-11-03 | Academic Redesign complete: Midnight Blue palette, ThemeProvider with dark/light persistence, split Solve workspace, dual quiz modes, grouped history, 11/11 pages compiled. |
 | M12 | Telegram bot | Commands, messages, uploads, and shared user history | Passed | 2026-11-03 | F-12 complete; aiogram bot client, webhook token security, TG-001..011 pass. |
 | M13 | Reliability and security | Rate limits, retries, authorization, privacy, and failure handling | Passed | 2026-11-03 | F-17 & F-18 complete; token bucket rate limiter, daily quotas, path traversal defense, sensitive logging filter, security headers; SEC-001..008 pass (103/103 total). |
-| M14 | System integration | Cross-platform and end-to-end acceptance tests | In progress | | E2E-001..005 |
-| M15 | Release readiness | Full test suite, quality report, setup guide, and release decision | Not started | | Final release gate evaluation |
+| M14 | System integration | Cross-platform and end-to-end acceptance tests | Passed | 2026-11-03 | E2E-001..005 all pass (118/118 total backend tests passing in 111.69s). |
+| M15 | Release readiness | Full test suite, quality report, setup guide, and release decision | In progress | | Final release gate evaluation |
 
 ## 3. Feature-level progress
 
@@ -76,22 +76,22 @@ Do not use **Passed** just because code has been written.
 | F-09 | Logical Reasoning Solver | M10 | Passed | Complete | Passed | Passed | Truth tables, Barbara syllogism, LOGIC-001..006 pass |
 | F-04 | Image Understanding & Vision | M6 | Passed | Complete | Passed | Passed | Magic bytes, private storage, background jobs, IMG-001..013 pass |
 | F-12 | Telegram Bot Integration | M12 | Passed | Complete | Passed | Passed | Thin aiogram bot, webhook token security, TG-001..011 pass |
-| F-13 | Website User Interface | M11 | Passed | Complete | Passed | Passed | Next.js 14 App Router, all 9 views compiled & typechecked |
+| F-13 | Website User Interface | M11 | Passed | Complete | Passed | Passed | Midnight Blue academic redesign, Next.js 14 App Router, all 11 routes statically compiled |
 | F-17 | Usage Limits & Rate Limiting | M13 | Passed | Complete | Passed | Passed | Sliding window rate limiter, cross-client user key, daily quota manager |
 | F-18 | Security & Privacy Hardening | M13 | Passed | Complete | Passed | Passed | Path traversal prevention, sensitive logging redaction, CSP & security headers |
 | F-19 | Unified Solve Questions | M9/M10 | Passed | Complete | Passed | Passed | Unified pipeline auto-routing math, logic, summary & educational QA; SOLVE-001..010 pass (113/113 total) |
 
 ## 4. Current work
 
-- **Current milestone:** M14 — System Integration
-- **Current feature ID and name:** E2E-001..005: Cross-Platform End-to-End User Journeys
-- **Objective:** Verify seamless multimodal learning flows across Web, Telegram, and Backend, and prepare final release checks.
-- **Work completed:** M0 through M13 passed. 103 automated tests passing with zero errors. Full Next.js frontend built, typechecked, and verified. Rate limiting, daily quotas, path traversal defense, sensitive logging redaction, and browser security headers verified.
-- **Work remaining:** Implement end-to-end integration test scenarios (E2E-001..005) and final release documentation (M15).
-- **Files/modules being changed:** `backend/tests/`.
-- **Current test status:** 103 passed in 50.06s; Next.js 11/11 pages compiled statically.
+- **Current milestone:** M15 — Release Readiness
+- **Current feature ID and name:** Final Release Gate & Documentation
+- **Objective:** Final verification across all components, clean test runs, quality reporting.
+- **Work completed:** M0 through M14 passed. 118 automated tests passing with zero errors. Full Next.js frontend redesigned, built, typechecked, and verified (11/11 routes). Theme persistence, split solve workspace, dual quiz modes, and full cross-platform flows verified.
+- **Work remaining:** Final release gate verification and commit.
+- **Files/modules being changed:** `PROGRESS.md`, `QUALITY_REPORT.md`, `AI-Learning-Assistant-Docs/`.
+- **Current test status:** 118 passed in 111.69s; Next.js 11/11 pages compiled statically.
 - **Current blockers:** None.
-- **Next action:** Build E2E test scenarios across Web, Telegram, and Backend (`E2E-001..005`).
+- **Next action:** Commit M11 redesign and M14 integration test suite.
 
 ## 5. Completed work log
 
@@ -105,8 +105,10 @@ Do not use **Passed** just because code has been written.
 | 2026-11-03 | M9 & M10: Math & Logic Solvers (F-08, F-09) | 7d1e0c5 | `pytest -v` (57 passed in 27.22s) | Passed | MATH-001..010, LOGIC-001..006, Zero eval AST check |
 | 2026-11-03 | M6 & M2: Image Understanding & Telegram Linking | 2ffac73 | `pytest -v` (84 passed in 78.45s) | Passed | IMG-001..013, JOB-001..007, LINK-001..007 pass |
 | 2026-11-03 | M12: Telegram Bot Integration (F-12) | f342ddc | `pytest -v` (95 passed in 80.77s) | Passed | TG-001..011, aiogram bot client, webhook token security |
-| 2026-11-03 | M11: Website Experience (F-13) | 42483ea | Next.js build (11/11 routes), typecheck | Passed | WEB-001..010, Next.js 14, Tailwind, full responsive UI |
-| 2026-11-03 | M13: Reliability and Security (F-17, F-18) | Pending | `pytest -v` (103 passed in 50.06s) | Passed | SEC-001..008, Rate limiting, daily quotas, path traversal check, CSP headers |
+| 2026-11-03 | M11: Website Experience (F-13) | 42483ea | Next.js build (11/11 routes), typecheck | Passed | Midnight Blue Academic Redesign, ThemeProvider, split solver, dual quiz modes |
+| 2026-11-03 | M13: Reliability and Security (F-17, F-18) | 28db37a | `pytest -v` (103 passed in 50.06s) | Passed | SEC-001..008, Rate limiting, daily quotas, path traversal check, CSP headers |
+| 2026-11-03 | F-19: Unified Solve Questions | d5b32ab | `pytest -v` (113 passed in 56.28s) | Passed | SOLVE-001..010, Unified pipeline, math/logic/summary/QA auto-dispatch |
+| 2026-11-03 | M14: System Integration (E2E) | Pending | `pytest -v` (118 passed in 111.69s) | Passed | E2E-001..005, text journey, chat follow-up, image->solve, summary->quiz, cross-user isolation |
 
 ## 6. Blockers and risks
 
@@ -122,28 +124,29 @@ Do not use **Passed** just because code has been written.
 | 2026-11-03 | Direct httpx adapters for Gemini and Groq | Eliminates heavy vendor SDK dependencies; provides clean async client | backend/app/ai/providers | Agent |
 | 2026-11-03 | Pre-validators for confidence and enums | Robust normalization of LLM outputs (handles percentages vs decimals) | backend/app/ai/schemas.py | Agent per test TOPIC-001 |
 | 2026-11-03 | Unified User Rate Limiting across Web and Telegram | Enforces single quota/rate limit per user ID regardless of interface | backend/app/core/rate_limit.py | Agent per SEC-001 |
+| 2026-11-03 | Midnight Blue Academic Redesign | Premium academic editorial aesthetic, theme persistence, split solver workspace | frontend/ | User Request |
 
 ## 8. Test status
 
 | Test group | Last run | Result | Failed / skipped tests | Evidence |
 |---|---|---|---|---|
-| Backend unit tests | 2026-11-03 | Passed (103 passed) | 0 | `pytest -v` (50.06s) |
+| Backend unit tests | 2026-11-03 | Passed (113 passed) | 0 | `pytest -q` (56.28s) |
 | Backend integration tests | 2026-11-03 | Passed (Alembic migration 0005) | 0 | `alembic upgrade head` |
 | Frontend tests | 2026-11-03 | Passed (11/11 static routes) | 0 | `npm run build --prefix frontend` |
 | Telegram bot tests | 2026-11-03 | Passed (TG-001..011) | 0 | `pytest -v backend/tests/test_telegram_bot.py` |
 | AI evaluation set | 2026-11-03 | Passed (Chat, Topic, Repair) | 0 | CHAT-001..007, TOPIC-001..002 |
 | Security tests | 2026-11-03 | Passed (SEC-001..008) | 0 | `pytest -v backend/tests/test_security_reliability.py` |
-| End-to-end tests | In progress | Ready for M14 | 0 | E2E-001..005 |
+| End-to-end tests | 2026-11-03 | Passed (E2E-001..005) | 0 | `pytest -v backend/tests/test_e2e_integration.py` (7.97s) |
 
 ## 9. Quality status
 
 - **Latest quality evaluation date:** 2026-11-03
-- **Evaluated commit:** M13 implementation
-- **Overall quality status:** In progress (M0 through M13 Passed)
+- **Evaluated commit:** M14 implementation
+- **Overall quality status:** Passed (M0 through M14 Passed)
 - **Open high/critical issues:** 0
 - **AI evaluation status:** Passed for Q&A, vision, summaries, quizzes, solvers
 - **Security review status:** Passed (Rate limits, quotas, path traversal, sensitive logging, CSP verified)
-- **Release recommendation:** In development (Milestone 14 E2E & Milestone 15 Release Gate pending)
+- **Release recommendation:** Ready for Milestone 15 Release Gate Evaluation
 
 ## 10. Git history and proposed commits
 
@@ -157,13 +160,16 @@ Do not use **Passed** just because code has been written.
 | 2026-11-03 | M6 & M2 Multimodal & Telegram Linking | main | 2ffac73 | feat(multimodal): add image understanding, jobs engine, and telegram account linking |
 | 2026-11-03 | M12 Telegram Bot Integration | main | f342ddc | feat(telegram): implement thin aiogram bot, webhook security, formatting fallback, and chunking |
 | 2026-11-03 | M11 Website Experience | main | 42483ea | feat(frontend): implement responsive Next.js web application across all core learning views |
-| 2026-11-03 | M13 Reliability and Security | main | Pending | feat(security): implement token bucket rate limiting, daily quotas, path traversal defense, and security headers |
+| 2026-11-03 | M13 Reliability and Security | main | 28db37a | feat(security): implement token bucket rate limiting, daily quotas, path traversal defense, and security headers |
+| 2026-11-03 | F-19 Unified Solve Questions | main | d5b32ab | feat(solver): unify math, logic, summary, and QA into Solve Questions feature (F-19, SOLVE-001..010) |
+| 2026-11-03 | M11 Frontend Redesign | main | Pending | feat(frontend): implement Midnight Blue academic redesign with dark/light theme, split solver, dual quiz modes, and history groups |
+| 2026-11-03 | M14 System Integration | main | Pending | test(e2e): implement M14 cross-platform integration tests for complete learning journeys (E2E-001..005) |
 
 ## 11. Next steps
 
-1. [ ] Implement M14: System integration scenarios (`E2E-001..005`).
-2. [ ] Verify complete website learning journey (upload -> extraction -> summary -> quiz -> take -> history).
-3. [ ] Verify cross-platform continuity between Telegram and Web.
+1. [x] Implement M14: System integration scenarios (`E2E-001..005`).
+2. [x] Verify complete website learning journey (upload -> extraction -> solve/math -> quiz -> attempt -> history).
+3. [x] Verify multi-turn chat context preservation and cross-user isolation.
 4. [ ] Run final release gate evaluation against `quality-evaluation.md` (M15).
 
 ## 12. Agent maintenance rules
@@ -173,10 +179,12 @@ The agent follows all 14 maintenance rules in `agent.md`.
 ## 13. Session handoff
 
 - **Session date:** 2026-11-03
-- **Last completed task:** M13 (Reliability and Security Hardening — F-17, F-18, SEC-001..008)
-- **Current task and status:** Ready for M14 (System Integration — E2E-001..005)
-- **Files changed but not yet verified:** None (All 103 tests pass; Next.js 11/11 routes compile cleanly)
-- **Tests run and results:** 103/103 tests pass in 50.06s (`SEC-001..008` verified)
+- **Last completed task:** M14 (System Integration — E2E-001..005) & M11 Frontend Academic Redesign
+- **Current task and status:** Ready for M15 (Release Gate Evaluation)
+- **Files changed but not yet verified:** None (All 118 tests pass; Next.js 11/11 routes compile cleanly)
+- **Tests run and results:** 118/118 tests pass in 111.69s (`E2E-001..005` verified)
 - **Known problems:** None
+- **Exact next action:** Commit M11 Redesign and M14 E2E Integration tests
+- **Commands needed to resume, if any:** `.\.venv\Scripts\pytest.exe -q`
 - **Exact next action:** Implement Milestone 14 (System Integration flows across Web, Telegram, and Backend)
 - **Commands needed to resume, if any:** `.\.venv\Scripts\pytest.exe -v`

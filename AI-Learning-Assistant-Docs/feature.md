@@ -730,69 +730,51 @@ Use short opaque callback identifiers. Do not place sensitive data or full promp
 
 ---
 
-## 17. F-13 — Website interfaces
+## 17. F-13 — Website interfaces (Academic Workspace Redesign)
 
-### Dashboard
+The web frontend is implemented in Next.js 14 App Router, TypeScript, and Tailwind CSS. It follows a **Dark Academic / Midnight Blue** editorial visual identity (`#070a12`, `#0b0f19`, `#0f1524`, `#10b981` emerald accents) designed for serious research and focused study, completely avoiding generic AI gradients, glowing borders, or glassmorphism.
 
-Display:
-- Welcome message
-- Ask/upload input
-- Quick actions
-- Recent conversations
-- Recent summaries
-- Recent quizzes and scores
-- Usage information, if enabled
+### Design System & Theme Engine
+- **Midnight Blue Palette**: Academic palette with deep midnight layers (`midnight-950` to `midnight-600`), restrained scholar emerald accents (`#10b981`), and subtle border dividers.
+- **Dual Theme Support**: System dark mode by default with full, high-contrast Light Mode support. Theme preference is persisted client-side via `ThemeProvider` and `localStorage` (`studymate_theme`).
+- **Collapsible Sidebar**: Clean editorial navigation bar with collapsible state, section headers, active route highlights, user profile badge, and one-click dark/light theme toggle.
 
-### AI chat
+### Workspace Homepage (`/`)
+- Academic workspace-first layout with instant Quick Solve input box.
+- Direct jump links to Solve Questions, Chat, Summaries, Quizzes, and Upload.
+- Real-time recent activity feeds (Conversations, Summaries, Quizzes) fetched from the shared backend.
+- Learning stats and quick system status.
 
-Support:
-- Conversation list
-- New conversation
-- Message history
-- Text input
-- Image upload
-- Processing indicators
-- Follow-up questions
-- Error and retry states
+### Unified Solve Questions Workspace (`/solve`)
+- Split-screen workspace layout: input and configuration on the left/top, structured solution and conversation on the right.
+- Multi-input support: direct mathematical equations, logic problems, educational passages, or direct drag-and-drop image upload.
+- Context-aware presentation: renders LaTeX formulas, step-by-step logic derivations, structured summary sections, or pedagogical concept points based on detected `task_type`.
+- Threaded follow-up discussion composer preserving context.
 
-### Upload/analyze
+### Quiz Generator & Workspace (`/quizzes`)
+- Dual Quiz Modes:
+  - **Examination Mode**: Formal timed exam mode with clean radio options, progress bar, answer secrecy enforcement, and authoritative review upon final submission.
+  - **Practice Mode**: Interactive study mode with immediate step-by-step explanations and answer review per question.
+- Quiz creation by topic or passage source, configurable difficulty, and question count.
 
-Support:
-- Drag-and-drop and file picker
-- Upload progress
-- Processing status
-- Extracted text and topic
-- Uncertainty warnings
-- Summarize and Generate Quiz actions
+### AI Chat Interface (`/chat`)
+- Editorial conversational layout with distinct user/assistant typography.
+- Markdown rendering with code blocks, tables, and LaTeX math notation.
+- Thread management and message history.
 
-### Summary workspace
+### Summary Workspace (`/summaries`)
+- Structured multi-style summary generator (Short, Detailed, Exam Notes).
+- Deep reading view with key terms glossary, revision points, and one-click copy to clipboard.
 
-Support:
-- Structured summary rendering
-- Style indicator
-- Source link
-- Copy action
-- Regenerate action subject to usage limits
+### Chronological Learning History (`/history`)
+- Grouped activity timeline: Today, Yesterday, Last 7 Days, and Older.
+- Real-time search filtering across conversations, quizzes, and summaries.
+- Direct resource linking and secure delete actions.
 
-### Quiz workspace
-
-Support:
-- Question navigation
-- Answer selection
-- Progress indicator
-- Submit confirmation
-- Score and explanations
-- Review of correct and incorrect answers
-
-### Solver pages
-
-Support:
-- Text input
-- Optional image input
-- Step-by-step result
-- Final answer
-- Verification status where relevant
-- Follow-up question
+### Settings & Preferences (`/settings`)
+- Profile overview and quota usage indicators.
+- Practical Learning Preferences: default difficulty, summary style, and math domain.
+- Telegram Account Linking workflow with deep-link generation and one-click copy.
 
 ### General UI requirements
 
@@ -800,6 +782,8 @@ Support:
 - Accessible labels and keyboard navigation.
 - Clear loading, empty, success, and error states.
 - Never display raw stack traces or provider errors.
+- Consistent visual design across both dark and light modes.
+- Preserve unsent input after recoverable failures.
 - Consistent visual design.
 - Preserve unsent input after recoverable failures.
 
