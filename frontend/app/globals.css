@@ -72,3 +72,26 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.4);
 }
+
+/* Print Stylesheet for Academic Papers & Solved Solutions */
+@media print {
+  nav, aside, header, button, .no-print {
+    display: none !important;
+  }
+  body, main {
+    background: #ffffff !important;
+    color: #111827 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+  .print-clean {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+

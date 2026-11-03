@@ -12,9 +12,11 @@ from app.api.v1.solvers import router as solvers_router
 from app.api.v1.summaries import router as summaries_router
 from app.api.v1.telegram import router as telegram_router
 from app.api.v1.uploads import router as uploads_router
+from app.api.v1.ai_settings import router as ai_settings_router
 
 api_v1_router = APIRouter(prefix="/api/v1")
 api_v1_router.include_router(health_router)
+api_v1_router.include_router(ai_settings_router)
 api_v1_router.include_router(auth_router)
 api_v1_router.include_router(telegram_router)
 api_v1_router.include_router(conversations_router)

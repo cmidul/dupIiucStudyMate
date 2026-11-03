@@ -21,6 +21,9 @@ import {
   FileCode,
   Table,
   Check,
+  Download,
+  Printer,
+  Copy,
 } from "lucide-react";
 import {
   api,
@@ -28,6 +31,7 @@ import {
   TaskType,
   UnifiedFollowUpResponse,
 } from "@/lib/api";
+import { MathBlock, FormattedTextWithMath } from "@/components/MathRenderer";
 
 interface FollowUpMessage {
   role: "user" | "assistant";
@@ -56,8 +60,69 @@ function SolveWorkspaceContent() {
   const [followUpInput, setFollowUpInput] = useState("");
   const [followUpLoading, setFollowUpLoading] = useState(false);
   const [followUpThread, setFollowUpThread] = useState<FollowUpMessage[]>([]);
+  const [copiedSolution, setCopiedSolution] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const generateSolutionMarkdown = () => {
+    if (!solution) return "";
+    let md = `# ${solution.title}\n\n`;
+    md += `**Task:** ${solution.task_label} (${solution.task_type})\n\n`;
+    md += `## Conclusion / Answer\n\n${solution.summary_or_answer}\n\n`;
+
+    if (solution.task_type === "mathematics" && solution.math_solution?.steps) {
+      md += `## Mathematical Derivation\n\n`;
+      solution.math_solution.steps.forEach((st: any, idx: number) => {
+        md += `### Step ${st.step || idx + 1}: ${st.explanation}\n`;
+        if (st.expression) {
+          md += `$$\n${st.expression}\n$$\n\n`;
+        }
+      });
+    }
+
+    if (solution.task_type === "logical_reasoning" && solution.logic_solution?.reasoning_steps) {
+      md += `## Formal Logical Reasoning\n\n`;
+      solution.logic_solution.reasoning_steps.forEach((st: string) => {
+        md += `- ${st}\n`;
+      });
+    }
+
+    if (solution.task_type === "general_educational" && solution.educational_solution?.steps) {
+      md += `## Pedagogical Explanation\n\n`;
+      solution.educational_solution.steps.forEach((st: any) => {
+        md += `### ${st.step}. ${st.title}\n${st.explanation}\n\n`;
+      });
+    }
+
+    return md;
+  };
+
+  const handleCopySolution = () => {
+    const md = generateSolutionMarkdown();
+    if (!md) return;
+    navigator.clipboard.writeText(md);
+    setCopiedSolution(true);
+    setTimeout(() => setCopiedSolution(false), 2000);
+  };
+
+  const handleExportMarkdown = () => {
+    const md = generateSolutionMarkdown();
+    if (!md) return;
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const safeTitle = (solution?.title || "solution").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    link.href = url;
+    link.download = `${safeTitle}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   // Pre-fill from query string if available
   useEffect(() => {
@@ -443,13 +508,58 @@ function SolveWorkspaceContent() {
                     </h2>
                   </div>
 
-                  {/* Verification Pill */}
-                  {solution.math_solution?.verification && (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-midnight-700 text-[11px] font-mono text-scholar-emerald">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>SymPy Verified ({solution.math_solution.verification.status})</span>
-                    </div>
-                  )}
+                  {/* Actions & Verification Bar */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Copy Solution Button */}
+                    <button
+                      type="button"
+                      onClick={handleCopySolution}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-50 dark:bg-midnight-800 hover:bg-slate-100 dark:hover:bg-midnight-700 border border-slate-200 dark:border-midnight-700 text-[11px] font-mono text-slate-700 dark:text-slate-300 transition"
+                      title="Copy full solution as Markdown"
+                    >
+                      {copiedSolution ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-scholar-emerald" />
+                          <span className="text-scholar-emerald">Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-slate-400" />
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </button>
+
+                    {/* Export Markdown Button */}
+                    <button
+                      type="button"
+                      onClick={handleExportMarkdown}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-50 dark:bg-midnight-800 hover:bg-slate-100 dark:hover:bg-midnight-700 border border-slate-200 dark:border-midnight-700 text-[11px] font-mono text-slate-700 dark:text-slate-300 transition"
+                      title="Export solution as .md file"
+                    >
+                      <Download className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Export .md</span>
+                    </button>
+
+                    {/* Print / PDF Button */}
+                    <button
+                      type="button"
+                      onClick={handlePrint}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-50 dark:bg-midnight-800 hover:bg-slate-100 dark:hover:bg-midnight-700 border border-slate-200 dark:border-midnight-700 text-[11px] font-mono text-slate-700 dark:text-slate-300 transition"
+                      title="Print or save as PDF"
+                    >
+                      <Printer className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Print / PDF</span>
+                    </button>
+
+                    {/* Verification Pill */}
+                    {solution.math_solution?.verification && (
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-midnight-700 text-[11px] font-mono text-scholar-emerald">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>SymPy Verified ({solution.math_solution.verification.status})</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Conclusion / High-Level Result Block */}
@@ -458,7 +568,7 @@ function SolveWorkspaceContent() {
                     {solution.task_type === "summarization" ? "Core Overview" : "Final Derivation / Conclusion"}
                   </div>
                   <div className="text-sm font-semibold font-mono text-emerald-600 dark:text-emerald-300 leading-relaxed">
-                    {solution.summary_or_answer}
+                    <FormattedTextWithMath text={solution.summary_or_answer} />
                   </div>
                 </div>
 
@@ -473,17 +583,21 @@ function SolveWorkspaceContent() {
                       {solution.math_solution.steps?.map((step: any, idx: number) => (
                         <div
                           key={idx}
-                          className="p-3 rounded-lg border border-slate-200 dark:border-midnight-700 bg-slate-50 dark:bg-midnight-800 space-y-1"
+                          className="p-3 rounded-lg border border-slate-200 dark:border-midnight-700 bg-slate-50 dark:bg-midnight-800 space-y-1.5"
                         >
-                          <div className="flex items-center gap-2 text-xs font-medium text-slate-800 dark:text-slate-200">
-                            <span className="w-4 h-4 rounded bg-slate-200 dark:bg-midnight-950 border border-slate-300 dark:border-midnight-700 flex items-center justify-center font-mono text-[10px] text-scholar-emerald">
+                          <div className="flex items-start gap-2 text-xs font-medium text-slate-800 dark:text-slate-200">
+                            <span className="w-4 h-4 rounded bg-slate-200 dark:bg-midnight-950 border border-slate-300 dark:border-midnight-700 flex items-center justify-center font-mono text-[10px] text-scholar-emerald flex-shrink-0 mt-0.5">
                               {step.step || idx + 1}
                             </span>
-                            <span>{step.explanation}</span>
+                            <FormattedTextWithMath text={step.explanation} className="leading-relaxed" />
                           </div>
                           {step.expression && (
-                            <div className="pl-6 font-mono text-xs text-slate-800 dark:text-slate-300 bg-white dark:bg-midnight-950 p-2 rounded border border-slate-200 dark:border-midnight-700 overflow-x-auto">
-                              {step.expression}
+                            <div className="pl-6 py-1">
+                              <MathBlock
+                                content={step.expression}
+                                block={true}
+                                className="text-slate-900 dark:text-slate-100 bg-white dark:bg-midnight-950 p-3 rounded border border-slate-200 dark:border-midnight-700 shadow-xs"
+                              />
                             </div>
                           )}
                         </div>
@@ -587,9 +701,10 @@ function SolveWorkspaceContent() {
                           <div className="text-xs font-semibold text-scholar-emerald">
                             {st.step}. {st.title}
                           </div>
-                          <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-                            {st.explanation}
-                          </p>
+                          <FormattedTextWithMath
+                            text={st.explanation}
+                            className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed"
+                          />
                         </div>
                       ))}
                     </div>
@@ -618,7 +733,7 @@ function SolveWorkspaceContent() {
                         <span className="text-[10px] font-mono uppercase text-slate-400 block mb-1">
                           {msg.role === "user" ? "Query" : "Explanation"}
                         </span>
-                        <div className="whitespace-pre-wrap">{msg.content}</div>
+                        <FormattedTextWithMath text={msg.content} className="whitespace-pre-wrap" />
                       </div>
                     ))}
                   </div>

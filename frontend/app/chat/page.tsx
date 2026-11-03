@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { api, Conversation, Message, TopicMetadata } from "@/lib/api";
+import { FormattedTextWithMath } from "@/components/MathRenderer";
 
 function ChatComponent() {
   const searchParams = useSearchParams();
@@ -218,11 +219,11 @@ function ChatComponent() {
                 <div
                   className={`max-w-2xl px-5 py-3.5 rounded-2xl text-xs md:text-sm leading-relaxed ${
                     m.role === "user"
-                      ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-950 rounded-br-none shadow-sm"
+                      ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-950 rounded-br-none shadow-sm whitespace-pre-wrap"
                       : "bg-white dark:bg-midnight-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-bl-none shadow-sm whitespace-pre-wrap font-sans"
                   }`}
                 >
-                  {m.content}
+                  <FormattedTextWithMath text={m.content} />
                 </div>
 
                 {/* Inline follow-up actions for assistant replies */}

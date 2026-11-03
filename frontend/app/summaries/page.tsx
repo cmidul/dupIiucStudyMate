@@ -13,9 +13,12 @@ import {
   AlertCircle,
   Loader2,
   ArrowRight,
+  Download,
+  Printer,
 } from "lucide-react";
 import Link from "next/link";
 import { api, Summary } from "@/lib/api";
+import { MathBlock, FormattedTextWithMath } from "@/components/MathRenderer";
 
 function SummariesComponent() {
   const searchParams = useSearchParams();
@@ -82,6 +85,44 @@ ${summary.content.examples.map((e) => `• ${e}`).join("\n")}
     navigator.clipboard.writeText(textToCopy);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleExportMarkdown = () => {
+    if (!summary) return;
+    const textToExport = `
+# ${summary.title} (${summary.style})
+*Topic: ${summary.topic}*
+
+## Executive Overview
+${summary.overview}
+
+## Key Analytical Takeaways
+${summary.content.key_points.map((p) => `- ${p}`).join("\n")}
+
+## Canonical Definitions
+${summary.content.important_definitions.map((d) => `- ${d}`).join("\n")}
+
+## Mathematical Expressions & Theorems
+${summary.content.formulas.map((f) => `- ${f}`).join("\n")}
+
+## Illustrative Examples
+${summary.content.examples.map((e) => `- ${e}`).join("\n")}
+    `.trim();
+
+    const blob = new Blob([textToExport], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const safeTitle = (summary.title || "summary").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    link.href = url;
+    link.download = `summary-${safeTitle}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handlePrint = () => {
+    window.print();
   };
 
   return (
@@ -201,23 +242,49 @@ ${summary.content.examples.map((e) => `• ${e}`).join("\n")}
               </h2>
               <p className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1">Topic: {summary.topic}</p>
             </div>
-            <button
-              onClick={handleCopy}
-              className="p-2 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-midnight-950 transition flex items-center gap-1.5 text-xs font-mono"
-              aria-label="Copy summary to clipboard"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-3.5 h-3.5 text-scholar-emerald" />
-                  <span className="text-scholar-emerald">Copied</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5" />
-                  <span>Copy</span>
-                </>
-              )}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="p-2 border border-slate-200 dark:border-midnight-700 bg-slate-50 dark:bg-midnight-800 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-midnight-700 transition flex items-center gap-1.5 text-xs font-mono"
+                aria-label="Copy summary to clipboard"
+                title="Copy summary"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-scholar-emerald" />
+                    <span className="text-scholar-emerald">Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>Copy</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleExportMarkdown}
+                className="p-2 border border-slate-200 dark:border-midnight-700 bg-slate-50 dark:bg-midnight-800 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-midnight-700 transition flex items-center gap-1.5 text-xs font-mono"
+                aria-label="Export summary as Markdown"
+                title="Export .md file"
+              >
+                <Download className="w-3.5 h-3.5 text-slate-400" />
+                <span>Export .md</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="p-2 border border-slate-200 dark:border-midnight-700 bg-slate-50 dark:bg-midnight-800 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-midnight-700 transition flex items-center gap-1.5 text-xs font-mono"
+                aria-label="Print or save as PDF"
+                title="Print / PDF"
+              >
+                <Printer className="w-3.5 h-3.5 text-slate-400" />
+                <span>Print / PDF</span>
+              </button>
+            </div>
           </div>
 
           {/* Overview */}
@@ -225,9 +292,9 @@ ${summary.content.examples.map((e) => `• ${e}`).join("\n")}
             <h3 className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-2">
               Executive Overview
             </h3>
-            <p className="text-xs md:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-sans">
-              {summary.overview}
-            </p>
+            <div className="text-xs md:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-sans">
+              <FormattedTextWithMath text={summary.overview} />
+            </div>
           </div>
 
           {/* Key Points */}
@@ -266,9 +333,9 @@ ${summary.content.examples.map((e) => `• ${e}`).join("\n")}
               <h3 className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-2">
                 Mathematical Expressions & Theorems
               </h3>
-              <div className="p-3.5 bg-slate-50 dark:bg-midnight-950 rounded-xl border border-slate-200 dark:border-slate-800 font-mono text-xs text-scholar-emerald space-y-1">
+              <div className="p-3.5 bg-slate-50 dark:bg-midnight-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
                 {summary.content.formulas.map((f, idx) => (
-                  <div key={idx}>{f}</div>
+                  <MathBlock key={idx} content={f} block={true} className="text-scholar-emerald" />
                 ))}
               </div>
             </div>

@@ -1,4 +1,5 @@
 import "./globals.css";
+import "katex/dist/katex.min.css";
 import React from "react";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";

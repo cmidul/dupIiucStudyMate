@@ -17,8 +17,13 @@ import {
   BookOpen,
   Check,
   Save,
+  Cpu,
+  Sparkles,
+  Key,
+  Eye,
+  EyeOff,
 } from "lucide-react";
-import { api, TelegramStatus, TelegramLinkToken, User } from "@/lib/api";
+import { api, TelegramStatus, TelegramLinkToken, User, AIStatusResponse } from "@/lib/api";
 import { useTheme } from "@/components/ThemeProvider";
 
 interface LearningPreferences {
@@ -53,10 +58,47 @@ export default function SettingsPage() {
   const [name, setName] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
 
+  // AI Provider & API Key state
+  const [aiStatus, setAiStatus] = useState<AIStatusResponse | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<string>("mock");
+  const [apiKeyInput, setApiKeyInput] = useState("");
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [aiSaving, setAiSaving] = useState(false);
+
   useEffect(() => {
     loadUser();
     loadPreferences();
+    loadAIStatus();
   }, []);
+
+  async function loadAIStatus() {
+    try {
+      const res = await api.getAIStatus();
+      setAiStatus(res);
+      setSelectedProvider(res.active_provider);
+    } catch {
+      // ignore
+    }
+  }
+
+  const handleConfigureAI = async (provider: string, key?: string) => {
+    setAiSaving(true);
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    try {
+      const res = await api.configureAI({ provider, api_key: key });
+      setSuccessMsg(res.message);
+      const updated = await api.getAIStatus();
+      setAiStatus(updated);
+      setSelectedProvider(updated.active_provider);
+      setApiKeyInput("");
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      setErrorMsg(error.message || "Failed to configure AI engine.");
+    } finally {
+      setAiSaving(false);
+    }
+  };
 
   function loadPreferences() {
     try {
@@ -362,7 +404,203 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Section 3: Telegram Account Synchronization */}
+        {/* Section 3: AI Provider & API Key Integration */}
+        <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
+          <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-scholar-emerald">
+              <Cpu className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-base font-serif font-semibold text-slate-900 dark:text-slate-100">
+                AI Intelligence Engine & API Keys
+              </h2>
+              <p className="text-xs text-slate-400">
+                Select your backend AI provider and configure API keys for live synthesis, solving, and multimodal vision.
+              </p>
+            </div>
+          </div>
+
+          {/* Provider Selection Tabs */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              {
+                id: "mock",
+                name: "Mock Engine",
+                badge: "Offline / Free",
+                desc: "Instant deterministic responses for testing without external credentials",
+              },
+              {
+                id: "gemini",
+                name: "Google Gemini",
+                badge: "Multimodal Vision",
+                desc: "Live reasoning & vision analysis via Gemini 2.0 Flash",
+              },
+              {
+                id: "groq",
+                name: "Groq Llama 3.3",
+                badge: "Ultra Low-Latency",
+                desc: "High-speed open-source inference via Llama 3.3 70B",
+              },
+            ].map((p) => {
+              const isSelected = selectedProvider === p.id;
+              const isCurrentActive = aiStatus?.active_provider === p.id;
+              const isConfigured = aiStatus?.providers?.[p.id]?.configured;
+
+              return (
+                <div
+                  key={p.id}
+                  onClick={() => setSelectedProvider(p.id)}
+                  className={`p-4 rounded-xl border cursor-pointer transition flex flex-col justify-between ${
+                    isSelected
+                      ? "bg-slate-50 dark:bg-midnight-950 border-scholar-emerald shadow-xs"
+                      : "bg-white dark:bg-midnight-850 border-slate-200 dark:border-midnight-700 hover:border-slate-300 dark:hover:border-midnight-600"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-1 mb-1">
+                      <span className="font-semibold text-xs text-slate-900 dark:text-slate-100">
+                        {p.name}
+                      </span>
+                      {isCurrentActive && (
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[10px] font-mono text-scholar-emerald mb-2">{p.badge}</div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+                      {p.desc}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 pt-2 border-t border-slate-100 dark:border-midnight-800 flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-slate-400">
+                      {isConfigured ? "Key: Configured" : "Key: Not Set"}
+                    </span>
+                    {isSelected && <Check className="w-3.5 h-3.5 text-scholar-emerald" />}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Configuration Form for Selected Provider */}
+          {selectedProvider === "mock" ? (
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                  Mock Engine Activated
+                </div>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Does not require external credentials. All mathematical and reasoning verification work offline.
+                </p>
+              </div>
+              {aiStatus?.active_provider !== "mock" && (
+                <button
+                  type="button"
+                  onClick={() => handleConfigureAI("mock")}
+                  disabled={aiSaving}
+                  className="px-4 py-2 bg-slate-900 dark:bg-scholar-emerald hover:bg-slate-800 dark:hover:bg-emerald-600 text-white dark:text-slate-950 text-xs font-semibold rounded-lg transition self-start sm:self-auto"
+                >
+                  {aiSaving ? "Switching..." : "Activate Mock Engine"}
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <Key className="w-3.5 h-3.5 text-scholar-emerald" />
+                    <span>{selectedProvider === "gemini" ? "Google Gemini API Key" : "Groq Cloud API Key"}</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    {selectedProvider === "gemini" ? (
+                      <>
+                        Provides live answers and image OCR. Free keys available at{" "}
+                        <a
+                          href="https://aistudio.google.com/app/apikey"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-scholar-emerald underline hover:opacity-80"
+                        >
+                          Google AI Studio
+                        </a>
+                        .
+                      </>
+                    ) : (
+                      <>
+                        Provides ultra-fast Llama 3.3 inference. Free keys available at{" "}
+                        <a
+                          href="https://console.groq.com/keys"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-scholar-emerald underline hover:opacity-80"
+                        >
+                          Groq Console
+                        </a>
+                        .
+                      </>
+                    )}
+                  </p>
+                </div>
+
+                {aiStatus?.providers?.[selectedProvider]?.configured && (
+                  <span className="px-2 py-0.5 text-[11px] font-mono rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 self-start sm:self-auto">
+                    Key Stored
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type={showApiKey ? "text" : "password"}
+                    value={apiKeyInput}
+                    onChange={(e) => setApiKeyInput(e.target.value)}
+                    placeholder={
+                      aiStatus?.providers?.[selectedProvider]?.configured
+                        ? "Enter new API key to update..."
+                        : selectedProvider === "gemini"
+                        ? "AIzaSy..."
+                        : "gsk_..."
+                    }
+                    className="w-full px-3 py-2 pr-10 text-xs bg-white dark:bg-midnight-900 border border-slate-200 dark:border-midnight-700 rounded-lg text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-scholar-emerald font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    title={showApiKey ? "Hide key" : "Show key"}
+                  >
+                    {showApiKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleConfigureAI(selectedProvider, apiKeyInput || undefined)}
+                  disabled={aiSaving || (!apiKeyInput.trim() && !aiStatus?.providers?.[selectedProvider]?.configured)}
+                  className="px-4 py-2 bg-slate-900 dark:bg-scholar-emerald hover:bg-slate-800 dark:hover:bg-emerald-600 disabled:opacity-50 text-white dark:text-slate-950 text-xs font-semibold rounded-lg transition flex items-center justify-center gap-1.5 flex-shrink-0"
+                >
+                  {aiSaving ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Verifying...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Activate {selectedProvider === "gemini" ? "Gemini" : "Groq"}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Section 4: Telegram Account Synchronization */}
         <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
           <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-4">
             <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-500">
