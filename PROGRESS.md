@@ -19,13 +19,13 @@ Use this file together with:
 | Field | Value |
 |---|---|
 | Project name | AI Learning Assistant |
-| Current phase | Phase 2 — Multimodal & Advanced Intelligence |
+| Current phase | Phase 3 — Interfaces & Client Delivery |
 | Overall status | In progress |
-| Current milestone | M2 — Telegram Account Linking / M12 — Telegram Bot |
-| Current feature | F-02 (Telegram Account Linking) |
+| Current milestone | M11 — Website experience |
+| Current feature | F-13 (Website Interfaces) |
 | Last updated | 2026-11-03 |
 | Current branch | main |
-| Latest commit | M6 implementation (ready for review) |
+| Latest commit | 2ffac73 |
 
 ### Status definitions
 
@@ -44,7 +44,7 @@ Do not use **Passed** just because code has been written.
 |---|---|---|---|---|---|
 | M0 | Repository inspection and setup | Existing code reviewed, environment documented, project structure ready | Passed | 2026-11-03 | Recon report delivered; .gitignore and tracking files established. |
 | M1 | Backend foundation | Application structure, configuration, database connection, health endpoint | Passed | 2026-11-03 | FastAPI app, Alembic migrations, health check, response envelopes, 9/9 tests pass. |
-| M2 | Authentication and user identity | Website accounts and Telegram account linking | In progress | | F-01 complete (AUTH-001..007 pass); F-02 (Telegram linking) pending bot setup. |
+| M2 | Authentication and user identity | Website accounts and Telegram account linking | Passed | 2026-11-03 | F-01 & F-02 complete; single-use hashed deep links; AUTH-001..007 & LINK-001..007 pass. |
 | M3 | Shared conversation system | Conversations, messages, context, and history | Passed | 2026-11-03 | Conversations & messages tables, cross-user isolation, CHAT-001..007 pass. |
 | M4 | AI provider foundation | Provider abstraction, free-provider integration, validation and error handling | Passed | 2026-11-03 | BaseAIProvider, AIRouter, Mock, Gemini, Groq adapters, AI-001..007 pass. |
 | M5 | Text question answering | Text input, intent/topic handling, answer generation | Passed | 2026-11-03 | TopicDetector, ambiguity prompts, context window, TOPIC-001..002 pass (25/25 total). |
@@ -53,8 +53,8 @@ Do not use **Passed** just because code has been written.
 | M8 | Quiz system | Quiz generation, attempts, scoring, and answer review | Passed | 2026-11-03 | F-07 complete, safe delivery, authoritative scoring, QUIZ-001..010 pass. |
 | M9 | Math solver | Mathematical question solving and verification | Passed | 2026-11-03 | F-08 complete, safe AST parser, SymPy verification, MATH-001..010 pass. |
 | M10 | Logical reasoning solver | Logic question handling and explanation | Passed | 2026-11-03 | F-09 complete, deterministic truth tables, syllogisms, LOGIC-001..006 pass. |
-| M11 | Website experience | Responsive interface and integration with shared backend | Not started | | F-13, WEB-001..010 |
-| M12 | Telegram bot | Commands, messages, uploads, and shared user history | Not started | | F-12, TG-001..011 |
+| M11 | Website experience | Responsive interface and integration with shared backend | In progress | | F-13, WEB-001..010 |
+| M12 | Telegram bot | Commands, messages, uploads, and shared user history | Passed | 2026-11-03 | F-12 complete; aiogram bot client, webhook token security, TG-001..011 pass. |
 | M13 | Reliability and security | Rate limits, retries, authorization, privacy, and failure handling | Not started | | F-17, F-18, SEC-001..008 |
 | M14 | System integration | Cross-platform and end-to-end acceptance tests | Not started | | E2E-001..005 |
 | M15 | Release readiness | Full test suite, quality report, setup guide, and release decision | Not started | | Final release gate evaluation |
@@ -69,25 +69,26 @@ Do not use **Passed** just because code has been written.
 | F-16 | AI Provider Abstraction & Routing | M4 | Passed | Complete | Passed | Passed | AI-001 through AI-007 all pass |
 | F-03 | Text Questions & AI Chat | M3/M5 | Passed | Complete | Passed | Passed | CHAT-001 through CHAT-007 all pass |
 | F-05 | Topic & Intent Detection | M5 | Passed | Complete | Passed | Passed | TOPIC-001 and TOPIC-002 pass |
-| F-02 | Telegram Account Linking | M2 | Not started | Not started | Not run | Not evaluated | Depends on Telegram bot integration (M12) |
+| F-02 | Telegram Account Linking | M2 | Passed | Complete | Passed | Passed | LINK-001 through LINK-007 all pass |
 | F-06 | Summarization Engine | M7 | Passed | Complete | Passed | Passed | Short, detailed, exam_notes, SUM-001..007 pass |
 | F-07 | Quiz Generation & Scoring | M8 | Passed | Complete | Passed | Passed | Safe answer key secrecy, scoring, QUIZ-001..010 pass |
 | F-08 | Math Problem Solver | M9 | Passed | Complete | Passed | Passed | Safe SymPy AST parsing (zero eval), MATH-001..010 pass |
 | F-09 | Logical Reasoning Solver | M10 | Passed | Complete | Passed | Passed | Truth tables, Barbara syllogism, LOGIC-001..006 pass |
 | F-04 | Image Understanding & Vision | M6 | Passed | Complete | Passed | Passed | Magic bytes, private storage, background jobs, IMG-001..013 pass |
-| F-02 | Telegram Account Linking | M2 | In progress | In progress | Not run | Not evaluated | Deep links, token expiry, identity consolidation |
+| F-12 | Telegram Bot Integration | M12 | Passed | Complete | Passed | Passed | Thin aiogram bot, webhook token security, TG-001..011 pass |
+| F-13 | Website User Interface | M11 | In progress | In progress | Not run | Not evaluated | Next.js responsive pages, shared API client |
 
 ## 4. Current work
 
-- **Current milestone:** M2 — Telegram Account Linking & M12 — Telegram Bot Integration
-- **Current feature ID and name:** F-02: Telegram Account Linking & F-12: Telegram Bot Integration
-- **Objective:** Implement secure deep-link linking token generation, token verification, Telegram user identity mapping, account linking routes, and verify with tests `LINK-001..007`.
-- **Work completed:** M0, M1, M3, M4, M5, M6, M7, M8, M9, M10 passed. 77 automated tests passing with zero errors. Multimodal image understanding, magic bytes inspection, private storage isolation, and background jobs lifecycle fully verified.
-- **Work remaining:** Implement linking tokens, Telegram webhook/bot handlers, and linked user authentication.
-- **Files/modules being changed:** `backend/app/services/telegram_link_service.py`, `backend/app/api/v1/auth.py`, `telegram-bot/`.
-- **Current test status:** 77 passed in 37.67s.
+- **Current milestone:** M11 — Website Experience & Client Integration
+- **Current feature ID and name:** F-13: Website Interfaces
+- **Objective:** Construct responsive web frontend in `frontend/` matching the required pages (Dashboard, Chat, Upload/Analyze, Summaries, Quizzes, Math/Logic Solvers, History, Settings with Telegram linking).
+- **Work completed:** M0, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M12 passed. 95 automated tests passing with zero errors. Telegram linking, bot commands, chunking, and webhooks fully verified.
+- **Work remaining:** Implement website UI and test with `WEB-001..010`.
+- **Files/modules being changed:** `frontend/`, `backend/app/api/v1/`.
+- **Current test status:** 95 passed in 80.77s.
 - **Current blockers:** None.
-- **Next action:** Build Telegram Account Linking service and routes.
+- **Next action:** Build frontend structure and components.
 
 ## 5. Completed work log
 
@@ -97,9 +98,10 @@ Do not use **Passed** just because code has been written.
 | 2026-11-03 | M1: Backend Foundation & Auth (F-01, F-14) | fed8e84 | `pytest -v` (9 passed) | Passed | AUTH-001..007, Health check, Alembic migration |
 | 2026-11-03 | M4: AI Provider Foundation (F-16) | c7ca976 | `pytest -v` (16 passed) | Passed | AI-001..007, Router, Mock/Gemini/Groq adapters |
 | 2026-11-03 | M3 & M5: Shared Chat & Topic Detection (F-03, F-05) | f8c2740 | `pytest -v` (25 passed in 7.29s) | Passed | CHAT-001..007, TOPIC-001..002, Alembic migration 0002 |
-| 2026-11-03 | M7 & M8: Summaries & Quizzes (F-06, F-07) | Pending | `pytest -v` (41 passed in 17.79s) | Passed | SUM-001..007, QUIZ-001..010, Alembic migration 0003 |
-| 2026-11-03 | M9 & M10: Math & Logic Solvers (F-08, F-09) | Pending | `pytest -v` (57 passed in 27.22s) | Passed | MATH-001..010, LOGIC-001..006, Zero eval AST check |
-| 2026-11-03 | M6: Image Understanding & Jobs (F-04) | Pending | `pytest -v` (77 passed in 37.67s) | Passed | IMG-001..013, JOB-001..007, Alembic migration 0004 |
+| 2026-11-03 | M7 & M8: Summaries & Quizzes (F-06, F-07) | ddd3d1b | `pytest -v` (41 passed in 17.79s) | Passed | SUM-001..007, QUIZ-001..010, Alembic migration 0003 |
+| 2026-11-03 | M9 & M10: Math & Logic Solvers (F-08, F-09) | 7d1e0c5 | `pytest -v` (57 passed in 27.22s) | Passed | MATH-001..010, LOGIC-001..006, Zero eval AST check |
+| 2026-11-03 | M6 & M2: Image Understanding & Telegram Linking | 2ffac73 | `pytest -v` (84 passed in 78.45s) | Passed | IMG-001..013, JOB-001..007, LINK-001..007 pass |
+| 2026-11-03 | M12: Telegram Bot Integration (F-12) | Pending | `pytest -v` (95 passed in 80.77s) | Passed | TG-001..011, aiogram bot client, webhook token security |
 
 ## 6. Blockers and risks
 

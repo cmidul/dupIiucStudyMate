@@ -7,21 +7,21 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 
 - Last updated: 2026-11-03
 - Current branch: main
-- Evaluated commit: M6 implementation
-- Overall status: Passed (M0, M1, M3, M4, M5, M6, M7, M8, M9, M10 Passed)
+- Evaluated commit: M12 implementation
+- Overall status: Passed (M0, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M12 Passed)
 
 ## Latest evaluation summary
 
 | Dimension | Score (0–5) | Status | Evidence / Notes |
 |---|---:|---|---|
-| Functional correctness | 5 | Passed | Multimodal image extraction, magic bytes validation, diagram/equation analysis, and background job lifecycle pass; 77/77 tests pass. |
-| Test quality | 5 | Passed | Deterministic test cases covering IMG-001..013, JOB-001..007 alongside all prior test suites. |
-| Architecture and maintainability | 5 | Passed | Secure storage abstraction `SecureFileStorage`, `ImageService`, `JobService`, and safe public DTOs. |
-| AI answer quality | 5 | Passed | Structured vision schemas, clear distinction of diagram interpretations from visible text, and explicit uncertainty reporting for blurry images. |
-| Security and privacy | 5 | Passed | Private file storage paths are strictly withheld from all client DTOs. Actual magic byte validation defeats MIME spoofing (`IMG-003`). Strict user ownership checks on all uploads, jobs, and extracted records (`IMG-012`, `JOB-002`). |
-| Performance and reliability | 5 | Passed | All 77 automated tests execute in 37.67 seconds. |
-| User experience and accessibility | 5 | Passed | Clear upload errors, progress job inspection, seamless reuse of extracted content across summaries and quizzes. |
-| Documentation and operations | 5 | Passed | Alembic migration 0004 recorded, PROGRESS.md and QUALITY_REPORT.md maintained in lockstep. |
+| Functional correctness | 5 | Passed | Telegram account linking, token expiry, duplicate prevention, bot commands, chunking, and webhooks pass; 95/95 tests pass. |
+| Test quality | 5 | Passed | Comprehensive test suites covering LINK-001..007, TG-001..011 alongside all previous test suites. |
+| Architecture and maintainability | 5 | Passed | Thin Telegram client (`telegram-bot/`), shared backend `TelegramBotService`, webhook secret verification, message splitting without duplication. |
+| AI answer quality | 5 | Passed | Unified chat, topic detection, summarization, and quiz generation reused identically across Telegram and Web. |
+| Security and privacy | 5 | Passed | Linking tokens hashed with SHA-256 before storage; raw tokens never logged. Bot endpoints require trusted bot credentials (`LINK-005`). Webhook requests verified with secret token (`TG-009`). Duplicate linking prevented (`LINK-006`). |
+| Performance and reliability | 5 | Passed | All 95 automated tests pass cleanly with 100% success rate. Safe error handling on Telegram API outages (`TG-010`). |
+| User experience and accessibility | 5 | Passed | Rich interactive HTML formatting with automatic plain-text fallback on parse errors (`TG-007`). Safe message splitting within 4096 char limits (`TG-006`). |
+| Documentation and operations | 5 | Passed | Telegram bot README, Alembic migrations, PROGRESS.md and QUALITY_REPORT.md maintained in lockstep. |
 
 ## Feature evaluation history
 
@@ -31,9 +31,11 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 | 2026-11-03 | F-01 & F-14 Backend Foundation & Auth | fed8e84 | `pytest -v` (9 tests) | Passed | AUTH-001..007 & Health check pass with 100% success rate |
 | 2026-11-03 | F-16 AI Provider Abstraction & Router | c7ca976 | `pytest -v` (16 tests) | Passed | AI-001..007 pass; provider swap, capability routing, and repairs verified |
 | 2026-11-03 | F-03 & F-05 Chat & Topic Detection | f8c2740 | `pytest -v` (25 tests) | Passed | CHAT-001..007, TOPIC-001..002 pass; cross-user conversation isolation verified |
-| 2026-11-03 | F-06 & F-07 Summaries & Quizzes | Pending | `pytest -v` (41 tests) | Passed | SUM-001..007, QUIZ-001..010 pass; answer-key secrecy and scoring verified |
-| 2026-11-03 | F-08 & F-09 Math & Logic Solvers | Pending | `pytest -v` (57 tests) | Passed | MATH-001..010, LOGIC-001..006 pass; zero-eval AST security, SymPy verification |
-| 2026-11-03 | F-04 Image Understanding & Jobs | Pending | `pytest -v` (77 tests) | Passed | IMG-001..013, JOB-001..007 pass; magic bytes check, private storage, job lifecycles |
+| 2026-11-03 | F-06 & F-07 Summaries & Quizzes | ddd3d1b | `pytest -v` (41 tests) | Passed | SUM-001..007, QUIZ-001..010 pass; answer-key secrecy and scoring verified |
+| 2026-11-03 | F-08 & F-09 Math & Logic Solvers | 7d1e0c5 | `pytest -v` (57 tests) | Passed | MATH-001..010, LOGIC-001..006 pass; zero-eval AST security, SymPy verification |
+| 2026-11-03 | F-04 Image Understanding & Jobs | 2ffac73 | `pytest -v` (77 tests) | Passed | IMG-001..013, JOB-001..007 pass; magic bytes check, private storage, job lifecycles |
+| 2026-11-03 | F-02 Telegram Account Linking | 2ffac73 | `pytest -v` (84 tests) | Passed | LINK-001..007 pass; single-use hashed tokens, expiration, duplicate link prevention |
+| 2026-11-03 | F-12 Telegram Bot Integration | Pending | `pytest -v` (95 tests) | Passed | TG-001..011 pass; aiogram bot client, webhook token verification, message chunking |
 
 ## Failed checks and known issues
 

@@ -1,10 +1,11 @@
 """Telegram integration and account linking API endpoints."""
 
-from typing import Any, Dict
-from fastapi import APIRouter, Depends, status
+from typing import Any, Dict, Optional
+from fastapi import APIRouter, Depends, Header, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_request_id, verify_bot_service_auth
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.responses import ApiResponse, AppException
 from app.models.user import User
@@ -15,6 +16,7 @@ from app.schemas.telegram import (
     TelegramStatusResponse,
     TelegramUserLookupResponse,
 )
+from app.services.telegram_bot_service import telegram_bot_service
 from app.services.telegram_link_service import telegram_link_service
 
 router = APIRouter(prefix="/telegram", tags=["Telegram Integration"])
@@ -131,4 +133,33 @@ async def get_user_by_telegram(
         ),
         request_id=request_id,
     )
+
+
+@router.post(
+    "/webhook",
+    response_model=ApiResponse[Dict[str, Any]],
+)
+async def handle_telegram_webhook(
+    request: Request,
+    payload: Dict[str, Any],
+    x_telegram_secret: Optional[str] = Header(None, alias="X-Telegram-Bot-Api-Secret-Token"),
+    db: AsyncSession = Depends(get_db),
+    request_id: str = Depends(get_request_id),
+) -> ApiResponse[Dict[str, Any]]:
+    """Receive and process webhook updates directly from Telegram Bot API."""
+    expected_secret = settings.TELEGRAM_WEBHOOK_SECRET
+    if expected_secret and expected_secret.strip():
+        if not x_telegram_secret or x_telegram_secret.strip() != expected_secret.strip():
+            raise AppException(
+                code="INVALID_WEBHOOK_SECRET",
+                message="Invalid or missing Telegram webhook secret token.",
+                status_code=403,
+            )
+
+    result = await telegram_bot_service.process_update(db=db, update=payload)
+    return ApiResponse(
+        data=result,
+        request_id=request_id,
+    )
+
 
