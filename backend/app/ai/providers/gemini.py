@@ -49,12 +49,13 @@ class GeminiProvider(BaseAIProvider):
         self._timeout_seconds = 30.0
 
     def _ensure_api_key(self) -> str:
-        if not self._api_key or not self._api_key.strip():
+        key = self._api_key or settings.GEMINI_API_KEY
+        if not key or not key.strip() or key.strip() == "your_gemini_api_key_here":
             raise AIAuthenticationError(
                 provider_name=self.name,
                 message="Google Gemini API key is missing. Please configure GEMINI_API_KEY in backend/.env.",
             )
-        return self._api_key.strip()
+        return key.strip()
 
     async def generate_text(self, request: TextGenerationRequest) -> TextGenerationResponse:
         api_key = self._ensure_api_key()

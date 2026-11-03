@@ -13,13 +13,14 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
 ROOT_DIR = BACKEND_DIR.parent
 ENV_FILE_PATH = BACKEND_DIR / ".env"
+ROOT_ENV_PATH = ROOT_DIR / ".env"
 
 
 class Settings(BaseSettings):
     """Application runtime settings."""
 
     model_config = SettingsConfigDict(
-        env_file=(str(ENV_FILE_PATH), ".env"),
+        env_file=(str(ENV_FILE_PATH), str(ROOT_ENV_PATH), ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
     )
