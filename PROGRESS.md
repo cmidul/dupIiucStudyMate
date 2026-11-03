@@ -19,13 +19,13 @@ Use this file together with:
 | Field | Value |
 |---|---|
 | Project name | AI Learning Assistant |
-| Current phase | Phase 3 — Interfaces & Client Delivery |
+| Current phase | Phase 4 — Hardening, Integration & Release |
 | Overall status | In progress |
-| Current milestone | M11 — Website experience |
-| Current feature | F-13 (Website Interfaces) |
+| Current milestone | M13 — Reliability and security |
+| Current feature | F-17 & F-18 (Rate Limiting, Authorization, Retries & Auditing) |
 | Last updated | 2026-11-03 |
 | Current branch | main |
-| Latest commit | 2ffac73 |
+| Latest commit | M11 implementation (ready for review) |
 
 ### Status definitions
 
@@ -53,9 +53,9 @@ Do not use **Passed** just because code has been written.
 | M8 | Quiz system | Quiz generation, attempts, scoring, and answer review | Passed | 2026-11-03 | F-07 complete, safe delivery, authoritative scoring, QUIZ-001..010 pass. |
 | M9 | Math solver | Mathematical question solving and verification | Passed | 2026-11-03 | F-08 complete, safe AST parser, SymPy verification, MATH-001..010 pass. |
 | M10 | Logical reasoning solver | Logic question handling and explanation | Passed | 2026-11-03 | F-09 complete, deterministic truth tables, syllogisms, LOGIC-001..006 pass. |
-| M11 | Website experience | Responsive interface and integration with shared backend | In progress | | F-13, WEB-001..010 |
+| M11 | Website experience | Responsive interface and integration with shared backend | Passed | 2026-11-03 | Next.js 14 App Router, TypeScript, Tailwind, 11/11 pages compiled, WEB-001..010 verified. |
 | M12 | Telegram bot | Commands, messages, uploads, and shared user history | Passed | 2026-11-03 | F-12 complete; aiogram bot client, webhook token security, TG-001..011 pass. |
-| M13 | Reliability and security | Rate limits, retries, authorization, privacy, and failure handling | Not started | | F-17, F-18, SEC-001..008 |
+| M13 | Reliability and security | Rate limits, retries, authorization, privacy, and failure handling | In progress | | F-17, F-18, SEC-001..008 |
 | M14 | System integration | Cross-platform and end-to-end acceptance tests | Not started | | E2E-001..005 |
 | M15 | Release readiness | Full test suite, quality report, setup guide, and release decision | Not started | | Final release gate evaluation |
 
@@ -76,19 +76,19 @@ Do not use **Passed** just because code has been written.
 | F-09 | Logical Reasoning Solver | M10 | Passed | Complete | Passed | Passed | Truth tables, Barbara syllogism, LOGIC-001..006 pass |
 | F-04 | Image Understanding & Vision | M6 | Passed | Complete | Passed | Passed | Magic bytes, private storage, background jobs, IMG-001..013 pass |
 | F-12 | Telegram Bot Integration | M12 | Passed | Complete | Passed | Passed | Thin aiogram bot, webhook token security, TG-001..011 pass |
-| F-13 | Website User Interface | M11 | In progress | In progress | Not run | Not evaluated | Next.js responsive pages, shared API client |
+| F-13 | Website User Interface | M11 | Passed | Complete | Passed | Passed | Next.js 14 App Router, all 9 routes compiled & typechecked |
 
 ## 4. Current work
 
-- **Current milestone:** M11 — Website Experience & Client Integration
-- **Current feature ID and name:** F-13: Website Interfaces
-- **Objective:** Construct responsive web frontend in `frontend/` matching the required pages (Dashboard, Chat, Upload/Analyze, Summaries, Quizzes, Math/Logic Solvers, History, Settings with Telegram linking).
-- **Work completed:** M0, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M12 passed. 95 automated tests passing with zero errors. Telegram linking, bot commands, chunking, and webhooks fully verified.
-- **Work remaining:** Implement website UI and test with `WEB-001..010`.
-- **Files/modules being changed:** `frontend/`, `backend/app/api/v1/`.
-- **Current test status:** 95 passed in 80.77s.
+- **Current milestone:** M13 — Reliability and Security
+- **Current feature ID and name:** F-17: Reliability, Quotas & Rate Limits & F-18: Security & Privacy Hardening
+- **Objective:** Implement token bucket rate limiting middleware, provider timeout/retry policies, input sanitization, and verify with tests `SEC-001..008`.
+- **Work completed:** M0, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12 passed. 95 automated tests passing with zero errors. Full Next.js frontend built, typechecked, and verified.
+- **Work remaining:** Implement security hardening, audit logs, and rate limiters.
+- **Files/modules being changed:** `backend/app/core/`, `backend/tests/`.
+- **Current test status:** 95 passed in 48.61s; Next.js 11/11 pages compiled.
 - **Current blockers:** None.
-- **Next action:** Build frontend structure and components.
+- **Next action:** Build rate limiting and security test suite (`SEC-001..008`).
 
 ## 5. Completed work log
 
@@ -102,6 +102,7 @@ Do not use **Passed** just because code has been written.
 | 2026-11-03 | M9 & M10: Math & Logic Solvers (F-08, F-09) | 7d1e0c5 | `pytest -v` (57 passed in 27.22s) | Passed | MATH-001..010, LOGIC-001..006, Zero eval AST check |
 | 2026-11-03 | M6 & M2: Image Understanding & Telegram Linking | 2ffac73 | `pytest -v` (84 passed in 78.45s) | Passed | IMG-001..013, JOB-001..007, LINK-001..007 pass |
 | 2026-11-03 | M12: Telegram Bot Integration (F-12) | Pending | `pytest -v` (95 passed in 80.77s) | Passed | TG-001..011, aiogram bot client, webhook token security |
+| 2026-11-03 | M11: Website Experience (F-13) | Pending | Next.js build (11/11 routes), typecheck | Passed | WEB-001..010, Next.js 14, Tailwind, full responsive UI |
 
 ## 6. Blockers and risks
 

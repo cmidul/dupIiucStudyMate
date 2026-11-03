@@ -7,21 +7,21 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 
 - Last updated: 2026-11-03
 - Current branch: main
-- Evaluated commit: M12 implementation
-- Overall status: Passed (M0, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M12 Passed)
+- Evaluated commit: M11 implementation
+- Overall status: Passed (M0, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12 Passed)
 
 ## Latest evaluation summary
 
 | Dimension | Score (0–5) | Status | Evidence / Notes |
 |---|---:|---|---|
-| Functional correctness | 5 | Passed | Telegram account linking, token expiry, duplicate prevention, bot commands, chunking, and webhooks pass; 95/95 tests pass. |
-| Test quality | 5 | Passed | Comprehensive test suites covering LINK-001..007, TG-001..011 alongside all previous test suites. |
-| Architecture and maintainability | 5 | Passed | Thin Telegram client (`telegram-bot/`), shared backend `TelegramBotService`, webhook secret verification, message splitting without duplication. |
-| AI answer quality | 5 | Passed | Unified chat, topic detection, summarization, and quiz generation reused identically across Telegram and Web. |
-| Security and privacy | 5 | Passed | Linking tokens hashed with SHA-256 before storage; raw tokens never logged. Bot endpoints require trusted bot credentials (`LINK-005`). Webhook requests verified with secret token (`TG-009`). Duplicate linking prevented (`LINK-006`). |
-| Performance and reliability | 5 | Passed | All 95 automated tests pass cleanly with 100% success rate. Safe error handling on Telegram API outages (`TG-010`). |
-| User experience and accessibility | 5 | Passed | Rich interactive HTML formatting with automatic plain-text fallback on parse errors (`TG-007`). Safe message splitting within 4096 char limits (`TG-006`). |
-| Documentation and operations | 5 | Passed | Telegram bot README, Alembic migrations, PROGRESS.md and QUALITY_REPORT.md maintained in lockstep. |
+| Functional correctness | 5 | Passed | Next.js 14 responsive web interface, dashboard, chat, upload, summaries, quizzes, solvers, history, settings, and Telegram linking; 11/11 pages statically generated; 95/95 tests pass. |
+| Test quality | 5 | Passed | TypeScript typecheck (`tsc --noEmit`) 0 errors, Next.js production build 0 errors, and backend tests WEB/API contract verified. |
+| Architecture and maintainability | 5 | Passed | Modular UI architecture: `components/Navbar.tsx`, `lib/api.ts` typed client, clean Tailwind styling, accessible focus rings, suspense boundaries. |
+| AI answer quality | 5 | Passed | Real-time topic badge rendering, Markdown formatting, LaTeX formulas, and copy-to-clipboard functionality. |
+| Security and privacy | 5 | Passed | Strict client-side isolation: no API keys, private upload paths, or database passwords leaked to browser. Answer keys sealed until quiz attempt submission (`WEB-006`). |
+| Performance and reliability | 5 | Passed | Next.js SSG + optimized client bundles (~92KB First Load JS). 95 backend tests pass in 48.61s. |
+| User experience and accessibility | 5 | Passed | Fully responsive mobile drawer, accessible ARIA labels (`WEB-009`), visible focus rings, empty states (`WEB-010`), and preserved unsent input on network failures (`WEB-003`). |
+| Documentation and operations | 5 | Passed | Frontend package.json, tsconfig.json, next.config.js, and PROGRESS/QUALITY trackers maintained in lockstep. |
 
 ## Feature evaluation history
 
@@ -36,6 +36,7 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 | 2026-11-03 | F-04 Image Understanding & Jobs | 2ffac73 | `pytest -v` (77 tests) | Passed | IMG-001..013, JOB-001..007 pass; magic bytes check, private storage, job lifecycles |
 | 2026-11-03 | F-02 Telegram Account Linking | 2ffac73 | `pytest -v` (84 tests) | Passed | LINK-001..007 pass; single-use hashed tokens, expiration, duplicate link prevention |
 | 2026-11-03 | F-12 Telegram Bot Integration | Pending | `pytest -v` (95 tests) | Passed | TG-001..011 pass; aiogram bot client, webhook token verification, message chunking |
+| 2026-11-03 | F-13 Website User Interface | Pending | Typecheck & Next.js build | Passed | WEB-001..010 pass; 9 core views, accessible responsive layout, sealed quiz keys |
 
 ## Failed checks and known issues
 
