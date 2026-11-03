@@ -19,13 +19,13 @@ Use this file together with:
 | Field | Value |
 |---|---|
 | Project name | AI Learning Assistant |
-| Current phase | Phase 1 — Core Backend & AI Foundation |
+| Current phase | Phase 2 — Multimodal & Advanced Intelligence |
 | Overall status | In progress |
-| Current milestone | M9 — Math solver / M10 — Logical reasoning |
-| Current feature | F-08 (Math Solver) & F-09 (Logic Solver) |
+| Current milestone | M6 — Image understanding & Background jobs |
+| Current feature | F-04 (Image Extraction & Vision) |
 | Last updated | 2026-11-03 |
 | Current branch | main |
-| Latest commit | M7 & M8 implementation (ready for review) |
+| Latest commit | M9 & M10 implementation (ready for review) |
 
 ### Status definitions
 
@@ -51,8 +51,8 @@ Do not use **Passed** just because code has been written.
 | M6 | Image understanding | Upload validation, image processing/OCR or vision workflow | Not started | | F-04, IMG-001..013 |
 | M7 | Summarization | Summary generation and display | Passed | 2026-11-03 | F-06 complete, short/detailed/exam_notes styles, SUM-001..007 pass. |
 | M8 | Quiz system | Quiz generation, attempts, scoring, and answer review | Passed | 2026-11-03 | F-07 complete, safe delivery, authoritative scoring, QUIZ-001..010 pass. |
-| M9 | Math solver | Mathematical question solving and verification | Not started | | F-08, MATH-001..010 |
-| M10 | Logical reasoning solver | Logic question handling and explanation | Not started | | F-09, LOGIC-001..006 |
+| M9 | Math solver | Mathematical question solving and verification | Passed | 2026-11-03 | F-08 complete, safe AST parser, SymPy verification, MATH-001..010 pass. |
+| M10 | Logical reasoning solver | Logic question handling and explanation | Passed | 2026-11-03 | F-09 complete, deterministic truth tables, syllogisms, LOGIC-001..006 pass. |
 | M11 | Website experience | Responsive interface and integration with shared backend | Not started | | F-13, WEB-001..010 |
 | M12 | Telegram bot | Commands, messages, uploads, and shared user history | Not started | | F-12, TG-001..011 |
 | M13 | Reliability and security | Rate limits, retries, authorization, privacy, and failure handling | Not started | | F-17, F-18, SEC-001..008 |
@@ -72,18 +72,21 @@ Do not use **Passed** just because code has been written.
 | F-02 | Telegram Account Linking | M2 | Not started | Not started | Not run | Not evaluated | Depends on Telegram bot integration (M12) |
 | F-06 | Summarization Engine | M7 | Passed | Complete | Passed | Passed | Short, detailed, exam_notes, SUM-001..007 pass |
 | F-07 | Quiz Generation & Scoring | M8 | Passed | Complete | Passed | Passed | Safe answer key secrecy, scoring, QUIZ-001..010 pass |
+| F-08 | Math Problem Solver | M9 | Passed | Complete | Passed | Passed | Safe SymPy AST parsing (zero eval), MATH-001..010 pass |
+| F-09 | Logical Reasoning Solver | M10 | Passed | Complete | Passed | Passed | Truth tables, Barbara syllogism, LOGIC-001..006 pass |
+| F-04 | Image Understanding & Vision | M6 | Not started | Not started | Not run | Not evaluated | Next priority |
 
 ## 4. Current work
 
-- **Current milestone:** M9 — Math Solver & M10 — Logical Reasoning Solver
-- **Current feature ID and name:** F-08: Math Problem Solver & F-09: Logical Reasoning Engine
-- **Objective:** Implement SymPy AST parser, step-by-step math solver (with strictly no eval), logic truth table and syllogism solvers, and verify with tests `MATH-001..010` and `LOGIC-001..006`.
-- **Work completed:** M0, M1, M3, M4, M5, M7, M8 passed. 41 automated tests passing with zero errors. Safe quiz delivery (answer key stripping), authoritative scoring, and multi-format summarization verified.
-- **Work remaining:** Implement math and logic services, AST verification, and endpoints.
-- **Files/modules being changed:** `backend/app/services/math_solver.py`, `backend/app/services/logic_solver.py`, `backend/app/api/v1/solvers.py`.
-- **Current test status:** 41 passed in 17.79s.
+- **Current milestone:** M6 — Image Understanding & Background Jobs
+- **Current feature ID and name:** F-04: Image Understanding & Vision Extraction
+- **Objective:** Implement secure image file validation (magic bytes, MIME type verification, file size limits), private storage management, background job processing, and vision model extraction.
+- **Work completed:** M0, M1, M3, M4, M5, M7, M8, M9, M10 passed. 57 automated tests passing with zero errors. Math solver (zero eval, AST security, SymPy verification) and logic solver (propositional truth tables, syllogistic deduction, sequence rules) fully verified.
+- **Work remaining:** Implement image upload endpoint, private storage manager, extraction worker/job queue, and vision prompt handling.
+- **Files/modules being changed:** `backend/app/services/image_service.py`, `backend/app/storage/`, `backend/app/api/v1/uploads.py`.
+- **Current test status:** 57 passed in 27.22s.
 - **Current blockers:** None.
-- **Next action:** Build Math Solver with safe SymPy AST evaluation.
+- **Next action:** Build Image Upload & Vision Extraction service.
 
 ## 5. Completed work log
 
@@ -94,6 +97,7 @@ Do not use **Passed** just because code has been written.
 | 2026-11-03 | M4: AI Provider Foundation (F-16) | c7ca976 | `pytest -v` (16 passed) | Passed | AI-001..007, Router, Mock/Gemini/Groq adapters |
 | 2026-11-03 | M3 & M5: Shared Chat & Topic Detection (F-03, F-05) | f8c2740 | `pytest -v` (25 passed in 7.29s) | Passed | CHAT-001..007, TOPIC-001..002, Alembic migration 0002 |
 | 2026-11-03 | M7 & M8: Summaries & Quizzes (F-06, F-07) | Pending | `pytest -v` (41 passed in 17.79s) | Passed | SUM-001..007, QUIZ-001..010, Alembic migration 0003 |
+| 2026-11-03 | M9 & M10: Math & Logic Solvers (F-08, F-09) | Pending | `pytest -v` (57 passed in 27.22s) | Passed | MATH-001..010, LOGIC-001..006, Zero eval AST check |
 
 ## 6. Blockers and risks
 

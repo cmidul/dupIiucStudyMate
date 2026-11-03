@@ -193,32 +193,43 @@ class MockAIProvider(BaseAIProvider):
             return obj.model_dump_json()
 
         if schema is MathSolutionSchema:
+            det_ans = "x = 2 or x = 3"
+            prob = "x^2 - 5x + 6 = 0"
+            if "Deterministic Answer:" in prompt:
+                m_ans = re.search(r"Deterministic Answer:\s*(.+)", prompt)
+                if m_ans:
+                    det_ans = m_ans.group(1).strip()
+            if "Problem:" in prompt:
+                m_prob = re.search(r"Problem:\s*(.+)", prompt)
+                if m_prob:
+                    prob = m_prob.group(1).strip().split("\n")[0]
             obj = MathSolutionSchema(
-                problem="x^2 - 5x + 6 = 0",
-                category="quadratic_equation",
+                problem=prob,
+                category="math",
                 status="solved",
                 steps=[
-                    MathStep(step=1, explanation="Factor the quadratic expression", expression="(x - 2)(x - 3) = 0"),
-                    MathStep(step=2, explanation="Solve each factor", expression="x = 2 or x = 3"),
+                    MathStep(step=1, explanation="Apply algebraic operations and simplification", expression=prob),
+                    MathStep(step=2, explanation="Evaluate to obtain solution", expression=det_ans),
                 ],
-                final_answer="x = 2 or x = 3",
+                final_answer=det_ans,
                 verification=MathVerification(performed=True, status="passed", method="sympy"),
             )
             return obj.model_dump_json()
 
         if schema is LogicSolutionSchema:
+            prob = prompt[:100].split("\n")[0]
             obj = LogicSolutionSchema(
-                problem="All A are B. All B are C. Are all A also C?",
+                problem=prob,
                 category="deductive_reasoning",
                 status="solved",
                 reasoning_steps=[
-                    "Every element in set A is contained within set B.",
-                    "Every element in set B is contained within set C.",
-                    "By transitive property of set inclusion, every element in set A is in set C.",
+                    "Examine given logical premises.",
+                    "Apply deductive inference rules.",
+                    "Derive conclusion.",
                 ],
-                final_answer="Yes.",
-                assumptions=[],
-                confidence=0.99,
+                final_answer="Conclusion follows logically.",
+                assumptions=["Standard domain assumptions."],
+                confidence=0.98,
             )
             return obj.model_dump_json()
 
