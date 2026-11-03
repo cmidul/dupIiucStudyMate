@@ -25,7 +25,7 @@ Use this file together with:
 | Current feature | Full Test Suite & Release Gate Verification |
 | Last updated | 2026-11-03 |
 | Current branch | main |
-| Latest commit | feat(e2e): implement M14 cross-platform integration tests (E2E-001..005) |
+| Latest commit | d59f578 (M14 E2E complete, ready for release gate) |
 
 ### Status definitions
 
@@ -108,7 +108,7 @@ Do not use **Passed** just because code has been written.
 | 2026-11-03 | M11: Website Experience (F-13) | 42483ea | Next.js build (11/11 routes), typecheck | Passed | Midnight Blue Academic Redesign, ThemeProvider, split solver, dual quiz modes |
 | 2026-11-03 | M13: Reliability and Security (F-17, F-18) | 28db37a | `pytest -v` (103 passed in 50.06s) | Passed | SEC-001..008, Rate limiting, daily quotas, path traversal check, CSP headers |
 | 2026-11-03 | F-19: Unified Solve Questions | d5b32ab | `pytest -v` (113 passed in 56.28s) | Passed | SOLVE-001..010, Unified pipeline, math/logic/summary/QA auto-dispatch |
-| 2026-11-03 | M14: System Integration (E2E) | Pending | `pytest -v` (118 passed in 111.69s) | Passed | E2E-001..005, text journey, chat follow-up, image->solve, summary->quiz, cross-user isolation |
+| 2026-11-03 | M14: System Integration (E2E) | d59f578 | `pytest -v` (118 passed in 111.69s) | Passed | E2E-001..005, text journey, chat follow-up, image->solve, summary->quiz, cross-user isolation |
 
 ## 6. Blockers and risks
 
@@ -162,8 +162,8 @@ Do not use **Passed** just because code has been written.
 | 2026-11-03 | M11 Website Experience | main | 42483ea | feat(frontend): implement responsive Next.js web application across all core learning views |
 | 2026-11-03 | M13 Reliability and Security | main | 28db37a | feat(security): implement token bucket rate limiting, daily quotas, path traversal defense, and security headers |
 | 2026-11-03 | F-19 Unified Solve Questions | main | d5b32ab | feat(solver): unify math, logic, summary, and QA into Solve Questions feature (F-19, SOLVE-001..010) |
-| 2026-11-03 | M11 Frontend Redesign | main | Pending | feat(frontend): implement Midnight Blue academic redesign with dark/light theme, split solver, dual quiz modes, and history groups |
-| 2026-11-03 | M14 System Integration | main | Pending | test(e2e): implement M14 cross-platform integration tests for complete learning journeys (E2E-001..005) |
+| 2026-11-03 | M11 Frontend Redesign | main | f98c0a9 | feat(frontend): implement Midnight Blue academic redesign with dark/light theme, split solver, dual quiz modes, and history groups |
+| 2026-11-03 | M14 System Integration | main | d59f578 | test(e2e): implement M14 cross-platform integration tests for complete learning journeys (E2E-001..005) |
 
 ## 11. Next steps
 
