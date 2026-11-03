@@ -12,6 +12,7 @@ import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+from app.core.rate_limit import rate_limiter
 from app.core.responses import AppException
 from app.models.user import User
 from app.schemas.chat import ChatMessageRequest
@@ -266,6 +267,20 @@ class TelegramBotService:
             )
             await self.send_formatted_chunks(chat_id, unlinked_prompt)
             return {"ok": True, "action": "unlinked_prompt"}
+
+        # Rate limit check for the unified user account across Web and Telegram (F-17, SEC-001)
+        if settings.RATE_LIMIT_ENABLED:
+            is_limited, remaining, retry_after = rate_limiter.record_request(
+                key=f"user:{user.id}",
+                limit=settings.RATE_LIMIT_REQUESTS_PER_MINUTE,
+            )
+            if is_limited:
+                rate_limit_msg = (
+                    f"⏳ <b>Rate Limit Reached</b>\n\n"
+                    f"You have sent too many requests. Please wait {int(retry_after) + 1} seconds before trying again."
+                )
+                await self.send_formatted_chunks(chat_id, rate_limit_msg)
+                return {"ok": False, "error": "RATE_LIMITED", "retry_after": retry_after}
 
         # 4. Photo upload workflow (TG-004)
         if "photo" in message:

@@ -15,6 +15,8 @@ from fastapi import HTTPException, status
 from app.ai.base import BaseAIProvider
 from app.ai.router import ai_router
 from app.ai.schemas import MathSolutionSchema, MathStep, MathVerification, TextGenerationRequest
+from app.core.quota import quota_manager
+from app.core.responses import AppException
 from app.schemas.solver import MathSolveRequest, MathSolveResponse
 
 
@@ -158,9 +160,10 @@ class MathSolverService:
         try:
             self.parser.validate_safety(raw_problem)
         except SafeMathSecurityError as e:
-            raise HTTPException(
+            raise AppException(
+                code="UNSAFE_EXPRESSION",
+                message=f"Mathematical safety check failed: {str(e)}",
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Mathematical safety check failed: {str(e)}",
             )
 
         # Step 2: Ambiguity check (e.g. 1/2x)

@@ -7,21 +7,21 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 
 - Last updated: 2026-11-03
 - Current branch: main
-- Evaluated commit: M11 implementation
-- Overall status: Passed (M0, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12 Passed)
+- Evaluated commit: M13 implementation
+- Overall status: Passed (M0 through M13 Passed)
 
 ## Latest evaluation summary
 
 | Dimension | Score (0–5) | Status | Evidence / Notes |
 |---|---:|---|---|
-| Functional correctness | 5 | Passed | Next.js 14 responsive web interface, dashboard, chat, upload, summaries, quizzes, solvers, history, settings, and Telegram linking; 11/11 pages statically generated; 95/95 tests pass. |
-| Test quality | 5 | Passed | TypeScript typecheck (`tsc --noEmit`) 0 errors, Next.js production build 0 errors, and backend tests WEB/API contract verified. |
-| Architecture and maintainability | 5 | Passed | Modular UI architecture: `components/Navbar.tsx`, `lib/api.ts` typed client, clean Tailwind styling, accessible focus rings, suspense boundaries. |
-| AI answer quality | 5 | Passed | Real-time topic badge rendering, Markdown formatting, LaTeX formulas, and copy-to-clipboard functionality. |
-| Security and privacy | 5 | Passed | Strict client-side isolation: no API keys, private upload paths, or database passwords leaked to browser. Answer keys sealed until quiz attempt submission (`WEB-006`). |
-| Performance and reliability | 5 | Passed | Next.js SSG + optimized client bundles (~92KB First Load JS). 95 backend tests pass in 48.61s. |
-| User experience and accessibility | 5 | Passed | Fully responsive mobile drawer, accessible ARIA labels (`WEB-009`), visible focus rings, empty states (`WEB-010`), and preserved unsent input on network failures (`WEB-003`). |
-| Documentation and operations | 5 | Passed | Frontend package.json, tsconfig.json, next.config.js, and PROGRESS/QUALITY trackers maintained in lockstep. |
+| Functional correctness | 5 | Passed | Sliding window rate limiting, daily cost quotas, path traversal defense, sensitive logging filter, browser security headers, and cascade deletion verified; 103/103 tests pass; Next.js 11/11 pages statically generated. |
+| Test quality | 5 | Passed | Comprehensive test suite (`SEC-001..008`), edge cases, cross-client rate limits, path traversal patterns (`..`, null bytes), injection payloads (XSS, SQL-like, unsafe AST math). |
+| Architecture and maintainability | 5 | Passed | Clean isolation in `backend/app/core/rate_limit.py`, `quota.py`, `logging_config.py`, and `storage/file_storage.py`. Zero duplication between Web and Telegram. |
+| AI answer quality | 5 | Passed | Quota checks safeguard AI invocations; deterministic SymPy verification flags unsafe expressions without model hallucination. |
+| Security and privacy | 5 | Passed | Token bucket rate limiting (HTTP 429), daily per-feature quotas, path traversal prevention, credentials and secrets redacted from logs, defensive CSP and security headers. |
+| Performance and reliability | 5 | Passed | In-memory thread-safe rate limiter and daily quotas add sub-millisecond overhead. Full 103 backend tests complete in 50.06s. |
+| User experience and accessibility | 5 | Passed | Clear HTTP 429 envelopes with `Retry-After` header and human-readable explanations on both website and Telegram. |
+| Documentation and operations | 5 | Passed | PROGRESS.md and QUALITY_REPORT.md kept in lockstep with verified test execution commands. |
 
 ## Feature evaluation history
 
@@ -35,8 +35,9 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 | 2026-11-03 | F-08 & F-09 Math & Logic Solvers | 7d1e0c5 | `pytest -v` (57 tests) | Passed | MATH-001..010, LOGIC-001..006 pass; zero-eval AST security, SymPy verification |
 | 2026-11-03 | F-04 Image Understanding & Jobs | 2ffac73 | `pytest -v` (77 tests) | Passed | IMG-001..013, JOB-001..007 pass; magic bytes check, private storage, job lifecycles |
 | 2026-11-03 | F-02 Telegram Account Linking | 2ffac73 | `pytest -v` (84 tests) | Passed | LINK-001..007 pass; single-use hashed tokens, expiration, duplicate link prevention |
-| 2026-11-03 | F-12 Telegram Bot Integration | Pending | `pytest -v` (95 tests) | Passed | TG-001..011 pass; aiogram bot client, webhook token verification, message chunking |
-| 2026-11-03 | F-13 Website User Interface | Pending | Typecheck & Next.js build | Passed | WEB-001..010 pass; 9 core views, accessible responsive layout, sealed quiz keys |
+| 2026-11-03 | F-12 Telegram Bot Integration | f342ddc | `pytest -v` (95 tests) | Passed | TG-001..011 pass; aiogram bot client, webhook token verification, message chunking |
+| 2026-11-03 | F-13 Website User Interface | 42483ea | Typecheck & Next.js build | Passed | WEB-001..010 pass; 9 core views, accessible responsive layout, sealed quiz keys |
+| 2026-11-03 | F-17 & F-18 Reliability and Security | Pending | `pytest -v` (103 tests) | Passed | SEC-001..008 pass; token bucket rate limiter, daily quotas, path traversal check, CSP headers |
 
 ## Failed checks and known issues
 
@@ -63,20 +64,28 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
   - Corrupt or oversized images rejected safely prior to AI model invocation (`IMG-004`, `IMG-005`).
   - Strict user ownership checks on uploaded files and extracted contents (`IMG-012`).
   - Strict cross-user isolation for background jobs (`JOB-002`).
+  - Cross-client rate limiting applies unified token bucket per user ID across Web and Telegram (`SEC-001`).
+  - Quota enforcement blocks AI calls before provider execution and prevents double-counting (`SEC-002`).
+  - Direct unauthenticated access to storage paths rejected (`SEC-003`).
+  - Path traversal attempts (`..`, null bytes, root prefixes) safely intercepted and rejected (`SEC-004`).
+  - Injection attacks (XSS payloads, SQL-like syntax, malicious AST math) sanitized and safely handled (`SEC-005`).
+  - SensitiveDataFilter scrubs passwords, bot tokens, and auth secrets from server logs (`SEC-006`).
+  - Resource deletion safely unlinks physical files and cascades associated contents (`SEC-007`).
+  - Defensive browser security headers (`nosniff`, `DENY`, `strict-origin-when-cross-origin`, CSP) attached to all responses (`SEC-008`).
 - Open findings: None.
 - Release blockers: None.
 
 ## Performance observations
 
 - Environment: Windows, Python 3.14.7, SQLite async in-memory test harness
-- Workload: 77 async unit and integration tests
-- Measurements: 77 tests completed in 37.67 seconds
+- Workload: 103 async unit, integration, and security tests
+- Measurements: 103 tests completed in 50.06 seconds with 100% pass rate
 - Limitations: In-memory test provider for CI; live adapters for external smoke tests
 
 ## Release decision
 
-- Decision: In development (M0, M1, M3, M4, M5, M6, M7, M8, M9, M10 passed; proceeding to M2 Telegram Account Linking & M12 Telegram Bot)
-- Conditions: M2 (Telegram linking), M11-M15 completion
+- Decision: In development (M0 through M13 passed; proceeding to M14 System Integration and M15 Release Gate)
+- Conditions: M14 (Cross-client E2E integration) and M15 completion
 - Evaluated by: Coding Agent
 - Date: 2026-11-03
 

@@ -142,6 +142,20 @@ class UploadRepository:
         res = await db.execute(stmt)
         return res.scalar_one_or_none()
 
+    async def delete_extracted_content(
+        self,
+        db: AsyncSession,
+        content_id: str,
+        user_id: str,
+    ) -> bool:
+        """Delete extracted content record scoped to user_id (SEC-007)."""
+        record = await self.get_extracted_content(db, content_id, user_id)
+        if not record:
+            return False
+        await db.delete(record)
+        await db.commit()
+        return True
+
 
 # Shared repository instance
 upload_repo = UploadRepository()

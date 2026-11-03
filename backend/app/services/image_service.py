@@ -13,6 +13,7 @@ from app.ai.schemas import (
     KeyConcept,
     VisualElement,
 )
+from app.core.quota import quota_manager
 from app.core.responses import AppException
 from app.models.job import BackgroundJob
 from app.models.upload import ExtractedContent, UploadedFile
@@ -43,6 +44,9 @@ class ImageService:
         process_synchronously: bool = False,
     ) -> ImageUploadResult:
         """Validate, store, and initiate background extraction for an image."""
+        # Check quota before calling vision model / storage (SEC-002)
+        quota_manager.check_quota(user_id=user_id, category="image_upload")
+
         # 1. Validation (IMG-001, IMG-002, IMG-003, IMG-004, IMG-005)
         try:
             detected_mime, ext = file_storage.validate_file(
@@ -86,11 +90,43 @@ class ImageService:
         else:
             job_resp = job_service._to_response(job)
 
+        # Record quota usage on successful upload initiation
+        quota_manager.record_usage(user_id=user_id, category="image_upload")
+
         return ImageUploadResult(
             file=self._file_to_response(uploaded_file),
             job=job_resp,
             extracted_content=extracted_res,
         )
+
+    async def delete_uploaded_file(
+        self,
+        db: AsyncSession,
+        file_id: str,
+        user_id: str,
+    ) -> bool:
+        """Securely delete an uploaded file and remove it from private disk storage (SEC-007)."""
+        file_record = await upload_repo.get_uploaded_file(db, file_id, user_id)
+        if not file_record:
+            raise AppException(code="NOT_FOUND", message="Uploaded file not found.", status_code=404)
+
+        if file_record.storage_path:
+            file_storage.delete_file(file_record.storage_path)
+
+        deleted = await upload_repo.delete_uploaded_file(db, file_id, user_id)
+        return deleted
+
+    async def delete_extracted_content(
+        self,
+        db: AsyncSession,
+        content_id: str,
+        user_id: str,
+    ) -> bool:
+        """Delete extracted educational content (SEC-007)."""
+        record = await upload_repo.get_extracted_content(db, content_id, user_id)
+        if not record:
+            raise AppException(code="NOT_FOUND", message="Extracted content not found.", status_code=404)
+        return await upload_repo.delete_extracted_content(db, content_id, user_id)
 
     async def process_image_job(
         self,

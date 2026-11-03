@@ -70,3 +70,35 @@ async def get_extracted_content(
     )
     return ApiResponse(data=content, request_id=request_id)
 
+
+@router.delete("/{file_id}", response_model=ApiResponse[dict])
+async def delete_upload(
+    file_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    request_id: str = Depends(get_request_id),
+) -> ApiResponse[dict]:
+    """Delete an uploaded file, private disk storage, and associated extracted content (SEC-007)."""
+    await image_service.delete_uploaded_file(
+        db=db,
+        file_id=file_id,
+        user_id=current_user.id,
+    )
+    return ApiResponse(data={"deleted": True, "file_id": file_id}, request_id=request_id)
+
+
+@router.delete("/content/{content_id}", response_model=ApiResponse[dict])
+async def delete_content(
+    content_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    request_id: str = Depends(get_request_id),
+) -> ApiResponse[dict]:
+    """Delete an extracted content record scoped to owner (SEC-007)."""
+    await image_service.delete_extracted_content(
+        db=db,
+        content_id=content_id,
+        user_id=current_user.id,
+    )
+    return ApiResponse(data={"deleted": True, "content_id": content_id}, request_id=request_id)
+

@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.router import ai_router
 from app.ai.schemas import SummarySchema, TextGenerationRequest
+from app.core.quota import quota_manager
 from app.core.responses import AppException
 from app.models.summary import Summary
 from app.repositories.summary_repo import summary_repo
@@ -25,6 +26,9 @@ class SummarizerService:
         data: SummaryGenerateRequest,
     ) -> SummaryResponse:
         """Generate, validate, and persist a learning summary."""
+        # Check daily quota before invoking AI provider (F-17, SEC-002)
+        quota_manager.check_quota(user_id=user_id, category="summary")
+
         source_text = ""
         if data.source_text and data.source_text.strip():
             source_text = data.source_text.strip()
@@ -107,6 +111,8 @@ class SummarizerService:
             source_content_id=data.source_content_id,
             conversation_id=data.conversation_id,
         )
+
+        quota_manager.record_usage(user_id=user_id, category="summary")
 
         return self._to_response(summary, summary_schema)
 

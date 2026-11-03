@@ -17,7 +17,13 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.api.v1.router import api_v1_router
 from app.core.config import settings
 from app.core.database import init_db
+from app.core.logging_config import setup_safe_logging
+from app.core.rate_limit import rate_limiter
 from app.core.responses import AppException
+from app.core.security import decode_access_token
+
+# Setup safe logging filter (masks passwords, secrets, tokens)
+setup_safe_logging()
 
 # Setup logging
 logging.basicConfig(
@@ -65,6 +71,79 @@ async def request_context_middleware(request: Request, call_next):
 
     response = await call_next(request)
     response.headers["X-Request-ID"] = request_id
+    return response
+
+
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    """Add defensive browser security headers to every response (F-18, SEC-008)."""
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Content-Security-Policy"] = "default-src 'self'"
+    if settings.is_production:
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
+
+
+@app.middleware("http")
+async def rate_limiting_middleware(request: Request, call_next):
+    """Enforce token bucket / sliding window rate limits per user/IP (F-17, SEC-001)."""
+    if not settings.RATE_LIMIT_ENABLED:
+        return await call_next(request)
+
+    path = request.url.path
+    if path in ("/health", "/api/v1/health", "/docs", "/redoc", "/openapi.json"):
+        return await call_next(request)
+
+    # Resolve rate limit key
+    user_id = None
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split("Bearer ", 1)[1].strip()
+        payload = decode_access_token(token)
+        if payload and "sub" in payload:
+            user_id = payload["sub"]
+    elif "access_token" in request.cookies:
+        payload = decode_access_token(request.cookies.get("access_token"))
+        if payload and "sub" in payload:
+            user_id = payload["sub"]
+
+    if not user_id:
+        tg_uid = request.headers.get("X-Telegram-User-Id")
+        if tg_uid and tg_uid.strip():
+            user_id = f"tg_{tg_uid.strip()}"
+
+    key = f"user:{user_id}" if user_id else f"ip:{request.client.host if request.client else 'unknown'}"
+    is_limited, remaining, retry_after = rate_limiter.record_request(
+        key=key,
+        limit=settings.RATE_LIMIT_REQUESTS_PER_MINUTE,
+    )
+
+    if is_limited:
+        request_id = getattr(request.state, "request_id", str(uuid.uuid4()))
+        return JSONResponse(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            content={
+                "error": {
+                    "code": "RATE_LIMITED",
+                    "message": "Too many requests. Please slow down and try again later.",
+                    "details": {"retry_after_seconds": round(retry_after, 1)},
+                },
+                "request_id": request_id,
+            },
+            headers={
+                "Retry-After": str(int(retry_after) + 1),
+                "X-RateLimit-Limit": str(settings.RATE_LIMIT_REQUESTS_PER_MINUTE),
+                "X-RateLimit-Remaining": "0",
+            },
+        )
+
+    response = await call_next(request)
+    response.headers["X-RateLimit-Limit"] = str(settings.RATE_LIMIT_REQUESTS_PER_MINUTE)
+    response.headers["X-RateLimit-Remaining"] = str(remaining)
     return response
 
 

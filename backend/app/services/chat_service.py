@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.router import ai_router
 from app.ai.schemas import TextGenerationRequest
+from app.core.quota import quota_manager
 from app.core.responses import AppException
 from app.models.conversation import Conversation
 from app.models.message import Message
@@ -45,6 +46,9 @@ class ChatService:
                 message="Message exceeds maximum allowed length of 8000 characters.",
                 status_code=422,
             )
+
+        # Check user quota before proceeding with AI processing (F-17, SEC-002)
+        quota_manager.check_quota(user_id=user_id, category="ai_chat")
 
         # 1. Resolve or create conversation with strict ownership check
         conversation: Optional[Conversation] = None
@@ -114,6 +118,9 @@ class ChatService:
             if len(content) > 50:
                 title_candidate += "..."
             await chat_repo.update_title(db, conversation.id, user_id, title_candidate)
+
+        # Record quota usage on successful assistant reply
+        quota_manager.record_usage(user_id=user_id, category="ai_chat")
 
         return ChatMessageResponse(
             conversation_id=conversation.id,

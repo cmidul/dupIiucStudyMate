@@ -60,10 +60,19 @@ class Settings(BaseSettings):
     STORAGE_LOCAL_DIR: str = str(BACKEND_DIR / "storage" / "uploads")
     REDIS_URL: Optional[str] = None
 
-    # Quotas and Rate Limits
+    # Quotas and Rate Limits (F-17)
     MAX_UPLOAD_SIZE_BYTES: int = 10 * 1024 * 1024  # 10 MB
     MAX_QUIZ_QUESTIONS: int = 20
+    RATE_LIMIT_ENABLED: bool = True
     RATE_LIMIT_REQUESTS_PER_MINUTE: int = 60
+    DAILY_AI_REQUESTS_QUOTA: int = 100
+    DAILY_IMAGE_UPLOADS_QUOTA: int = 25
+    DAILY_SUMMARY_QUOTA: int = 30
+    DAILY_QUIZ_QUOTA: int = 30
+    DAILY_SOLVER_QUOTA: int = 40
+
+    # CORS and Browser Security (F-18, SEC-008)
+    CORS_ALLOWED_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
     @property
     def is_production(self) -> bool:

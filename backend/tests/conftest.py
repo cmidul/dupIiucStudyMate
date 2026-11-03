@@ -10,6 +10,8 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.database import Base, get_db
+from app.core.quota import quota_manager
+from app.core.rate_limit import rate_limiter
 from app.main import app
 
 # Isolated in-memory SQLite database for testing
@@ -33,11 +35,15 @@ TestingSessionLocal = async_sessionmaker(
 @pytest_asyncio.fixture(autouse=True)
 async def setup_test_db():
     """Create all tables in memory before each test and drop them after."""
+    rate_limiter.reset()
+    quota_manager.reset()
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+    rate_limiter.reset()
+    quota_manager.reset()
 
 
 @pytest_asyncio.fixture

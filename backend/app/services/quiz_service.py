@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.router import ai_router
 from app.ai.schemas import QuizOption, QuizSchema, TextGenerationRequest
+from app.core.quota import quota_manager
 from app.core.responses import AppException
 from app.models.quiz import Quiz, QuizAttempt, QuizQuestion
 from app.repositories.quiz_repo import quiz_repo
@@ -34,6 +35,9 @@ class QuizService:
         data: QuizGenerateRequest,
     ) -> QuizDeliveryResponse:
         """Generate, validate, and store a quiz, returning safe questions without answer keys."""
+        # Check quota before calling AI (F-17, SEC-002)
+        quota_manager.check_quota(user_id=user_id, category="quiz")
+
         if data.question_count < 1 or data.question_count > 20:
             raise AppException(
                 code="INVALID_INPUT",
@@ -103,7 +107,23 @@ class QuizService:
 
         # Re-fetch with questions
         saved_quiz = await quiz_repo.get_quiz(db, quiz.id, user_id, include_questions=True)
+
+        # Record quota usage on successful quiz generation
+        quota_manager.record_usage(user_id=user_id, category="quiz")
+
         return self._to_delivery_response(saved_quiz)
+
+    async def delete_quiz(
+        self,
+        db: AsyncSession,
+        quiz_id: str,
+        user_id: str,
+    ) -> bool:
+        """Delete quiz strictly belonging to user (SEC-007)."""
+        quiz = await quiz_repo.get_quiz(db, quiz_id, user_id)
+        if not quiz:
+            raise AppException(code="NOT_FOUND", message="Quiz not found or access denied.", status_code=404)
+        return await quiz_repo.delete_quiz(db, quiz_id, user_id)
 
     def _validate_quiz_schema(self, quiz: QuizSchema) -> None:
         """Validate question structure, option count, and correct option presence (QUIZ-005)."""

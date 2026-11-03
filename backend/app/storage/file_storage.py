@@ -98,12 +98,36 @@ class SecureFileStorage:
         }
         return detected_mime, ext_map[detected_mime]
 
+    def _safe_resolve(self, relative_path: str) -> Path:
+        """Resolve a relative storage path safely, preventing directory traversal attacks (SEC-004)."""
+        if not relative_path or "\0" in relative_path:
+            raise FileValidationError("Invalid or null-byte corrupted file path.")
+
+        # Check for directory traversal sequences
+        clean_path = relative_path.replace("\\", "/")
+        parts = [p for p in clean_path.split("/") if p and p != "."]
+        if ".." in parts:
+            raise FileValidationError("Path traversal pattern ('..') detected.")
+
+        target = (self.base_dir / relative_path).resolve()
+        base = self.base_dir.resolve()
+
+        try:
+            target.relative_to(base)
+        except ValueError:
+            raise FileValidationError("Path traversal attempt: target is outside storage root.")
+
+        return target
+
     def save_file(self, user_id: str, file_bytes: bytes, ext: str) -> str:
         """Save file bytes to an unguessable private location.
         
         Returns:
             Relative storage path string (never expose absolute server paths).
         """
+        if not user_id or ".." in user_id or "/" in user_id or "\\" in user_id or "\0" in user_id:
+            raise FileValidationError("Invalid user identifier for storage partition.")
+
         user_folder = self.base_dir / user_id
         user_folder.mkdir(parents=True, exist_ok=True)
 
@@ -118,18 +142,21 @@ class SecureFileStorage:
 
     def read_file(self, relative_path: str) -> bytes:
         """Read file bytes from private storage."""
-        full_path = self.base_dir / relative_path
+        full_path = self._safe_resolve(relative_path)
         if not full_path.exists() or not full_path.is_file():
             raise FileValidationError("Requested file does not exist in storage.")
         with open(full_path, "rb") as f:
             return f.read()
 
     def delete_file(self, relative_path: str) -> bool:
-        """Remove file from storage."""
-        full_path = self.base_dir / relative_path
-        if full_path.exists() and full_path.is_file():
-            full_path.unlink()
-            return True
+        """Remove file from storage safely."""
+        try:
+            full_path = self._safe_resolve(relative_path)
+            if full_path.exists() and full_path.is_file():
+                full_path.unlink()
+                return True
+        except FileValidationError:
+            return False
         return False
 
 
