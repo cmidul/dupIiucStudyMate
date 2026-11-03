@@ -7,14 +7,14 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 
 - Last updated: 2026-11-03
 - Current branch: main
-- Evaluated commit: M13 implementation
-- Overall status: Passed (M0 through M13 Passed)
+- Evaluated commit: F-19 Unified Solve Questions implementation
+- Overall status: Passed (M0 through M13, F-19 Passed)
 
 ## Latest evaluation summary
 
 | Dimension | Score (0–5) | Status | Evidence / Notes |
 |---|---:|---|---|
-| Functional correctness | 5 | Passed | Sliding window rate limiting, daily cost quotas, path traversal defense, sensitive logging filter, browser security headers, and cascade deletion verified; 103/103 tests pass; Next.js 11/11 pages statically generated. |
+| Functional correctness | 5 | Passed | Unified Solve Questions pipeline auto-detects mathematical problems, logical reasoning, educational summaries, and conceptual questions; 113/113 tests pass; Next.js 11/11 pages statically generated. |
 | Test quality | 5 | Passed | Comprehensive test suite (`SEC-001..008`), edge cases, cross-client rate limits, path traversal patterns (`..`, null bytes), injection payloads (XSS, SQL-like, unsafe AST math). |
 | Architecture and maintainability | 5 | Passed | Clean isolation in `backend/app/core/rate_limit.py`, `quota.py`, `logging_config.py`, and `storage/file_storage.py`. Zero duplication between Web and Telegram. |
 | AI answer quality | 5 | Passed | Quota checks safeguard AI invocations; deterministic SymPy verification flags unsafe expressions without model hallucination. |
@@ -38,6 +38,7 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 | 2026-11-03 | F-12 Telegram Bot Integration | f342ddc | `pytest -v` (95 tests) | Passed | TG-001..011 pass; aiogram bot client, webhook token verification, message chunking |
 | 2026-11-03 | F-13 Website User Interface | 42483ea | Typecheck & Next.js build | Passed | WEB-001..010 pass; 9 core views, accessible responsive layout, sealed quiz keys |
 | 2026-11-03 | F-17 & F-18 Reliability and Security | Pending | `pytest -v` (103 tests) | Passed | SEC-001..008 pass; token bucket rate limiter, daily quotas, path traversal check, CSP headers |
+| 2026-11-03 | F-19 Unified Solve Questions | Pending | `pytest -v` (113 tests) | Passed | SOLVE-001..010 pass; automatic routing into math, logic, summary, educational QA; image inputs, follow-ups |
 
 ## Failed checks and known issues
 

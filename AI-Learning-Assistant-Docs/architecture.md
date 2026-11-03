@@ -31,12 +31,15 @@ flowchart TD
     API --> AUTH[Authentication & User Management]
     API --> ROUTER[Request / Intent Router]
 
+    ROUTER --> UNIFIED[Unified Solve Questions Service]
     ROUTER --> IMG[Image and Content Processing]
     ROUTER --> TOPIC[Topic Detection]
-    ROUTER --> SUM[Summarization Engine]
     ROUTER --> QUIZ[Quiz Generation Engine]
-    ROUTER --> MATH[Math Solver]
-    ROUTER --> LOGIC[Logic Solver]
+
+    UNIFIED --> MATH[Math Solver Engine]
+    UNIFIED --> LOGIC[Logic Solver Engine]
+    UNIFIED --> SUM[Summarization Engine]
+    UNIFIED --> QA[Educational QA Engine]
 
     IMG --> AI[AI Provider Abstraction Layer]
     TOPIC --> AI

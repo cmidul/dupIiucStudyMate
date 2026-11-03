@@ -79,6 +79,7 @@ Do not use **Passed** just because code has been written.
 | F-13 | Website User Interface | M11 | Passed | Complete | Passed | Passed | Next.js 14 App Router, all 9 views compiled & typechecked |
 | F-17 | Usage Limits & Rate Limiting | M13 | Passed | Complete | Passed | Passed | Sliding window rate limiter, cross-client user key, daily quota manager |
 | F-18 | Security & Privacy Hardening | M13 | Passed | Complete | Passed | Passed | Path traversal prevention, sensitive logging redaction, CSP & security headers |
+| F-19 | Unified Solve Questions | M9/M10 | Passed | Complete | Passed | Passed | Unified pipeline auto-routing math, logic, summary & educational QA; SOLVE-001..010 pass (113/113 total) |
 
 ## 4. Current work
 

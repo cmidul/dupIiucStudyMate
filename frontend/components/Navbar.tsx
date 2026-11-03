@@ -23,7 +23,7 @@ const NAV_ITEMS = [
   { href: "/upload", label: "Upload & Analyze", icon: UploadCloud },
   { href: "/summaries", label: "Summaries", icon: FileText },
   { href: "/quizzes", label: "Quizzes", icon: Award },
-  { href: "/solve", label: "Math & Logic", icon: Calculator },
+  { href: "/solve", label: "Solve Questions", icon: Calculator },
   { href: "/history", label: "History", icon: History },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

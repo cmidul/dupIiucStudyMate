@@ -53,10 +53,9 @@ Website pages:
 3. Upload / Analyze
 4. Summaries
 5. Quizzes
-6. Math Solver
-7. Logic Solver
-8. Learning History
-9. Settings
+6. Solve Questions (Unified Math, Logic, Summary & Conceptual QA)
+7. Learning History
+8. Settings
 
 Both clients should support the core actions: ask, upload, summarize, generate quiz, explain, solve, and follow up. The website may offer richer controls; Telegram uses messages, commands, and inline keyboards.
 
@@ -576,6 +575,30 @@ Verification status: `passed`, `failed`, `not_available`, or `ambiguous`.
 - Assumptions are identified.
 - Ambiguity is handled explicitly.
 - Truth-table results are deterministic where applicable.
+
+---
+
+## 13.1 F-19 — Unified Solve Questions
+
+### Concept
+Unifies mathematical problem solving, logical reasoning, passage summarization, and conceptual educational question-answering into one intelligent "Solve Questions" entry point. Users provide text, an educational image, or an extracted source without manually selecting the task mode.
+
+### Task Routing & Expected Behavior
+1. **Mathematics:** Step-by-step algebraic/calculus solving, formula explanations, deterministic SymPy cross-verification.
+2. **Logical Reasoning:** Deductive syllogism proofs, deterministic truth-table construction, sequence pattern inference.
+3. **Summarization:** Identifies core ideas and generates structured summaries with key terms, formulas, and revision points.
+4. **General Educational:** Progressive pedagogical explanation steps, concept definitions, takeaways, and conclusions.
+
+### Conversational Continuity
+Every solved problem links to a conversation thread allowing users to ask immediate follow-up questions grounded in the solution context.
+
+### Acceptance Criteria
+- Automatic classification without manual mode toggling.
+- Supports plain text and direct/extracted image inputs.
+- Safe AST validation against code injection payloads.
+- Structured response contract with step cards, verification status, and truth tables.
+- Interactive follow-up conversational thread.
+- Full Telegram bot integration (`/solve` command and photo handlers).
 
 ---
 

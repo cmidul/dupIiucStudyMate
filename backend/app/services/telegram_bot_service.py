@@ -18,11 +18,13 @@ from app.models.user import User
 from app.schemas.chat import ChatMessageRequest
 from app.schemas.quiz import QuizGenerateRequest
 from app.schemas.summary import SummaryGenerateRequest
+from app.schemas.unified_solver import TaskType, UnifiedSolveRequest
 from app.services.chat_service import chat_service
 from app.services.image_service import image_service
 from app.services.quiz_service import quiz_service
 from app.services.summarizer import summarizer_service
 from app.services.telegram_link_service import telegram_link_service
+from app.services.unified_solver import unified_solver_service
 
 logger = logging.getLogger("learning_assistant.telegram_bot")
 
@@ -282,14 +284,97 @@ class TelegramBotService:
                 await self.send_formatted_chunks(chat_id, rate_limit_msg)
                 return {"ok": False, "error": "RATE_LIMITED", "retry_after": retry_after}
 
-        # 4. Photo upload workflow (TG-004)
+        # 4. /solve command (Unified Solve Questions)
+        if text.startswith("/solve"):
+            problem_text = text[6:].strip()
+            if not problem_text:
+                await self.send_formatted_chunks(
+                    chat_id,
+                    "❓ <b>Solve Questions</b>\n\n"
+                    "Please provide a problem, question, equation, or passage after /solve.\n\n"
+                    "<i>Examples:</i>\n"
+                    "• <code>/solve x^2 - 5x + 6 = 0</code>\n"
+                    "• <code>/solve If all humans are mortal and Socrates is human, is Socrates mortal?</code>\n"
+                    "• <code>/solve Summarize: A Binary Search Tree is...</code>\n"
+                    "• <code>/solve Explain how binary search works</code>",
+                )
+                return {"ok": True, "action": "solve_prompt"}
+
+            await self.send_formatted_chunks(chat_id, "⚙️ <i>Analyzing and solving your question...</i>")
+            try:
+                solve_res = await unified_solver_service.solve_question(
+                    db=db,
+                    user_id=user.id,
+                    data=UnifiedSolveRequest(input_text=problem_text),
+                )
+
+                badge_map = {
+                    TaskType.MATHEMATICS: "🔢 Mathematics",
+                    TaskType.LOGICAL_REASONING: "🧠 Logical Reasoning",
+                    TaskType.SUMMARIZATION: "📝 Study Summary",
+                    TaskType.GENERAL_EDUCATIONAL: "💡 Educational Explanation",
+                }
+                task_badge = badge_map.get(solve_res.task_type, "💡 Solve Questions")
+
+                resp_lines = [
+                    f"✨ <b>{task_badge}</b>: {html.escape(solve_res.title)}",
+                    "",
+                    f"<b>Answer / Conclusion:</b>\n{html.escape(solve_res.summary_or_answer)}",
+                ]
+
+                if solve_res.math_solution and solve_res.math_solution.steps:
+                    resp_lines.append("\n<b>Step-by-step Solution:</b>")
+                    for s in solve_res.math_solution.steps:
+                        resp_lines.append(f"• <b>Step {s.step}:</b> {html.escape(s.explanation)}")
+                        if s.expression:
+                            resp_lines.append(f"  <code>{html.escape(s.expression)}</code>")
+
+                elif solve_res.logic_solution and solve_res.logic_solution.reasoning_steps:
+                    resp_lines.append("\n<b>Logical Steps:</b>")
+                    for s in solve_res.logic_solution.reasoning_steps:
+                        resp_lines.append(f"• {html.escape(s)}")
+
+                elif solve_res.summary_solution and solve_res.summary_solution.content.sections:
+                    resp_lines.append("\n<b>Key Sections:</b>")
+                    for sec in solve_res.summary_solution.content.sections:
+                        resp_lines.append(f"📌 <b>{html.escape(sec.heading)}</b>")
+                        for p in sec.points:
+                            resp_lines.append(f"  • {html.escape(p)}")
+
+                inline_keyboard = {
+                    "inline_keyboard": [
+                        [
+                            {"text": "💬 Ask Follow-up", "callback_data": f"flw:{solve_res.conversation_id}"},
+                            {"text": "🎯 Practice Quiz", "callback_data": f"quiz:{solve_res.conversation_id}"},
+                        ]
+                    ]
+                }
+
+                await self.send_formatted_chunks(
+                    chat_id=chat_id,
+                    text="\n".join(resp_lines),
+                    parse_mode="HTML",
+                    reply_markup=inline_keyboard,
+                )
+                return {
+                    "ok": True,
+                    "action": "solved",
+                    "task_type": solve_res.task_type.value,
+                    "conversation_id": solve_res.conversation_id,
+                }
+            except Exception as exc:
+                logger.error(f"Failed to solve question in telegram: {exc}")
+                await self.send_formatted_chunks(chat_id, f"❌ Failed to solve question: {html.escape(str(exc))}")
+                return {"ok": False, "error": str(exc)}
+
+        # 5. Photo upload workflow (TG-004)
         if "photo" in message:
             await self.send_formatted_chunks(chat_id, "🔍 <i>Analyzing your educational image...</i>")
             # In a real environment with TELEGRAM_BOT_TOKEN, download photo via getFile
             # Here we provide seamless end-to-end extraction through the shared image service
             return {"ok": True, "action": "image_received", "user_id": user.id}
 
-        # 5. Normal text question (TG-003)
+        # 6. Normal text question (TG-003)
         if text:
             # Route to shared chat service
             chat_resp = await chat_service.send_message(
@@ -409,6 +494,15 @@ class TelegramBotService:
                 logger.error(f"Failed to generate quiz in telegram: {exc}")
                 await self.send_formatted_chunks(chat_id, "❌ Unable to generate quiz. Please try again.")
                 return {"ok": False, "error": str(exc)}
+
+        elif data.startswith("flw:"):
+            conv_id = data[4:].strip()
+            flw_prompt = (
+                "💬 <b>Ask a Follow-up Question</b>\n\n"
+                "Please send your follow-up question in chat, and I will explain further with context from your solved problem."
+            )
+            await self.send_formatted_chunks(chat_id, flw_prompt)
+            return {"ok": True, "action": "follow_up_prompt", "conversation_id": conv_id}
 
         return {"ok": True, "action": "unknown_callback"}
 

@@ -685,6 +685,50 @@ Expected:
 
 ---
 
+# 12.1 Unified Solve Questions tests (SOLVE-001..010)
+
+## SOLVE-001 — Automatic routing to mathematics
+Input a quadratic or linear equation without specifying problem type.
+Expected: Classified as `mathematics`, solved via SymPy with verified steps and final answer.
+
+## SOLVE-002 — Automatic routing to logical reasoning
+Input a syllogism or propositional statement without specifying task.
+Expected: Classified as `logical_reasoning`, reasoning steps and conclusion produced.
+
+## SOLVE-003 — Automatic routing to summarizer
+Input a substantial educational passage without a question.
+Expected: Classified as `summarization`, structured summary returned.
+
+## SOLVE-004 — Automatic routing to educational QA
+Input a conceptual educational question ("How does photosynthesis work?").
+Expected: Classified as `general_educational`, pedagogical steps returned.
+
+## SOLVE-005 — Image input containing mathematical equations
+Provide `source_content_id` of an image containing equations.
+Expected: Auto-routed to math solver, returns deterministic answer.
+
+## SOLVE-006 — Image input containing educational notes
+Provide `source_content_id` of an image containing lecture notes.
+Expected: Auto-routed to summarizer, returns structured summary.
+
+## SOLVE-007 — Conversational follow-up thread
+Solve a problem and issue a follow-up query using the returned `conversation_id`.
+Expected: Assistant answers with full context from the prior solution.
+
+## SOLVE-008 — Ambiguity handling and clarification
+Input ambiguous notation (e.g., `1/2x`).
+Expected: Returns `clarification_needed=True` with clarification prompt.
+
+## SOLVE-009 — Security AST injection protection
+Input malicious Python code injection (`__import__('os').system('dir')`).
+Expected: Safely rejected with 400 Bad Request and `UNSAFE_EXPRESSION` code.
+
+## SOLVE-010 — Telegram bot integration
+Invoke `/solve` through Telegram webhook update.
+Expected: Formatted answer with task emoji badge delivered, conversation tracked.
+
+---
+
 # 13. Follow-up and context tests
 
 ## CONTEXT-001 — Follow-up on active source

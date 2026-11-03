@@ -123,13 +123,29 @@ class MockAIProvider(BaseAIProvider):
         prompt_lower = (prompt or "").lower()
 
         if schema is TopicDetectionSchema:
+            intent = "general_question"
+            topic = "Data Structures"
+            subject = "Computer Science"
+            if any(w in prompt_lower for w in ["math", "equation", "solve", "x^2", "x +", "2x", "factor", "root", "integral", "derivative"]):
+                intent = "math_solve"
+                topic = "Algebra"
+                subject = "Mathematics"
+            elif any(w in prompt_lower for w in ["logic", "syllogism", "truth table", "all a are b", "tautology", "valid argument"]):
+                intent = "logic_solve"
+                topic = "Propositional Logic"
+                subject = "Logic"
+            elif any(w in prompt_lower for w in ["summar", "notes", "passage", "paragraph", "overview"]):
+                intent = "summarize"
+                topic = "Study Notes"
+                subject = "General Education"
+
             obj = TopicDetectionSchema(
-                subject="Computer Science",
-                topic="Data Structures",
-                subtopic="Binary Search Tree",
+                subject=subject,
+                topic=topic,
+                subtopic="Core Concepts",
                 difficulty="beginner",
                 input_type="text",
-                intent="general_question",
+                intent=intent,
                 confidence=0.96,
             )
             return obj.model_dump_json()
