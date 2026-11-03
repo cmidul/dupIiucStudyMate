@@ -5,7 +5,7 @@ Defines the normalized internal representation for AI inputs and outputs.
 
 from enum import Enum
 from typing import Any, Dict, List, Optional, Type, TypeVar
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -93,6 +93,43 @@ class TopicDetectionSchema(BaseModel):
     confidence: float = Field(0.9, ge=0.0, le=1.0)
     needs_clarification: bool = False
     clarification_question: Optional[str] = None
+
+    @field_validator("confidence", mode="before")
+    @classmethod
+    def clamp_confidence(cls, v: Any) -> float:
+        try:
+            val = float(v)
+            if val > 1.0:
+                if val <= 100.0 and val >= 10.0:
+                    val = val / 100.0
+                else:
+                    val = 1.0
+            return max(0.0, min(1.0, val))
+        except (ValueError, TypeError):
+            return 0.5
+
+    @field_validator("difficulty", mode="before")
+    @classmethod
+    def normalize_difficulty(cls, v: Any) -> str:
+        allowed = {"beginner", "intermediate", "advanced", "unknown"}
+        val = str(v).lower().strip() if v else "unknown"
+        return val if val in allowed else "unknown"
+
+    @field_validator("intent", mode="before")
+    @classmethod
+    def normalize_intent(cls, v: Any) -> str:
+        allowed = {
+            "general_question",
+            "summarize",
+            "generate_quiz",
+            "math_solve",
+            "logic_solve",
+            "explain_topic",
+            "follow_up",
+            "unknown",
+        }
+        val = str(v).lower().strip() if v else "unknown"
+        return val if val in allowed else "unknown"
 
 
 class SummarySection(BaseModel):
