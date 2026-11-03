@@ -55,7 +55,7 @@ async def upload_and_solve_question(
         process_synchronously=True,
     )
 
-    content_id = upload_result.extracted_content_id
+    content_id = upload_result.extracted_content.id if upload_result.extracted_content else None
     solve_req = UnifiedSolveRequest(
         input_text=input_text,
         source_content_id=content_id,

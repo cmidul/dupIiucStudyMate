@@ -46,7 +46,7 @@ class GeminiProvider(BaseAIProvider):
 
     def __init__(self, api_key: Optional[str] = None):
         self._api_key = api_key or settings.GEMINI_API_KEY
-        self._timeout_seconds = 30.0
+        self._timeout_seconds = 60.0
 
     def _ensure_api_key(self) -> str:
         key = self._api_key or settings.GEMINI_API_KEY
@@ -174,6 +174,18 @@ class GeminiProvider(BaseAIProvider):
             raise AIAuthenticationError(
                 provider_name=self.name,
                 message="Google Gemini authentication failed. The supplied API key is invalid or unauthorized.",
+            )
+        if response.status_code == 404:
+            # Model deprecated or not found
+            error_msg = ""
+            try:
+                error_msg = response.json().get("error", {}).get("message", "")
+            except Exception:
+                pass
+            raise AIProviderError(
+                code="PROVIDER_MODEL_NOT_FOUND",
+                message=f"Gemini model '{self.default_text_model}' not found: {error_msg}",
+                status_code=502,
             )
         if response.status_code == 429:
             raise AIRateLimitError(

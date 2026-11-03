@@ -61,14 +61,22 @@ class QuizService:
             f"Requirements:\n"
             f"- Each question must have exactly 4 clear options labeled A, B, C, D.\n"
             f"- Specify correct_option_id matching one of the options.\n"
-            f"- Include a detailed pedagogical explanation.\n"
-            f"Output strictly matching the required QuizSchema JSON."
+            f"- Include a detailed pedagogical explanation.\n\n"
+            f"CRITICAL: You MUST respond with ONLY valid JSON matching this exact schema:\n"
+            f'{{"title": "string", "topic": "string", "difficulty": "{data.difficulty}", '
+            f'"question_type": "mcq", "questions": [{{"id": "q1", "question": "string", '
+            f'"options": [{{"id": "A", "text": "string"}}, {{"id": "B", "text": "string"}}, '
+            f'{{"id": "C", "text": "string"}}, {{"id": "D", "text": "string"}}], '
+            f'"correct_option_id": "A", "explanation": "string"}}]}}\n'
+            f"Keep explanations concise (1-2 sentences) to avoid JSON truncation. "
+            f"No markdown, no commentary, ONLY the JSON object."
         )
 
         req = TextGenerationRequest(
             prompt=prompt,
-            system_prompt="You are an expert educational exam writer. Formulate rigorous, unambiguous MCQ questions.",
+            system_prompt="You are an expert educational exam writer. Formulate rigorous, unambiguous MCQ questions. Respond with ONLY valid JSON.",
             temperature=0.2,
+            max_tokens=4096,
             response_schema=QuizSchema,
         )
 

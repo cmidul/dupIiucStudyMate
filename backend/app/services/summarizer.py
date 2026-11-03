@@ -73,7 +73,13 @@ class SummarizerService:
             f"Generate a structured educational summary in '{data.style}' style.\n"
             f"Style guidance: {instruction}{incomplete_note}\n\n"
             f"Source material:\n{source_text[:6000]}\n\n"
-            f"Output strictly matching the required SummarySchema JSON."
+            f"CRITICAL: You MUST respond with ONLY valid JSON matching this exact schema:\n"
+            f'{{"title": "string", "topic": "string", "style": "{data.style}", '
+            f'"overview": "string", "sections": [{{"heading": "string", "points": ["string"]}}], '
+            f'"key_terms": [{{"term": "string", "definition": "string"}}], '
+            f'"examples": ["string"], "formulas": ["string"], "revision_points": ["string"]}}\n'
+            f"Keep sections concise (max 3-4 sections, 2-3 points each) to avoid truncation. "
+            f"No markdown, no commentary, ONLY the JSON object."
         )
 
         system_prompt = (
@@ -85,6 +91,7 @@ class SummarizerService:
             prompt=prompt,
             system_prompt=system_prompt,
             temperature=0.2,
+            max_tokens=4096,
             response_schema=SummarySchema,
         )
 

@@ -40,16 +40,16 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite+aiosqlite:///./learning_assistant.db"
 
     # AI Provider Settings
-    AI_DEFAULT_PROVIDER: str = "mock"  # gemini, groq, mock
-    AI_FALLBACK_PROVIDER: str = "mock"
+    AI_DEFAULT_PROVIDER: str = "gemini"  # gemini, groq, mock
+    AI_FALLBACK_PROVIDER: str = "groq"  # gemini, groq, mock
 
     # Provider Keys (Server-side only)
     GEMINI_API_KEY: Optional[str] = None
-    AI_MODEL_TEXT: str = "gemini-2.0-flash"
-    AI_MODEL_VISION: str = "gemini-2.0-flash"
+    AI_MODEL_TEXT: str = "gemini-3.5-flash"
+    AI_MODEL_VISION: str = "gemini-3.5-flash"
 
     GROQ_API_KEY: Optional[str] = None
-    GROQ_MODEL_TEXT: str = "llama-3.3-70b-versatile"
+    GROQ_MODEL_TEXT: str = "qwen/qwen3.8-27b"
 
     # Telegram Integration
     TELEGRAM_BOT_TOKEN: Optional[str] = None

@@ -39,7 +39,7 @@ class GroqProvider(BaseAIProvider):
 
     def __init__(self, api_key: Optional[str] = None):
         self._api_key = api_key or settings.GROQ_API_KEY
-        self._timeout_seconds = 20.0
+        self._timeout_seconds = 45.0
 
     def _ensure_api_key(self) -> str:
         key = self._api_key or settings.GROQ_API_KEY
