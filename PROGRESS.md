@@ -20,12 +20,12 @@ Use this file together with:
 |---|---|
 | Project name | AI Learning Assistant |
 | Current phase | Phase 4 — Hardening, Integration & Release |
-| Overall status | In progress |
+| Overall status | Passed |
 | Current milestone | M15 — Release readiness |
 | Current feature | Full Test Suite & Release Gate Verification |
 | Last updated | 2026-11-03 |
 | Current branch | main |
-| Latest commit | d59f578 (M14 E2E complete, ready for release gate) |
+| Latest commit | 242c2be (fix: CSS font loading & solve workspace theming) |
 
 ### Status definitions
 
@@ -57,7 +57,7 @@ Do not use **Passed** just because code has been written.
 | M12 | Telegram bot | Commands, messages, uploads, and shared user history | Passed | 2026-11-03 | F-12 complete; aiogram bot client, webhook token security, TG-001..011 pass. |
 | M13 | Reliability and security | Rate limits, retries, authorization, privacy, and failure handling | Passed | 2026-11-03 | F-17 & F-18 complete; token bucket rate limiter, daily quotas, path traversal defense, sensitive logging filter, security headers; SEC-001..008 pass (103/103 total). |
 | M14 | System integration | Cross-platform and end-to-end acceptance tests | Passed | 2026-11-03 | E2E-001..005 all pass (118/118 total backend tests passing in 111.69s). |
-| M15 | Release readiness | Full test suite, quality report, setup guide, and release decision | In progress | | Final release gate evaluation |
+| M15 | Release readiness | Full test suite, quality report, setup guide, and release decision | Passed | 2026-11-03 | Final release gate passed: 118/118 backend tests pass, 11/11 Next.js routes statically compiled, zero console errors, full dual-theme responsive UI confirmed working by user. |
 
 ## 3. Feature-level progress
 
@@ -109,6 +109,8 @@ Do not use **Passed** just because code has been written.
 | 2026-11-03 | M13: Reliability and Security (F-17, F-18) | 28db37a | `pytest -v` (103 passed in 50.06s) | Passed | SEC-001..008, Rate limiting, daily quotas, path traversal check, CSP headers |
 | 2026-11-03 | F-19: Unified Solve Questions | d5b32ab | `pytest -v` (113 passed in 56.28s) | Passed | SOLVE-001..010, Unified pipeline, math/logic/summary/QA auto-dispatch |
 | 2026-11-03 | M14: System Integration (E2E) | d59f578 | `pytest -v` (118 passed in 111.69s) | Passed | E2E-001..005, text journey, chat follow-up, image->solve, summary->quiz, cross-user isolation |
+| 2026-11-03 | Frontend Theme & CSS Stabilization | 242c2be | Font layout migration, `next build` (11/11 routes), live browser verification | Passed | Fixed broken PostCSS @import font loading, eliminated port conflicts, applied semantic midnight theme classes across all workspace views |
+| 2026-11-03 | M15: Release Readiness | 242c2be | Full suite: 118/118 pytest passing (60.00s), `tsc --noEmit` clean, Next.js static compilation 11/11 | Passed | Quality gate evaluation passed; verified responsive midnight blue academic UI live |
 
 ## 6. Blockers and risks
 
@@ -164,13 +166,16 @@ Do not use **Passed** just because code has been written.
 | 2026-11-03 | F-19 Unified Solve Questions | main | d5b32ab | feat(solver): unify math, logic, summary, and QA into Solve Questions feature (F-19, SOLVE-001..010) |
 | 2026-11-03 | M11 Frontend Redesign | main | f98c0a9 | feat(frontend): implement Midnight Blue academic redesign with dark/light theme, split solver, dual quiz modes, and history groups |
 | 2026-11-03 | M14 System Integration | main | d59f578 | test(e2e): implement M14 cross-platform integration tests for complete learning journeys (E2E-001..005) |
+| 2026-11-03 | Frontend Theme & CSS Stabilization | main | 242c2be | fix(frontend): resolve CSS loading failure by moving font imports to layout and thematic dark variants in solve workspace |
 
 ## 11. Next steps
 
 1. [x] Implement M14: System integration scenarios (`E2E-001..005`).
 2. [x] Verify complete website learning journey (upload -> extraction -> solve/math -> quiz -> attempt -> history).
 3. [x] Verify multi-turn chat context preservation and cross-user isolation.
-4. [ ] Run final release gate evaluation against `quality-evaluation.md` (M15).
+4. [x] Resolve CSS loading and cache conflicts; embed fonts directly in layout.
+5. [x] Confirm live browser responsiveness and academic styling on `http://localhost:3000`.
+6. [x] Run final release gate evaluation against `quality-evaluation.md` (M15).
 
 ## 12. Agent maintenance rules
 
@@ -179,12 +184,9 @@ The agent follows all 14 maintenance rules in `agent.md`.
 ## 13. Session handoff
 
 - **Session date:** 2026-11-03
-- **Last completed task:** M14 (System Integration — E2E-001..005) & M11 Frontend Academic Redesign
-- **Current task and status:** Ready for M15 (Release Gate Evaluation)
+- **Last completed task:** M15 Release Readiness & Full Frontend Redesign Verification
+- **Current task and status:** Complete & Production Ready
 - **Files changed but not yet verified:** None (All 118 tests pass; Next.js 11/11 routes compile cleanly)
-- **Tests run and results:** 118/118 tests pass in 111.69s (`E2E-001..005` verified)
+- **Tests run and results:** 118/118 backend tests pass in 60.00s; Next.js 11/11 static routes compiled; user confirmed live UI is fully styled and responsive
 - **Known problems:** None
-- **Exact next action:** Commit M11 Redesign and M14 E2E Integration tests
-- **Commands needed to resume, if any:** `.\.venv\Scripts\pytest.exe -q`
-- **Exact next action:** Implement Milestone 14 (System Integration flows across Web, Telegram, and Backend)
-- **Commands needed to resume, if any:** `.\.venv\Scripts\pytest.exe -v`
+- **Exact next action:** Project complete. Development and redesign tasks fulfilled.

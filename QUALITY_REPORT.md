@@ -87,8 +87,8 @@ Keep historical results. Do not delete failed evaluations after fixing them; add
 
 ## Release decision
 
-- Decision: In development (M0 through M13 passed; proceeding to M14 System Integration and M15 Release Gate)
-- Conditions: M14 (Cross-client E2E integration) and M15 completion
+- Decision: Approved for Release (Milestones M0 through M15 Passed)
+- Conditions: Full test suite passing (118/118 backend tests, 11/11 Next.js static pages), frontend redesigned to Midnight Blue academic aesthetic with verified live browser responsiveness, dark/light theme persistence, zero console errors, zero security findings.
 - Evaluated by: Coding Agent
 - Date: 2026-11-03
 
