@@ -10,12 +10,23 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.database import Base, get_db
+from app.core.config import settings
 from app.core.quota import quota_manager
 from app.core.rate_limit import rate_limiter
 from app.main import app
 
 # Isolated in-memory SQLite database for testing
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+
+
+@pytest.fixture(autouse=True)
+def use_offline_services(monkeypatch):
+    """Keep regular tests independent of local credentials and external APIs."""
+    monkeypatch.setattr(settings, "AI_DEFAULT_PROVIDER", "mock")
+    monkeypatch.setattr(settings, "AI_FALLBACK_PROVIDER", "")
+    monkeypatch.setattr(settings, "TELEGRAM_BOT_TOKEN", None)
+    monkeypatch.setattr(settings, "TELEGRAM_BOT_SECRET", "dev-telegram-bot-secret")
+    monkeypatch.setattr(settings, "TELEGRAM_WEBHOOK_SECRET", None)
 
 test_engine = create_async_engine(
     TEST_DATABASE_URL,

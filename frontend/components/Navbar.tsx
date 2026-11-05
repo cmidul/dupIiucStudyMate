@@ -34,15 +34,15 @@ interface NavItem {
 
 const MAIN_NAV: NavItem[] = [
   { href: "/", label: "Home", description: "Academic workspace", icon: Compass },
-  { href: "/solve", label: "Solve Questions", description: "Math, logic & passage solver", icon: Calculator },
-  { href: "/quizzes", label: "Quiz Generator", description: "Exam & practice assessments", icon: Award },
+  { href: "/solve", label: "Solve", description: "Solve a question from text or a photo", icon: Calculator },
+  { href: "/quizzes", label: "Quizzes", description: "Practice and timed exams", icon: Award },
 ];
 
 const LEARNING_NAV: NavItem[] = [
-  { href: "/upload", label: "Learning Tools", description: "Extract & vision analysis", icon: UploadCloud },
+  { href: "/upload", label: "Image reader", description: "Extract text from images", icon: UploadCloud },
   { href: "/history", label: "History", description: "Study timeline & archive", icon: HistoryIcon },
-  { href: "/summaries", label: "Saved Items", description: "Generated notes & summaries", icon: Bookmark },
-  { href: "/chat", label: "Dialogue", description: "Socratic AI chat", icon: MessageSquare },
+  { href: "/summaries", label: "Summaries", description: "Create and review study notes", icon: Bookmark },
+  { href: "/chat", label: "Chat", description: "Discuss a topic with the AI tutor", icon: MessageSquare },
 ];
 
 const ACCOUNT_NAV: NavItem[] = [
@@ -55,7 +55,6 @@ export default function Navbar() {
 
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -63,7 +62,6 @@ export default function Navbar() {
     if (saved !== null) {
       setCollapsed(saved === "true");
     }
-    setMounted(true);
   }, []);
 
   useEffect(() => {
@@ -85,9 +83,9 @@ export default function Navbar() {
   // Reusable link class builder
   const navLinkClass = (active: boolean, extraClass = "") =>
     [
-      "flex items-center gap-3 px-2.5 py-2 rounded-lg text-xs font-medium transition group",
+      "flex min-h-11 items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition group",
       active
-        ? "bg-midnight-750 dark:bg-midnight-750 text-scholar-emerald border border-midnight-600/60 shadow-xs"
+        ? "bg-[var(--workspace-tint)] text-scholar-emerald font-semibold"
         : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-midnight-800",
       extraClass,
     ].join(" ");
@@ -112,6 +110,8 @@ export default function Navbar() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={active ? "page" : undefined}
+              aria-label={collapsed ? item.label : undefined}
               title={collapsed ? `${item.label} — ${item.description}` : undefined}
               className={navLinkClass(active, collapsed ? "justify-center" : "")}
             >
@@ -128,14 +128,14 @@ export default function Navbar() {
     [
       "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition",
       active
-        ? "bg-midnight-750 text-scholar-emerald border border-midnight-600"
+        ? "bg-[var(--workspace-tint)] text-scholar-emerald font-semibold"
         : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-midnight-800",
     ].join(" ");
 
   return (
     <>
       {/* Mobile Top Header */}
-      <header className="md:hidden flex items-center justify-between px-4 h-14 bg-white dark:bg-midnight-850 border-b border-slate-200 dark:border-midnight-700 z-40 text-slate-800 dark:text-slate-200">
+      <header className="md:hidden sticky top-0 flex items-center justify-between px-4 h-14 flex-shrink-0 bg-white dark:bg-midnight-850 border-b border-slate-200 dark:border-midnight-700 z-40 text-slate-800 dark:text-slate-200">
         <Link href="/" className="flex items-center gap-2.5 font-serif font-bold text-base tracking-tight text-slate-900 dark:text-slate-100">
           <span className="w-7 h-7 rounded border border-slate-200 dark:border-midnight-600 bg-slate-50 dark:bg-midnight-800 flex items-center justify-center font-mono text-xs font-semibold text-scholar-emerald">
             SM
@@ -153,6 +153,7 @@ export default function Navbar() {
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle navigation menu"
+            aria-expanded={mobileOpen}
             className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-midnight-700 text-slate-500 dark:text-slate-400"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -177,6 +178,7 @@ export default function Navbar() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    aria-current={pathname === item.href ? "page" : undefined}
                     onClick={() => setMobileOpen(false)}
                     className={mobileLinkClass(pathname === item.href)}
                   >
@@ -232,13 +234,13 @@ export default function Navbar() {
 
       {/* Desktop Collapsible Academic Sidebar */}
       <aside
-        className={`hidden md:flex flex-col flex-shrink-0 bg-white dark:bg-midnight-850 border-r border-slate-200 dark:border-midnight-700 text-slate-600 dark:text-slate-300 transition-all duration-200 select-none ${
-          collapsed ? "w-16" : "w-60"
+        className={`hidden md:flex sticky top-0 h-screen flex-col flex-shrink-0 bg-white dark:bg-midnight-850 border-r border-slate-200 dark:border-midnight-700 text-slate-600 dark:text-slate-300 transition-all duration-200 select-none ${
+          collapsed ? "w-16" : "w-56"
         }`}
         aria-label="Sidebar Navigation"
       >
         {/* Brand Header */}
-        <div className="h-16 px-4 flex items-center justify-between border-b border-slate-200 dark:border-midnight-700">
+        <div className={`flex shrink-0 items-center border-b border-slate-200 dark:border-midnight-700 ${collapsed ? "flex-col gap-1 py-2" : "h-16 px-4 justify-between"}`}>
           <Link
             href="/"
             className="flex items-center gap-2.5 overflow-hidden"
@@ -269,8 +271,8 @@ export default function Navbar() {
 
         {/* Navigation Sections */}
         <div className="flex-1 overflow-y-auto py-4 px-2 space-y-6">
-          {renderNavSection(MAIN_NAV, "Main")}
-          {renderNavSection(LEARNING_NAV, "Learning")}
+          {renderNavSection(MAIN_NAV, "Study")}
+          {renderNavSection(LEARNING_NAV, "Library")}
           {renderNavSection(ACCOUNT_NAV, "Account")}
         </div>
 

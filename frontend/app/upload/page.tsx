@@ -91,15 +91,12 @@ export default function UploadPage() {
   return (
     <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-8 w-full">
       {/* Header */}
-      <div className="border-b border-slate-200 dark:border-slate-800 pb-5">
-        <span className="text-[11px] font-mono uppercase tracking-wider text-scholar-emerald font-semibold">
-          Multimodal Ingestion
-        </span>
+      <div className="page-heading border-b border-slate-200 dark:border-midnight-700 pb-5">
         <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100 mt-1">
-          Manuscript & Image Analysis
+          Image reader
         </h1>
         <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Upload textbook excerpts, handwritten proofs, whiteboard diagrams, or problem sets for OCR extraction.
+          Extract text and equations from a photo, scan, or slide.
         </p>
       </div>
 
@@ -171,7 +168,7 @@ export default function UploadPage() {
 
       {/* Extracted Content Result */}
       {extracted && (
-        <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
+        <div className="workspace-panel p-6 md:p-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold text-scholar-emerald mb-1">

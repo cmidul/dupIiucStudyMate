@@ -53,17 +53,17 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white dark:bg-midnight-850 border border-slate-200 dark:border-midnight-700 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="workspace-panel w-full max-w-md p-6 sm:p-8 space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
+        <div className="page-heading text-center space-y-2">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-slate-100 dark:bg-midnight-800 border border-slate-200 dark:border-midnight-700 text-scholar-emerald mb-1">
             <UserPlus className="w-5 h-5" />
           </div>
           <h1 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 dark:text-slate-100">
-            Create Research Profile
+            Create an account
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
-            Establish a unified account to sync conversations across web and Telegram.
+            Save your study history and access it from the web or Telegram.
           </p>
         </div>
 

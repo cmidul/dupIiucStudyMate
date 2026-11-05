@@ -131,26 +131,26 @@ function ChatComponent() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] md:h-screen w-full overflow-hidden bg-slate-50 dark:bg-midnight-950">
+    <div className="flex h-[calc(100dvh-3.5rem)] md:h-[100dvh] w-full overflow-hidden">
       {/* Sidebar: Conversation List */}
-      <aside className="w-72 bg-white dark:bg-midnight-900 border-r border-slate-200 dark:border-slate-800 hidden lg:flex flex-col flex-shrink-0">
+      <aside className="w-56 bg-white dark:bg-midnight-850 border-r border-slate-200 dark:border-midnight-700 hidden lg:flex flex-col flex-shrink-0">
         <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <span className="font-mono text-xs uppercase tracking-wider text-slate-500 font-semibold">
-            Inquiry Logs
+            Conversations
           </span>
           <button
             onClick={handleNewChat}
             className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 bg-slate-100 dark:bg-midnight-800 text-slate-800 dark:text-slate-200 hover:text-scholar-emerald dark:hover:text-scholar-emerald rounded-lg transition"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>New Session</span>
+            <span>New chat</span>
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {conversations.length === 0 ? (
             <div className="p-4 text-center text-xs text-slate-400">
-              No historical sessions recorded.
+              No conversations yet.
             </div>
           ) : (
             conversations.map((c) => (
@@ -181,7 +181,13 @@ function ChatComponent() {
       </aside>
 
       {/* Main Chat Thread */}
-      <div className="flex-1 flex flex-col h-full bg-slate-50 dark:bg-midnight-950 relative">
+      <div className="flex-1 min-w-0 flex flex-col h-full relative">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200 dark:border-midnight-700 px-4 py-3 md:px-8 bg-white dark:bg-midnight-850">
+          <h1 className="text-lg font-semibold">Chat</h1>
+          <button type="button" onClick={handleNewChat} className="lg:hidden inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-semibold text-scholar-emerald">
+            <Plus className="w-4 h-4" /> New chat
+          </button>
+        </div>
         {/* Topic Badge Header */}
         {latestTopic && (
           <div className="px-6 py-2.5 bg-white dark:bg-midnight-900 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 text-xs text-slate-700 dark:text-slate-300">
@@ -202,10 +208,10 @@ function ChatComponent() {
                 <MessageSquare className="w-5 h-5" />
               </div>
               <h3 className="font-serif font-semibold text-slate-800 dark:text-slate-200 text-base mb-1">
-                Academic Dialogue Workspace
+                What would you like to understand?
               </h3>
               <p className="text-xs max-w-sm text-slate-500 dark:text-slate-400">
-                Inquire about theoretical principles, mathematical derivations, or algorithmic edge cases.
+                Ask for an explanation, a worked example, or help with a concept.
               </p>
             </div>
           ) : (
@@ -217,7 +223,7 @@ function ChatComponent() {
                 }`}
               >
                 <div
-                  className={`max-w-2xl px-5 py-3.5 rounded-2xl text-xs md:text-sm leading-relaxed ${
+                  className={`max-w-full md:max-w-2xl break-words px-4 py-3.5 rounded-2xl text-sm md:text-base leading-relaxed ${
                     m.role === "user"
                       ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-950 rounded-br-none shadow-sm whitespace-pre-wrap"
                       : "bg-white dark:bg-midnight-900 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-bl-none shadow-sm whitespace-pre-wrap font-sans"

@@ -24,10 +24,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-midnight-900 text-slate-900 dark:text-slate-100 transition-colors duration-150 antialiased selection:bg-emerald-500/20 selection:text-emerald-300">
+      <body className="min-h-screen flex flex-col md:flex-row antialiased selection:bg-teal-500/20">
         <ThemeProvider>
           <Navbar />
-          <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+          <main className="workspace-main flex-1 flex flex-col min-w-0" id="workspace">
             {children}
           </main>
         </ThemeProvider>

@@ -120,6 +120,8 @@ class MockAIProvider(BaseAIProvider):
 
     def _generate_default_schema_response(self, schema: Any, prompt: str) -> str:
         """Produce predictable JSON string corresponding to target schema."""
+        from app.schemas.unified_solver import EducationalSolution, EducationalStep
+
         prompt_lower = (prompt or "").lower()
 
         if schema is TopicDetectionSchema:
@@ -149,6 +151,13 @@ class MockAIProvider(BaseAIProvider):
                 confidence=0.96,
             )
             return obj.model_dump_json()
+
+        if schema is EducationalSolution:
+            return EducationalSolution(
+                topic="Offline test fixture",
+                steps=[EducationalStep(step=1, title="Example", explanation="Mock explanation for offline testing.")],
+                conclusion="Mock answer for offline testing.",
+            ).model_dump_json()
 
         if schema is SummarySchema:
             obj = SummarySchema(

@@ -6,9 +6,8 @@ Automatically classifies user input without requiring manual mode selection.
 """
 
 import json
-import logging
 import re
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Optional, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.router import ai_router
@@ -23,9 +22,7 @@ from app.schemas.chat import ChatMessageRequest
 from app.schemas.solver import LogicSolveRequest, MathSolveRequest
 from app.schemas.summary import SummaryGenerateRequest
 from app.schemas.unified_solver import (
-    EducationalConcept,
     EducationalSolution,
-    EducationalStep,
     TaskType,
     UnifiedFollowUpRequest,
     UnifiedFollowUpResponse,
@@ -37,8 +34,6 @@ from app.services.logic_solver import logic_solver_service
 from app.services.math_solver import SafeMathParser, SafeMathSecurityError, math_solver_service
 from app.services.summarizer import summarizer_service
 from app.services.topic_detector import topic_detector
-
-logger = logging.getLogger("learning_assistant.unified_solver")
 
 MATH_SECURITY_PARSER = SafeMathParser()
 
@@ -65,6 +60,8 @@ class UnifiedSolverService:
         self,
         text: str,
         ext_content: Optional[ExtractedContent] = None,
+        *,
+        contextual_image_question: bool = False,
     ) -> Tuple[TaskType, float, bool, Optional[str]]:
         """Classify user text or extracted content into the appropriate task type.
         
@@ -93,6 +90,9 @@ class UnifiedSolverService:
                     message=f"Input contains disallowed code execution token matching '{pattern}'.",
                     status_code=400,
                 )
+
+        if contextual_image_question:
+            return TaskType.GENERAL_EDUCATIONAL, 0.85, False, None
 
         # 2. Check for Ambiguous Expressions e.g. 1/2x without grouping
         for pattern in AMBIGUOUS_PATTERNS:
@@ -123,17 +123,9 @@ class UnifiedSolverService:
             "x^2", "x**2", "sqrt(", "sin(", "cos(", "tan(", "log(", "ln("
         ])
         is_arithmetic = bool(re.search(r"^\s*\(?\s*\d+[\s\d\+\-\*\/\^\(\)\.]+\s*\)?\s*$", clean))
-        parsed_eqs = []
-        if ext_content and ext_content.equations:
-            try:
-                raw_eq = ext_content.equations
-                parsed_eqs = json.loads(raw_eq) if isinstance(raw_eq, str) else raw_eq
-            except Exception:
-                parsed_eqs = []
-        has_extracted_eq = bool(parsed_eqs and len(parsed_eqs) > 0)
         starts_with_math_solve = lowered.startswith("solve ") and any(c in clean for c in ["x", "y", "z", "+", "-", "*", "/", "="])
 
-        if has_equation or has_calc_terms or is_arithmetic or has_extracted_eq or starts_with_math_solve:
+        if has_equation or has_calc_terms or is_arithmetic or starts_with_math_solve:
             return TaskType.MATHEMATICS, 0.95, False, None
 
         # 4. Check for Logical Reasoning
@@ -172,6 +164,7 @@ class UnifiedSolverService:
         # 1. Resolve source text and extracted content
         source_text = (data.input_text or "").strip()
         ext_content: Optional[ExtractedContent] = None
+        contextual_image_question = False
 
         if data.source_content_id:
             ext_content = await upload_repo.get_extracted_content(db, data.source_content_id, user_id)
@@ -182,18 +175,27 @@ class UnifiedSolverService:
                     status_code=404,
                 )
             if not source_text:
-                # Use extracted equations if present and no text provided, or extracted text
-                parsed_eqs = []
-                if ext_content.equations:
-                    try:
-                        raw_eq = ext_content.equations
-                        parsed_eqs = json.loads(raw_eq) if isinstance(raw_eq, str) else raw_eq
-                    except Exception:
-                        parsed_eqs = []
-                if parsed_eqs and len(parsed_eqs) > 0:
-                    source_text = parsed_eqs[0]
-                else:
-                    source_text = ext_content.extracted_text
+                source_text = (ext_content.extracted_text or "").strip()
+                try:
+                    equations = json.loads(ext_content.equations or "[]")
+                except json.JSONDecodeError:
+                    equations = []
+                if len(equations) == 1:
+                    equation = equations[0].strip()
+                    bare_text = re.sub(r"^solve(?:\s+the equation)?(?:\s*:\s*|\s+)", "", source_text, flags=re.I)
+                    if not source_text or (
+                        ";" not in equation and "".join(bare_text.split()) == "".join(equation.split())
+                    ):
+                        source_text = equation
+                    else:
+                        contextual_image_question = True
+                elif source_text:
+                    question_labels = re.findall(
+                        r"^\s*(?:Q(?:uestion)?\s*\d+|\d+[.)]?\s*\(?[a-z]\))",
+                        source_text,
+                        flags=re.IGNORECASE | re.MULTILINE,
+                    )
+                    contextual_image_question = bool(equations) or source_text.count("?") > 1 or len(question_labels) > 1
 
         if not source_text:
             raise AppException(
@@ -213,7 +215,9 @@ class UnifiedSolverService:
             conversation = await chat_repo.create_conversation(db, user_id, title=f"Solve: {title_preview}")
 
         # 3. Classify input into task type
-        task_type, confidence, needs_clarification, clarification_q = self.classify_input(source_text, ext_content)
+        task_type, confidence, needs_clarification, clarification_q = self.classify_input(
+            source_text, ext_content, contextual_image_question=contextual_image_question,
+        )
 
         # If ambiguous, return early with clarification
         if needs_clarification:
@@ -335,7 +339,9 @@ class UnifiedSolverService:
         else:
             # TaskType.GENERAL_EDUCATIONAL
             quota_manager.check_quota(user_id=user_id, category="ai_chat")
-            edu_solution = await self._generate_educational_explanation(source_text)
+            edu_solution = await self._generate_educational_explanation(
+                source_text, concise=contextual_image_question,
+            )
             quota_manager.record_usage(user_id=user_id, category="ai_chat")
 
             asst_text = f"**Answer:** {edu_solution.conclusion}\n\n" + "\n".join(
@@ -359,60 +365,36 @@ class UnifiedSolverService:
                 educational_solution=edu_solution,
             )
 
-    async def _generate_educational_explanation(self, question: str) -> EducationalSolution:
+    async def _generate_educational_explanation(self, question: str, *, concise: bool = False) -> EducationalSolution:
         """Generate a structured, pedagogical step-by-step educational explanation."""
         prompt = (
             f"Provide an understandable, pedagogical step-by-step explanation for the following educational question:\n\n"
             f"Question: {question}\n\n"
-            f"Break it down into progressive learning steps, define core concepts, and provide a clear conclusion."
+            "Return a JSON object with subject, topic, steps (each with step, title, and explanation), "
+            "key_concepts (each with concept and explanation), conclusion, and takeaways (strings). "
+            "Answer each question in order if the input contains multiple questions. "
+            "Put the direct answers in conclusion and the supporting explanations in steps."
         )
         system_prompt = (
             "You are an expert tutor. Provide accurate, clear educational explanations suitable for students. "
             "Prioritize step-by-step clarity and essential concept retention."
         )
+        if concise:
+            prompt += (
+                " Keep the complete response concise. Give a short answer and only the essential working "
+                "for each labeled question in conclusion. Leave steps, key_concepts, and takeaways empty "
+                "if they would repeat the answers. Cover each question and its alternatives."
+            )
 
         req = TextGenerationRequest(
             prompt=prompt,
             system_prompt=system_prompt,
             temperature=0.2,
+            max_tokens=960 if concise else 4096,
+            response_schema=EducationalSolution,
         )
-
-        try:
-            res = await ai_router.generate_text(req)
-            content = res.content
-        except Exception as exc:
-            logger.warning(f"AI text generation error: {exc}. Using fallback explanation.")
-            content = f"Educational explanation for: {question}"
-
-        # Build structured educational solution
-        steps = [
-            EducationalStep(
-                step=1,
-                title="Concept Overview",
-                explanation=content[:250].strip() if len(content) > 50 else content,
-            ),
-            EducationalStep(
-                step=2,
-                title="Key Mechanism & Analysis",
-                explanation=content[250:600].strip() if len(content) > 300 else "Core concepts and underlying mechanics.",
-            ),
-        ]
-
-        concepts = [
-            EducationalConcept(
-                concept="Core Subject Knowledge",
-                explanation="Foundational definitions and relationships relevant to the topic.",
-            )
-        ]
-
-        return EducationalSolution(
-            subject="General",
-            topic="Educational Concept",
-            steps=steps,
-            key_concepts=concepts,
-            conclusion=content[:180].strip() if len(content) > 180 else content,
-            takeaways=["Understand fundamental mechanisms", "Apply concepts to practical problems"],
-        )
+        result = await ai_router.generate_text(req)
+        return EducationalSolution.model_validate(result.structured_data)
 
     async def ask_follow_up(
         self,

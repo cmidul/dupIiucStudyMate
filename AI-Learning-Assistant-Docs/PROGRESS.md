@@ -183,6 +183,8 @@ The agent follows all 14 maintenance rules in `agent.md`.
 
 ## 13. Session handoff
 
+- **2026-11-05 AI provider and image Solve repair:** Live Gemini and Groq text checks passed. A live image solve through the Next.js proxy returned `x = 3`. See the root `PROGRESS.md` for setup and verification details.
+
 - **Session date:** 2026-11-03
 - **Last completed task:** M15 Release Readiness & Full Frontend Redesign Verification
 - **Current task and status:** Complete & Production Ready

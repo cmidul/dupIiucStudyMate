@@ -189,7 +189,10 @@ class ImageService:
             "Analyze this learning material image in detail. Extract all visible text, identify key educational "
             "concepts, note equations, and describe any visual diagrams or figures. Distinguish visible text from "
             "diagram interpretation. If parts are blurry or uncertain, record them in uncertainties. "
-            "If no educational context is present, state so explicitly."
+            "For a question sheet, transcribe every question in order, including its numbering and subparts. "
+            "Keep the other fields concise. If no educational context is present, state so explicitly. "
+            "Return JSON with title, subject, topic, "
+            "extracted_text, and equations (a list of equation strings). Put transcribed text in extracted_text."
         )
 
         try:
@@ -212,11 +215,15 @@ class ImageService:
         except (AITimeoutError, AIProviderError) as e:
             logger.error(f"AI Vision provider failed: {e}")
             is_transient = isinstance(e, AITimeoutError)
+            public_error = e.code in {"IMAGE_TRANSCRIPTION_TOO_LONG", "PROVIDER_RATE_LIMITED"}
             await job_service.fail_job(
                 db=db,
                 job=job,
-                error_code="AI_PROVIDER_ERROR",
-                error_message="Vision model failed to process image within timeout bounds.",
+                error_code=e.code if public_error else "AI_PROVIDER_ERROR",
+                error_message=(
+                    e.message if public_error
+                    else "The image analysis service could not read this image. Please try again shortly."
+                ),
                 is_transient=is_transient,
             )
             return None

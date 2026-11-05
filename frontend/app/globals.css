@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #f8fafc;
+  --bg-primary: #f2f5f3;
   --bg-surface: #ffffff;
   --bg-surface-elevated: #f1f5f9;
   --border-subtle: #e2e8f0;
@@ -11,19 +11,25 @@
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-muted: #64748b;
-  --accent-emerald: #059669;
+  --accent-emerald: #0f7364;
+  --workspace-accent: #0f7364;
+  --workspace-tint: #e7f4ee;
+  --workspace-answer-border: #b2d6c8;
 }
 
 .dark {
-  --bg-primary: #0b0f19;
-  --bg-surface: #111827;
-  --bg-surface-elevated: #162032;
-  --border-subtle: #1e293b;
-  --border-hover: #334155;
+  --bg-primary: #141d20;
+  --bg-surface: #1a2529;
+  --bg-surface-elevated: #212f33;
+  --border-subtle: #324449;
+  --border-hover: #40575d;
   --text-primary: #f1f5f9;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
-  --accent-emerald: #10b981;
+  --accent-emerald: #80dbc2;
+  --workspace-accent: #80dbc2;
+  --workspace-tint: #1c3330;
+  --workspace-answer-border: #40665d;
 }
 
 body {
@@ -34,18 +40,67 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle academic paper texture overlay in dark mode */
-.dark body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 24px 24px;
-  z-index: 9999;
+.workspace-main :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), textarea, select) {
+  font-family: inherit;
+  font-size: 0.9375rem;
+}
+
+.workspace-main .bg-scholar-emerald.text-white,
+header .bg-scholar-emerald.text-white,
+aside .bg-scholar-emerald.text-white {
+  background-color: #126a5d;
+  color: #fff;
+}
+
+.workspace-main .bg-scholar-emerald.text-white:hover {
+  background-color: #0e584d;
+}
+
+:root:not(.dark) .workspace-main .bg-scholar-emerald.text-slate-950 {
+  color: #fff;
+}
+
+.page-heading h1 {
+  font-size: clamp(1.75rem, 2.6vw, 2.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.page-heading p {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.workspace-panel {
+  min-width: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+}
+
+.answer-panel {
+  background: var(--workspace-tint);
+  border: 1px solid var(--workspace-answer-border);
+  border-radius: 0.875rem;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.answer-content {
+  font-size: 1rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.answer-content pre {
+  white-space: pre;
+  overflow-x: auto;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.625rem;
+  background: var(--bg-surface);
+  font-size: 0.875rem;
 }
 
 /* Accessible focus ring */

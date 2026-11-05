@@ -60,7 +60,7 @@ export default function SettingsPage() {
 
   // AI Provider & API Key state
   const [aiStatus, setAiStatus] = useState<AIStatusResponse | null>(null);
-  const [selectedProvider, setSelectedProvider] = useState<string>("mock");
+  const [selectedProvider, setSelectedProvider] = useState<string>("gemini");
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [showApiKey, setShowApiKey] = useState(false);
   const [aiSaving, setAiSaving] = useState(false);
@@ -193,15 +193,12 @@ export default function SettingsPage() {
   return (
     <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-8 w-full">
       {/* Header */}
-      <div className="border-b border-slate-200 dark:border-slate-800 pb-5">
-        <span className="text-[11px] font-mono uppercase tracking-wider text-scholar-emerald font-semibold">
-          Configuration & Accounts
-        </span>
+      <div className="page-heading border-b border-slate-200 dark:border-midnight-700 pb-5">
         <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100 mt-1">
-          Workspace Settings
+          Settings
         </h1>
         <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Configure personal study preferences, workspace appearance, and cross-platform synchronization.
+          Manage your account, study preferences, appearance, and Telegram connection.
         </p>
       </div>
 
@@ -433,18 +430,17 @@ export default function SettingsPage() {
                 id: "gemini",
                 name: "Google Gemini",
                 badge: "Multimodal Vision",
-                desc: "Live reasoning & vision analysis via Gemini 2.0 Flash",
+                desc: "Live reasoning and image analysis",
               },
               {
                 id: "groq",
-                name: "Groq Llama 3.3",
+                name: "Groq",
                 badge: "Ultra Low-Latency",
-                desc: "High-speed open-source inference via Llama 3.3 70B",
+                desc: "High-speed live text generation",
               },
             ].map((p) => {
               const isSelected = selectedProvider === p.id;
               const isCurrentActive = aiStatus?.active_provider === p.id;
-              const isConfigured = aiStatus?.providers?.[p.id]?.configured;
 
               return (
                 <div
@@ -475,7 +471,7 @@ export default function SettingsPage() {
 
                   <div className="mt-3 pt-2 border-t border-slate-100 dark:border-midnight-800 flex items-center justify-between text-[11px] font-mono">
                     <span className="text-slate-400">
-                      {isConfigured ? "Key: Configured" : "Key: Not Set"}
+                      {p.id === "mock" ? "Offline testing" : aiStatus?.providers?.[p.id]?.model}
                     </span>
                     {isSelected && <Check className="w-3.5 h-3.5 text-scholar-emerald" />}
                   </div>
@@ -489,22 +485,12 @@ export default function SettingsPage() {
             <div className="p-4 rounded-xl bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                  Mock Engine Activated
+                  {aiStatus?.active_provider === "mock" ? "Mock Engine Activated" : "Mock Engine"}
                 </div>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  Does not require external credentials. All mathematical and reasoning verification work offline.
+                  For offline testing, set AI_DEFAULT_PROVIDER=mock in the backend environment and restart the backend.
                 </p>
               </div>
-              {aiStatus?.active_provider !== "mock" && (
-                <button
-                  type="button"
-                  onClick={() => handleConfigureAI("mock")}
-                  disabled={aiSaving}
-                  className="px-4 py-2 bg-slate-900 dark:bg-scholar-emerald hover:bg-slate-800 dark:hover:bg-emerald-600 text-white dark:text-slate-950 text-xs font-semibold rounded-lg transition self-start sm:self-auto"
-                >
-                  {aiSaving ? "Switching..." : "Activate Mock Engine"}
-                </button>
-              )}
             </div>
           ) : (
             <div className="p-4 rounded-xl bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 space-y-4">
@@ -530,7 +516,7 @@ export default function SettingsPage() {
                       </>
                     ) : (
                       <>
-                        Provides ultra-fast Llama 3.3 inference. Free keys available at{" "}
+                        Provides fast text generation. API keys are available at{" "}
                         <a
                           href="https://console.groq.com/keys"
                           target="_blank"

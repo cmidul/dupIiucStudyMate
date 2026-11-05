@@ -4,7 +4,10 @@ from typing import Any, Dict, Optional
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from app.api.deps import get_request_id
+from app.ai.providers.gemini import GeminiProvider
+from app.ai.providers.groq import GroqProvider
 from app.ai.router import ai_router
+from app.ai.schemas import TextGenerationRequest
 from app.core.config import settings
 from app.core.responses import ApiResponse, AppException
 
@@ -18,11 +21,8 @@ class AIConfigRequest(BaseModel):
 
 @router.get("/status", response_model=ApiResponse[Dict[str, Any]])
 async def get_ai_status(request_id: str = Depends(get_request_id)) -> ApiResponse[Dict[str, Any]]:
-    gemini_provider = ai_router.get_provider("gemini")
-    groq_provider = ai_router.get_provider("groq")
-
-    has_gemini = bool(gemini_provider and getattr(gemini_provider, "_api_key", None))
-    has_groq = bool(groq_provider and getattr(groq_provider, "_api_key", None))
+    has_gemini = settings.is_gemini_configured
+    has_groq = settings.is_groq_configured
 
     return ApiResponse(
         data={
@@ -40,10 +40,10 @@ async def get_ai_status(request_id: str = Depends(get_request_id)) -> ApiRespons
                     "configured": has_gemini,
                     "model": settings.AI_MODEL_TEXT,
                     "vision_model": settings.AI_MODEL_VISION,
-                    "description": "Live multimodal reasoning via Gemini 2.0 Flash",
+                    "description": "Live text and image analysis",
                 },
                 "groq": {
-                    "name": "Groq Llama 3.3",
+                    "name": "Groq",
                     "status": "active" if settings.AI_DEFAULT_PROVIDER == "groq" else ("configured" if has_groq else "unconfigured"),
                     "configured": has_groq,
                     "model": settings.GROQ_MODEL_TEXT,
@@ -68,38 +68,24 @@ async def configure_ai_provider(
             message=f"Unsupported provider '{payload.provider}'. Must be 'gemini', 'groq', or 'mock'.",
         )
 
-    if provider_name == "gemini":
-        if payload.api_key and payload.api_key.strip():
-            settings.GEMINI_API_KEY = payload.api_key.strip()
-            p = ai_router.get_provider("gemini")
-            if p:
-                p._api_key = payload.api_key.strip()
-        gemini_provider = ai_router.get_provider("gemini")
-        if not gemini_provider or not getattr(gemini_provider, "_api_key", None):
-            raise AppException(
-                status_code=400,
-                code="MISSING_API_KEY",
-                message="Cannot activate Gemini without an API key. Please provide a valid GEMINI_API_KEY.",
-            )
-        settings.AI_DEFAULT_PROVIDER = "gemini"
+    if provider_name == "mock" or settings.is_production:
+        raise AppException(
+            status_code=403,
+            code="SERVER_CONFIG_REQUIRED",
+            message="Set the AI provider in the backend environment and restart the backend.",
+        )
 
-    elif provider_name == "groq":
-        if payload.api_key and payload.api_key.strip():
-            settings.GROQ_API_KEY = payload.api_key.strip()
-            p = ai_router.get_provider("groq")
-            if p:
-                p._api_key = payload.api_key.strip()
-        groq_provider = ai_router.get_provider("groq")
-        if not groq_provider or not getattr(groq_provider, "_api_key", None):
-            raise AppException(
-                status_code=400,
-                code="MISSING_API_KEY",
-                message="Cannot activate Groq without an API key. Please provide a valid GROQ_API_KEY.",
-            )
-        settings.AI_DEFAULT_PROVIDER = "groq"
-
-    elif provider_name == "mock":
-        settings.AI_DEFAULT_PROVIDER = "mock"
+    key = (payload.api_key or "").strip() or None
+    provider = GeminiProvider(api_key=key) if provider_name == "gemini" else GroqProvider(api_key=key)
+    # Verify the selected adapter directly so another provider cannot mask a failure.
+    await provider.generate_text(TextGenerationRequest(prompt="Reply with OK.", max_tokens=1024))
+    if key:
+        if provider_name == "gemini":
+            settings.GEMINI_API_KEY = key
+        else:
+            settings.GROQ_API_KEY = key
+    ai_router.register_provider(provider)
+    settings.AI_DEFAULT_PROVIDER = provider_name
 
     return ApiResponse(
         data={

@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     """Application runtime settings."""
 
     model_config = SettingsConfigDict(
-        env_file=(str(ENV_FILE_PATH), str(ROOT_ENV_PATH), ".env"),
+        env_file=(str(ROOT_ENV_PATH), str(ENV_FILE_PATH)),
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
 
     # AI Provider Settings
     AI_DEFAULT_PROVIDER: str = "gemini"  # gemini, groq, mock
-    AI_FALLBACK_PROVIDER: str = "groq"  # gemini, groq, mock
+    AI_FALLBACK_PROVIDER: str = "groq"  # gemini, groq, or empty
 
     # Provider Keys (Server-side only)
     GEMINI_API_KEY: Optional[str] = None
@@ -83,12 +83,12 @@ class Settings(BaseSettings):
     @property
     def is_gemini_configured(self) -> bool:
         """Check whether Google Gemini API key is provided without exposing it."""
-        return bool(self.GEMINI_API_KEY and self.GEMINI_API_KEY.strip() and self.GEMINI_API_KEY != "your_gemini_api_key_here")
+        return (self.GEMINI_API_KEY or "").strip() not in ("", "your_gemini_api_key_here")
 
     @property
     def is_groq_configured(self) -> bool:
         """Check whether Groq API key is provided without exposing it."""
-        return bool(self.GROQ_API_KEY and self.GROQ_API_KEY.strip() and self.GROQ_API_KEY != "your_groq_api_key_here")
+        return (self.GROQ_API_KEY or "").strip() not in ("", "your_groq_api_key_here")
 
     @property
     def is_telegram_configured(self) -> bool:

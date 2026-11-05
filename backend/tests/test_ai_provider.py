@@ -3,6 +3,7 @@
 Directly verifies test cases AI-001 through AI-007 from test.md.
 """
 
+import httpx
 import pytest
 from app.ai.base import BaseAIProvider
 from app.ai.exceptions import (
@@ -13,6 +14,7 @@ from app.ai.exceptions import (
     AITimeoutError,
 )
 from app.ai.mock_provider import MockAIProvider
+from app.ai.providers.gemini import GeminiProvider
 from app.ai.providers.groq import GroqProvider
 from app.ai.router import AIRouter
 from app.ai.schemas import (
@@ -25,6 +27,7 @@ from app.ai.schemas import (
     TextGenerationResponse,
     TopicDetectionSchema,
 )
+from app.core.config import settings
 
 
 @pytest.mark.asyncio
@@ -68,16 +71,17 @@ async def test_ai_002_vision_provider_contract():
 
 
 @pytest.mark.asyncio
-async def test_ai_003_capability_routing():
+async def test_ai_003_capability_routing(monkeypatch):
     """AI-003: Capability routing.
 
     Verify text requests route to text-capable providers, image requests route only to
-    vision-capable providers, and text-only models (like Groq) are never used for vision.
+    vision-capable providers, and text-only models are never used for vision.
     """
     router = AIRouter()
 
-    # Groq does not support vision
     groq = GroqProvider(api_key="mock_groq_key")
+    monkeypatch.setattr(groq, "default_text_model", "text-only-model")
+    router.register_provider(groq)
     assert not groq.has_capability(AICapability.VISION)
     assert groq.has_capability(AICapability.TEXT)
 
@@ -211,13 +215,14 @@ async def test_ai_006_invalid_structured_output_and_repair():
 
 
 @pytest.mark.asyncio
-async def test_ai_007_secret_handling():
+async def test_ai_007_secret_handling(monkeypatch):
     """AI-007: Secret handling.
 
     Verify credentials are never exposed in representation or error messages.
     """
     fake_secret = "AIzaSySecretFakeApiKey12345"
     provider = GroqProvider(api_key=fake_secret)
+    monkeypatch.setattr(provider, "default_text_model", "text-only-model")
 
     # Calling __repr__ or checking exception does not leak secret
     assert fake_secret not in str(provider)
@@ -229,3 +234,117 @@ async def test_ai_007_secret_handling():
         assert fake_secret not in str(exc)
         if hasattr(exc, "details") and exc.details:
             assert fake_secret not in str(exc.details)
+
+
+@pytest.mark.asyncio
+async def test_gemini_uses_header_and_returns_final_answer(monkeypatch):
+    async def post(self, url, *, json, headers):
+        assert headers["x-goog-api-key"] == "test-key"
+        assert "test-key" not in url
+        assert json["systemInstruction"] == {"parts": [{"text": "Be concise."}]}
+        return httpx.Response(200, json={"candidates": [{
+            "finishReason": "STOP",
+            "content": {"parts": [{"text": "Thinking", "thought": True}, {"text": "Final answer"}]},
+        }]})
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", post)
+    response = await GeminiProvider(api_key="test-key").generate_text(
+        TextGenerationRequest(prompt="Explain photosynthesis.", system_prompt="Be concise.")
+    )
+    assert response.content == "Final answer"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("first_failure", [None, "MAX_TOKENS", "UNAVAILABLE"])
+async def test_gemini_vision_requests_the_extraction_schema(monkeypatch, first_failure):
+    budgets = []
+
+    async def post(self, url, *, json, headers):
+        assert json["generationConfig"]["responseJsonSchema"] == ExtractedContentSchema.model_json_schema()
+        budgets.append(json["generationConfig"]["maxOutputTokens"])
+        if len(budgets) == 1 and first_failure == "MAX_TOKENS":
+            return httpx.Response(200, json={"candidates": [{"finishReason": "MAX_TOKENS"}]})
+        if len(budgets) == 1 and first_failure == "UNAVAILABLE":
+            return httpx.Response(503)
+        return httpx.Response(200, json={"candidates": [{
+            "content": {"parts": [{"text": '{"extracted_text":"2x + 4 = 10"}'}]},
+        }]})
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", post)
+    response = await GeminiProvider(api_key="test-key").analyze_image(
+        ImageAnalysisRequest(image_bytes=b"test-image", response_schema=ExtractedContentSchema)
+    )
+    assert response.structured_data["extracted_text"] == "2x + 4 = 10"
+    assert budgets == {
+        None: [4096],
+        "MAX_TOKENS": [4096, 8192],
+        "UNAVAILABLE": [4096, 4096],
+    }[first_failure]
+
+
+@pytest.mark.asyncio
+async def test_vision_falls_back_to_groq_when_gemini_is_rate_limited(monkeypatch):
+    monkeypatch.setattr(settings, "AI_DEFAULT_PROVIDER", "gemini")
+    monkeypatch.setattr(settings, "AI_FALLBACK_PROVIDER", "groq")
+    router = AIRouter()
+    router.register_provider(GeminiProvider(api_key="test-gemini-key"))
+    groq = GroqProvider(api_key="test-groq-key")
+    monkeypatch.setattr(groq, "default_text_model", "qwen/qwen3.8-27b")
+    router.register_provider(groq)
+
+    async def post(self, url, *, json, headers):
+        if "generativelanguage.googleapis.com" in url:
+            return httpx.Response(429)
+        assert json["messages"][0]["content"][1]["image_url"]["url"] == "data:image/png;base64,cG5n"
+        assert json["response_format"] == {"type": "json_object"}
+        return httpx.Response(200, json={"choices": [{"message": {"content": '{"extracted_text":"Q1. Explain buses."}'}}]})
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", post)
+    result = await router.analyze_image(ImageAnalysisRequest(
+        image_bytes=b"png", mime_type="image/png", response_schema=ExtractedContentSchema,
+    ))
+    assert result.provider == "groq"
+    assert result.structured_data["extracted_text"] == "Q1. Explain buses."
+
+
+@pytest.mark.asyncio
+async def test_groq_waits_once_for_short_rate_limit(monkeypatch):
+    calls = []
+
+    async def post(self, url, *, json, headers):
+        calls.append("request")
+        if len(calls) == 1:
+            return httpx.Response(429, headers={"Retry-After": "12"})
+        return httpx.Response(200, json={"choices": [{"message": {"content": "Answer"}}]})
+
+    async def sleep(seconds):
+        calls.append(seconds)
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", post)
+    monkeypatch.setattr("app.ai.providers.groq.asyncio.sleep", sleep)
+    result = await GroqProvider(api_key="test-key").generate_text(TextGenerationRequest(prompt="Question"))
+    assert result.content == "Answer"
+    assert calls == ["request", 12, "request"]
+
+
+@pytest.mark.asyncio
+async def test_groq_empty_completion_fails(monkeypatch):
+    async def post(self, url, *, json, headers):
+        assert json["max_completion_tokens"] == 100
+        return httpx.Response(200, json={"choices": []})
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", post)
+    with pytest.raises(AIProviderError, match="did not return a complete answer"):
+        await GroqProvider(api_key="test-key").generate_text(
+            TextGenerationRequest(prompt="Explain photosynthesis.", max_tokens=100)
+        )
+
+
+@pytest.mark.asyncio
+async def test_settings_cannot_switch_live_backend_to_mock(client, monkeypatch):
+    monkeypatch.setattr(settings, "AI_DEFAULT_PROVIDER", "gemini")
+
+    response = await client.post("/api/v1/ai/configure", json={"provider": "mock"})
+
+    assert response.status_code == 403
+    assert settings.AI_DEFAULT_PROVIDER == "gemini"

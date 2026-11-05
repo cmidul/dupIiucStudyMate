@@ -103,16 +103,13 @@ export default function HistoryPage() {
   return (
     <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-8 w-full">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+      <div className="page-heading flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-midnight-700 pb-5">
         <div>
-          <span className="text-[11px] font-mono uppercase tracking-wider text-scholar-emerald font-semibold">
-            Archive & Audit
-          </span>
           <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100 mt-1">
-            Learning Archive
+            History
           </h1>
           <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Review past inquiry records, question derivations, and synchronized Telegram exchanges.
+            Reopen past questions and conversations from the web or Telegram.
           </p>
         </div>
 

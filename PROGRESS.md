@@ -183,6 +183,14 @@ The agent follows all 14 maintenance rules in `agent.md`.
 
 ## 13. Session handoff
 
+- **2026-11-05 AI provider and image Solve repair:** Live provider activation verifies the selected provider before switching. Mock mode is selected through backend configuration. Educational Solve returns the validated provider answer or a provider error. Gemini receives the extraction schema for image requests. Both live text adapters passed their smoke checks, and a synthetic equation image returned `x = 3` through the Next.js proxy. Frontend type-check passed.
+- For persistent live configuration, set the provider keys and model IDs in `backend/.env` and restart the backend. In local development, Settings can activate a live provider for the running process. Gemini handles image analysis with the current adapters.
+- The frontend uses the Next.js proxy by default. Set `STUDYMATE_BACKEND_API_URL` in the Next.js environment if FastAPI runs at an address other than `http://127.0.0.1:8000/api/v1`.
+- Backend verification passed all 125 tests with `python -m pytest -q --tb=short`. The suite uses offline AI and Telegram settings so it can run alongside a live `backend/.env`.
+- Image Solve now preserves the full transcript for questions that contain code or equations as context. The original two-question JPEG returned both answers through the live Gemini endpoint. All 19 focused Solve and end-to-end tests passed after this routing fix.
+- When Gemini rejects a worksheet because of quota, Image Solve can fall back to Groq Qwen 3.8 for transcription and answer generation. The `test 2.png` worksheet returned HTTP 200 after a short Groq cooldown. This check verified delivery of a response. The generated solution still contained calculation errors and omitted some requested working.
+- Frontend redesign uses a shared light and dark palette, simpler navigation, and clearer page headings. Solve puts the answer before worked steps, preserves code and equation formatting, and moves focus to the result. Frontend type-check and production build passed. The sample multi-question answer was verified in the browser at 1280 px and 390 px.
+
 - **Session date:** 2026-11-03
 - **Last completed task:** M15 Release Readiness & Full Frontend Redesign Verification
 - **Current task and status:** Complete & Production Ready

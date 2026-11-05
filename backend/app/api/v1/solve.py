@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db, get_request_id
-from app.core.responses import ApiResponse
+from app.core.responses import ApiResponse, AppException
 from app.models.user import User
 from app.schemas.unified_solver import (
     UnifiedFollowUpRequest,
@@ -55,10 +55,27 @@ async def upload_and_solve_question(
         process_synchronously=True,
     )
 
-    content_id = upload_result.extracted_content.id if upload_result.extracted_content else None
+    if not upload_result.extracted_content:
+        if upload_result.job.error_code == "PROVIDER_RATE_LIMITED":
+            raise AppException(
+                status_code=429,
+                code="PROVIDER_RATE_LIMITED",
+                message="Image analysis reached the provider's rate or quota limit. Try again later.",
+            )
+        if upload_result.job.error_code == "IMAGE_TRANSCRIPTION_TOO_LONG":
+            raise AppException(
+                status_code=422,
+                code="IMAGE_TRANSCRIPTION_TOO_LONG",
+                message=upload_result.job.error_message or "Crop the page into smaller sections and try again.",
+            )
+        raise AppException(
+            status_code=502,
+            code="IMAGE_EXTRACTION_FAILED",
+            message="Image analysis failed. Check the vision provider configuration or try again shortly.",
+        )
     solve_req = UnifiedSolveRequest(
         input_text=input_text,
-        source_content_id=content_id,
+        source_content_id=upload_result.extracted_content.id,
         preferred_style=preferred_style,
     )
     result = await unified_solver_service.solve_question(

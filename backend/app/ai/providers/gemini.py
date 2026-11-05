@@ -5,8 +5,6 @@ Never prints or leaks API keys.
 """
 
 import base64
-import json
-import logging
 from typing import Any, Dict, Optional, Set
 import httpx
 
@@ -15,7 +13,6 @@ from app.ai.exceptions import (
     AIAuthenticationError,
     AIProviderError,
     AIRateLimitError,
-    AIStructuredOutputError,
     AITimeoutError,
 )
 from app.ai.schemas import (
@@ -26,8 +23,6 @@ from app.ai.schemas import (
     TextGenerationResponse,
 )
 from app.core.config import settings
-
-logger = logging.getLogger("learning_assistant.ai.gemini")
 
 GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
 
@@ -62,36 +57,36 @@ class GeminiProvider(BaseAIProvider):
         model = self.default_text_model
         url = f"{GEMINI_API_BASE_URL}/models/{model}:generateContent"
 
-        contents = []
-        if request.system_prompt:
-            contents.append({"role": "user", "parts": [{"text": f"SYSTEM INSTRUCTION: {request.system_prompt}"}]})
-        contents.append({"role": "user", "parts": [{"text": request.prompt}]})
-
         gen_config: Dict[str, Any] = {
             "temperature": request.temperature,
             "maxOutputTokens": request.max_tokens,
         }
         if request.response_schema:
             gen_config["responseMimeType"] = "application/json"
+            gen_config["responseJsonSchema"] = request.response_schema.model_json_schema()
 
         payload = {
-            "contents": contents,
+            "contents": [{"role": "user", "parts": [{"text": request.prompt}]}],
             "generationConfig": gen_config,
         }
+        if request.system_prompt:
+            payload["systemInstruction"] = {"parts": [{"text": request.system_prompt}]}
+        if model == "gemini-3.5-flash":
+            gen_config["thinkingConfig"] = {"thinkingLevel": "low"}
 
         try:
             async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
                 response = await client.post(
                     url,
                     json=payload,
-                    params={"key": api_key},
+                    headers={"x-goog-api-key": api_key},
                 )
         except httpx.TimeoutException as exc:
             raise AITimeoutError() from exc
         except Exception as exc:
             raise AIProviderError(message=f"Network error contacting Gemini API: {exc}") from exc
 
-        self._check_http_status(response)
+        self._check_http_status(response, model)
         data = response.json()
         raw_text = self._extract_text_from_response(data)
 
@@ -130,6 +125,9 @@ class GeminiProvider(BaseAIProvider):
         }
         if request.response_schema:
             gen_config["responseMimeType"] = "application/json"
+            gen_config["responseJsonSchema"] = request.response_schema.model_json_schema()
+        if model == "gemini-3.5-flash":
+            gen_config["thinkingConfig"] = {"thinkingLevel": "low"}
 
         payload = {
             "contents": contents,
@@ -138,18 +136,28 @@ class GeminiProvider(BaseAIProvider):
 
         try:
             async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
-                response = await client.post(
-                    url,
-                    json=payload,
-                    params={"key": api_key},
-                )
+                for attempt in range(2):
+                    response = await client.post(url, json=payload, headers={"x-goog-api-key": api_key})
+                    if attempt == 0 and response.status_code in (502, 503, 504):
+                        continue
+                    self._check_http_status(response, model)
+                    data = response.json()
+                    candidate = next(iter(data.get("candidates") or []), {})
+                    if candidate.get("finishReason") != "MAX_TOKENS":
+                        break
+                    gen_config["maxOutputTokens"] = 8192
+        except AIProviderError:
+            raise
         except httpx.TimeoutException as exc:
             raise AITimeoutError() from exc
         except Exception as exc:
             raise AIProviderError(message=f"Network error contacting Gemini Vision API: {exc}") from exc
 
-        self._check_http_status(response)
-        data = response.json()
+        if candidate.get("finishReason") == "MAX_TOKENS":
+            raise AIProviderError(
+                code="IMAGE_TRANSCRIPTION_TOO_LONG",
+                message="The page has too much text to read in one request. Crop it into smaller sections and upload each section separately.",
+            )
         raw_text = self._extract_text_from_response(data)
 
         structured_data = None
@@ -166,7 +174,7 @@ class GeminiProvider(BaseAIProvider):
             structured_data=structured_data,
         )
 
-    def _check_http_status(self, response: httpx.Response) -> None:
+    def _check_http_status(self, response: httpx.Response, model: str) -> None:
         """Inspect HTTP status and map to normalized domain exceptions."""
         if response.status_code == 200:
             return
@@ -176,15 +184,9 @@ class GeminiProvider(BaseAIProvider):
                 message="Google Gemini authentication failed. The supplied API key is invalid or unauthorized.",
             )
         if response.status_code == 404:
-            # Model deprecated or not found
-            error_msg = ""
-            try:
-                error_msg = response.json().get("error", {}).get("message", "")
-            except Exception:
-                pass
             raise AIProviderError(
                 code="PROVIDER_MODEL_NOT_FOUND",
-                message=f"Gemini model '{self.default_text_model}' not found: {error_msg}",
+                message=f"Gemini model '{model}' is unavailable. Check the configured model ID.",
                 status_code=502,
             )
         if response.status_code == 429:
@@ -204,10 +206,10 @@ class GeminiProvider(BaseAIProvider):
         )
 
     def _extract_text_from_response(self, data: Dict[str, Any]) -> str:
-        candidates = data.get("candidates", [])
-        if not candidates:
-            return ""
-        parts = candidates[0].get("content", {}).get("parts", [])
-        text_parts = [p.get("text", "") for p in parts if "text" in p]
-        return "\n".join(text_parts).strip()
+        candidate = next(iter(data.get("candidates") or []), {})
+        parts = candidate.get("content", {}).get("parts", [])
+        content = "\n".join(part.get("text", "") for part in parts if not part.get("thought")).strip()
+        if not content or candidate.get("finishReason") not in (None, "STOP"):
+            raise AIProviderError(message="Gemini did not return a complete answer.")
+        return content
 

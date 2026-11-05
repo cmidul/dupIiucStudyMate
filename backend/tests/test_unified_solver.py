@@ -5,15 +5,22 @@ summarization, general educational QA, image inputs, follow-up conversation thre
 ambiguity handling, security AST protection, and Telegram bot integration.
 """
 
+import io
 import json
 import pytest
 from httpx import AsyncClient
+from PIL import Image
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
+from app.ai.exceptions import AITimeoutError
+from app.ai.router import ai_router
+from app.ai.schemas import ExtractedContentSchema, ImageAnalysisResponse, TextGenerationResponse
+from app.schemas.unified_solver import EducationalSolution
 from app.models.user import User
 from app.repositories.upload_repo import upload_repo
 from app.services.telegram_bot_service import telegram_bot_service
+from app.storage.file_storage import file_storage
 
 
 async def get_test_auth(client: AsyncClient, email: str = "solve_user@example.com") -> tuple[str, str, dict]:
@@ -103,9 +110,102 @@ async def test_solve_004_auto_general_educational(client: AsyncClient):
 
     assert data["task_type"] == "general_educational"
     assert data["task_label"] == "Educational Explanation"
-    assert data["educational_solution"] is not None
+    assert data["summary_or_answer"] == data["educational_solution"]["conclusion"]
     assert len(data["educational_solution"]["steps"]) > 0
     assert data["conversation_id"] is not None
+
+
+@pytest.mark.asyncio
+async def test_educational_solve_surfaces_provider_timeout(client: AsyncClient, monkeypatch):
+    async def fail_generation(request):
+        raise AITimeoutError()
+
+    monkeypatch.setattr(ai_router, "generate_text", fail_generation)
+    _, _, headers = await get_test_auth(client)
+    response = await client.post(
+        "/api/v1/solve",
+        json={"input_text": "How does photosynthesis convert sunlight into chemical energy?"},
+        headers=headers,
+    )
+
+    assert response.status_code == 504
+    assert response.json()["error"]["code"] == "PROVIDER_UNAVAILABLE"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("vision_succeeds", [True, False])
+async def test_solve_uploaded_image(client: AsyncClient, monkeypatch, tmp_path, vision_succeeds):
+    async def analyze_image(request):
+        if not vision_succeeds:
+            raise AITimeoutError()
+        extraction = ExtractedContentSchema(extracted_text="Solve 2x + 4 = 10", equations=["2x + 4 = 10"])
+        return ImageAnalysisResponse(
+            content=extraction.model_dump_json(), provider="mock", model="test-vision",
+            structured_data=extraction.model_dump(),
+        )
+
+    monkeypatch.setattr(ai_router, "analyze_image", analyze_image)
+    monkeypatch.setattr(file_storage, "base_dir", tmp_path)
+    _, _, headers = await get_test_auth(client)
+    image = io.BytesIO()
+    Image.new("RGB", (64, 64), "white").save(image, format="PNG")
+
+    response = await client.post(
+        "/api/v1/solve/upload", headers=headers,
+        files={"file": ("equation.png", image.getvalue(), "image/png")},
+    )
+
+    if vision_succeeds:
+        assert response.status_code == 200
+        result = response.json()["data"]
+        assert result["summary_or_answer"] == "x = 3"
+        assert result["source_content_id"]
+    else:
+        assert response.status_code == 502
+        assert response.json()["error"]["code"] == "IMAGE_EXTRACTION_FAILED"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("equations", [[], ["A[20] = h + A[8] - A[3];"]])
+async def test_image_exam_preserves_all_questions(client: AsyncClient, monkeypatch, tmp_path, equations):
+    assignment = "A[20] = h + A[8] - A[3];"
+    transcript = (
+        "Q1. Write MIPS instructions for this C assignment. " + assignment + "\n"
+        "Q2. Calculate the clock rate for 48 billion cycles in 6 seconds."
+    )
+
+    async def analyze_image(request):
+        extraction = ExtractedContentSchema(extracted_text=transcript, equations=equations)
+        return ImageAnalysisResponse(
+            content=extraction.model_dump_json(), provider="mock", model="test-vision",
+            structured_data=extraction.model_dump(),
+        )
+
+    async def generate_text(request):
+        assert transcript in request.prompt
+        assert request.response_schema is EducationalSolution
+        answer = EducationalSolution(conclusion="Q1. Load, add, subtract, store. Q2. 8 GHz.")
+        return TextGenerationResponse(
+            content=answer.model_dump_json(), provider="mock", model="test-text",
+            structured_data=answer.model_dump(),
+        )
+
+    monkeypatch.setattr(ai_router, "analyze_image", analyze_image)
+    monkeypatch.setattr(ai_router, "generate_text", generate_text)
+    monkeypatch.setattr(file_storage, "base_dir", tmp_path)
+    _, _, headers = await get_test_auth(client)
+    image = io.BytesIO()
+    Image.new("RGB", (64, 64), "white").save(image, format="JPEG")
+
+    response = await client.post(
+        "/api/v1/solve/upload", headers=headers,
+        files={"file": ("exam.jpg", image.getvalue(), "image/jpeg")},
+    )
+
+    assert response.status_code == 200
+    result = response.json()["data"]
+    assert result["task_type"] == "general_educational"
+    assert "8 GHz" in result["summary_or_answer"]
 
 
 @pytest.mark.asyncio

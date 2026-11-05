@@ -32,6 +32,7 @@ import {
   UnifiedFollowUpResponse,
 } from "@/lib/api";
 import { MathBlock, FormattedTextWithMath } from "@/components/MathRenderer";
+import SolutionText from "@/components/SolutionText";
 
 interface FollowUpMessage {
   role: "user" | "assistant";
@@ -63,6 +64,11 @@ function SolveWorkspaceContent() {
   const [copiedSolution, setCopiedSolution] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const answerHeadingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (solution) answerHeadingRef.current?.focus();
+  }, [solution]);
 
   const generateSolutionMarkdown = () => {
     if (!solution) return "";
@@ -253,7 +259,7 @@ function SolveWorkspaceContent() {
       default:
         return {
           icon: Lightbulb,
-          label: "Pedagogical Explanation",
+          label: "Explanation",
           badgeClass: "bg-amber-950/70 text-amber-300 border-amber-800/80",
         };
     }
@@ -263,53 +269,49 @@ function SolveWorkspaceContent() {
     <div className="p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6 text-slate-800 dark:text-slate-200">
       {/* Workspace Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-midnight-700 pb-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-mono tracking-wider uppercase text-scholar-emerald">
-            <span className="w-1.5 h-1.5 rounded-full bg-scholar-emerald"></span>
-            <span>Split Workspace</span>
-          </div>
+        <div className="page-heading">
           <h1 className="font-serif text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5">
             Solve Questions
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Automatic task detection for mathematical proofs, formal syllogisms, passage notes, and educational QA.
+            Type a question or upload a photo to get an answer and worked steps.
           </p>
         </div>
 
         {/* Mobile View Switcher */}
-        <div className="flex md:hidden rounded-lg border border-slate-200 dark:border-midnight-700 bg-slate-100 dark:bg-midnight-850 p-1 text-xs">
+        <div className="flex lg:hidden rounded-lg border border-slate-200 dark:border-midnight-700 bg-white dark:bg-midnight-850 p-1 text-sm">
           <button
             onClick={() => setMobileTab("composer")}
+            aria-pressed={mobileTab === "composer"}
             className={`px-3 py-1 rounded font-medium transition ${
               mobileTab === "composer" ? "bg-white dark:bg-midnight-750 text-scholar-emerald shadow-sm font-semibold" : "text-slate-500 dark:text-slate-400"
             }`}
           >
-            Composer
+            Question
           </button>
           <button
             onClick={() => setMobileTab("solution")}
+            aria-pressed={mobileTab === "solution"}
             className={`px-3 py-1 rounded font-medium transition ${
               mobileTab === "solution" ? "bg-white dark:bg-midnight-750 text-scholar-emerald shadow-sm font-semibold" : "text-slate-500 dark:text-slate-400"
             }`}
           >
-            Solution {solution && "•"}
+            Answer
           </button>
         </div>
       </div>
 
       {/* Split Workspace Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(17rem,0.65fr)_minmax(0,1.35fr)] gap-5 items-start">
         {/* ================= LEFT PANEL: COMPOSER ================= */}
         <div
-          className={`md:col-span-5 space-y-4 ${
-            mobileTab === "solution" ? "hidden md:block" : "block"
+          className={`min-w-0 space-y-4 ${
+            mobileTab === "solution" ? "hidden lg:block" : "block"
           }`}
         >
-          <div className="bg-white dark:bg-midnight-850 border border-slate-200 dark:border-midnight-700 rounded-xl p-5 shadow-sm space-y-4">
+          <div className="workspace-panel p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Input Composer
-              </span>
+              <h2 className="text-base font-semibold">Your question</h2>
               {(inputText || selectedFile) && (
                 <button
                   type="button"
@@ -328,10 +330,10 @@ function SolveWorkspaceContent() {
               </label>
               <textarea
                 id="problem-textarea"
-                rows={6}
+                rows={5}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="Type any question, algebraic equation, logical premise, or paste an educational passage...&#10;&#10;e.g. 'Solve x^2 - 5x + 6 = 0' or 'If all A are B and all B are C...'"
+                placeholder="For example, why does increasing the clock rate reduce execution time?"
                 className="w-full p-3.5 bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-midnight-700 rounded-lg text-xs font-mono text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-scholar-emerald focus:ring-1 focus:ring-scholar-emerald leading-relaxed resize-y"
               />
             </div>
@@ -388,7 +390,7 @@ function SolveWorkspaceContent() {
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-midnight-700 bg-slate-50 dark:bg-midnight-800 hover:bg-slate-100 dark:hover:bg-midnight-700 text-xs font-medium text-slate-700 dark:text-slate-300 transition"
                 >
                   <Upload className="w-3.5 h-3.5 text-scholar-emerald" />
-                  <span>Attach Image</span>
+                  <span>Upload a photo</span>
                 </button>
               </div>
 
@@ -410,7 +412,7 @@ function SolveWorkspaceContent() {
 
             {/* Error Message */}
             {errorMsg && (
-              <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/80 text-red-600 dark:text-red-300 rounded-lg text-xs flex items-start gap-2">
+              <div role="alert" className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/80 text-red-700 dark:text-red-300 rounded-lg text-sm flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
                 <span className="leading-relaxed">{errorMsg}</span>
               </div>
@@ -421,17 +423,17 @@ function SolveWorkspaceContent() {
               type="button"
               onClick={handleSolve}
               disabled={loading}
-              className="w-full py-2.5 px-4 bg-scholar-emerald hover:bg-emerald-600 disabled:opacity-50 text-white font-semibold text-xs rounded-lg transition flex items-center justify-center gap-2 shadow-xs"
+              className="w-full min-h-11 py-2.5 px-4 bg-scholar-emerald disabled:opacity-50 text-white font-semibold text-sm rounded-lg transition flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>Classifying & Solving...</span>
+                  <span>Working on it…</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>Derive Solution</span>
+                  <span>Solve question</span>
                 </>
               )}
             </button>
@@ -440,54 +442,59 @@ function SolveWorkspaceContent() {
 
         {/* ================= RIGHT PANEL: AI ANSWER & EXPLANATION ================= */}
         <div
-          className={`md:col-span-7 space-y-6 ${
-            mobileTab === "composer" ? "hidden md:block" : "block"
+          aria-busy={loading}
+          className={`min-w-0 space-y-5 ${
+            mobileTab === "composer" ? "hidden lg:block" : "block"
           }`}
         >
           {loading ? (
             /* Contextual Loading State */
-            <div className="border border-slate-200 dark:border-midnight-700 rounded-xl bg-white dark:bg-midnight-850 p-12 text-center space-y-4">
+            <div role="status" className="workspace-panel p-8 text-center space-y-4">
               <Loader2 className="w-7 h-7 text-scholar-emerald animate-spin mx-auto" />
               <div>
                 <div className="text-sm font-serif font-semibold text-slate-900 dark:text-slate-200">
-                  Analyzing Question & Synthesizing Solution
+                  {selectedFile ? "Reading your photo" : "Working on your answer"}
                 </div>
                 <p className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1">
-                  Parsing mathematical AST, checking truth-table constraints, or compiling summary sections...
+                  {selectedFile ? "We’ll read the text, then work through the questions." : "Your answer and worked steps will appear here."}
                 </p>
               </div>
             </div>
           ) : !solution ? (
             /* Empty State */
-            <div className="border border-dashed border-slate-200 dark:border-midnight-700 rounded-xl bg-slate-50/50 dark:bg-midnight-850/50 p-12 text-center space-y-3">
+            <div className="workspace-panel p-8 sm:p-12 text-center space-y-3">
               <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-midnight-800 border border-slate-200 dark:border-midnight-700 flex items-center justify-center text-slate-400 mx-auto">
                 <Calculator className="w-5 h-5 text-scholar-emerald" />
               </div>
               <h2 className="text-sm font-serif font-semibold text-slate-900 dark:text-slate-200">
-                Workspace Awaiting Problem Input
+                Your answer will appear here
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
-                Enter an equation, a propositional premise, or upload lecture notes on the left. The solution, verification status, and step derivations will render here.
+                Start with a written question or a clear photo of the problem.
               </p>
             </div>
+          ) : solution.clarification_needed ? (
+            <div className="workspace-panel p-5 space-y-3" role="status">
+              <h2 ref={answerHeadingRef} tabIndex={-1} className="flex items-center gap-2 font-semibold">
+                <HelpCircle className="w-5 h-5 text-amber-500" />
+                A detail is missing
+              </h2>
+              <p className="leading-relaxed">{solution.clarification_question || solution.summary_or_answer}</p>
+              <button type="button" onClick={() => setMobileTab("composer")} className="lg:hidden text-sm font-semibold text-scholar-emerald">
+                Edit question
+              </button>
+            </div>
           ) : (
-            /* Solution Output */
-            <div className="space-y-6">
-              {/* Ambiguity Alert */}
-              {solution.clarification_needed && (
-                <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 rounded-xl text-amber-800 dark:text-amber-200 text-xs space-y-1.5">
-                  <div className="flex items-center gap-1.5 font-bold font-mono">
-                    <HelpCircle className="w-4 h-4 text-amber-500" />
-                    <span>Ambiguity Detected</span>
-                  </div>
-                  <p className="leading-relaxed">
-                    {solution.clarification_question || solution.summary_or_answer}
-                  </p>
-                </div>
-              )}
+            <div className="space-y-5">
 
               {/* Main Solution Card */}
-              <div className="border border-slate-200 dark:border-midnight-700 rounded-xl bg-white dark:bg-midnight-850 p-6 shadow-sm space-y-6">
+              <div className="workspace-panel p-4 sm:p-6 space-y-6">
+                <section aria-labelledby="answer-heading" className="answer-panel p-4 sm:p-6">
+                  <h2 id="answer-heading" ref={answerHeadingRef} tabIndex={-1} className="text-xl font-semibold tracking-tight mb-3">
+                    {solution.task_type === "summarization" ? "Summary" : "Answer"}
+                  </h2>
+                  <SolutionText text={solution.summary_or_answer} />
+                </section>
                 {/* Header: Task Badge & Title */}
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-midnight-700 pb-4">
                   <div>
@@ -499,13 +506,15 @@ function SolveWorkspaceContent() {
                           className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono border ${task.badgeClass}`}
                         >
                           <Icon className="w-3 h-3" />
-                          <span>Task: {task.label}</span>
+                          <span>{task.label}</span>
                         </span>
                       );
                     })()}
-                    <h2 className="font-serif text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight mt-2">
-                      {solution.title}
-                    </h2>
+                    {solution.math_solution?.verification?.status === "passed" && (
+                      <span className="ml-2 inline-flex items-center gap-1.5 text-xs font-medium text-scholar-emerald">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Checked with SymPy
+                      </span>
+                    )}
                   </div>
 
                   {/* Actions & Verification Bar */}
@@ -552,23 +561,6 @@ function SolveWorkspaceContent() {
                       <span>Print / PDF</span>
                     </button>
 
-                    {/* Verification Pill */}
-                    {solution.math_solution?.verification && (
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-midnight-700 text-[11px] font-mono text-scholar-emerald">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>SymPy Verified ({solution.math_solution.verification.status})</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Conclusion / High-Level Result Block */}
-                <div className="border border-slate-200 dark:border-midnight-700 bg-slate-50 dark:bg-midnight-950 rounded-lg p-4">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                    {solution.task_type === "summarization" ? "Core Overview" : "Final Derivation / Conclusion"}
-                  </div>
-                  <div className="text-sm font-semibold font-mono text-emerald-600 dark:text-emerald-300 leading-relaxed">
-                    <FormattedTextWithMath text={solution.summary_or_answer} />
                   </div>
                 </div>
 
@@ -576,8 +568,8 @@ function SolveWorkspaceContent() {
                 {/* 1. Mathematics Steps */}
                 {solution.task_type === "mathematics" && solution.math_solution && (
                   <div className="space-y-3">
-                    <h3 className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                      Step-by-Step Mathematical Derivation
+                    <h3 className="text-lg font-semibold">
+                      Worked steps
                     </h3>
                     <div className="space-y-2">
                       {solution.math_solution.steps?.map((step: any, idx: number) => (
@@ -692,19 +684,16 @@ function SolveWorkspaceContent() {
                 {/* 4. Pedagogical QA */}
                 {solution.task_type === "general_educational" && solution.educational_solution && (
                   <div className="space-y-4">
-                    <h3 className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                      Step-by-Step Pedagogical Explanation
+                    <h3 className="text-lg font-semibold">
+                      How to get there
                     </h3>
                     <div className="space-y-2.5">
                       {solution.educational_solution.steps?.map((st, idx) => (
                         <div key={idx} className="p-3 rounded-lg border border-slate-200 dark:border-midnight-700 bg-slate-50 dark:bg-midnight-800 space-y-1">
-                          <div className="text-xs font-semibold text-scholar-emerald">
+                          <div className="text-sm font-semibold text-scholar-emerald">
                             {st.step}. {st.title}
                           </div>
-                          <FormattedTextWithMath
-                            text={st.explanation}
-                            className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed"
-                          />
+                          <SolutionText text={st.explanation} />
                         </div>
                       ))}
                     </div>
@@ -713,11 +702,11 @@ function SolveWorkspaceContent() {
               </div>
 
               {/* Conversational Follow-Up Thread */}
-              <div className="border border-slate-200 dark:border-midnight-700 rounded-xl bg-white dark:bg-midnight-850 p-5 shadow-sm space-y-4">
-                <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              <div className="workspace-panel p-5 space-y-4">
+                <h2 className="flex items-center gap-2 text-base font-semibold">
                   <RefreshCw className="w-3.5 h-3.5 text-scholar-emerald" />
-                  <span>Socratic Follow-Up Thread</span>
-                </div>
+                  <span>Ask a follow-up</span>
+                </h2>
 
                 {followUpThread.length > 0 && (
                   <div className="space-y-2.5 pt-1">
@@ -743,6 +732,7 @@ function SolveWorkspaceContent() {
                 <div className="flex gap-2 pt-1">
                   <input
                     type="text"
+                    aria-label="Follow-up question"
                     value={followUpInput}
                     onChange={(e) => setFollowUpInput(e.target.value)}
                     onKeyDown={(e) => {
@@ -752,7 +742,7 @@ function SolveWorkspaceContent() {
                       }
                     }}
                     placeholder="Ask a clarifying follow-up question..."
-                    className="flex-1 px-3 py-2 bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-midnight-700 rounded-lg text-xs font-mono text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-scholar-emerald"
+                    className="min-w-0 flex-1 px-3 py-2 bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-midnight-700 rounded-lg text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-scholar-emerald"
                   />
                   <button
                     type="button"
