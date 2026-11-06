@@ -9,12 +9,8 @@ import {
   ExternalLink,
   Unlink,
   Loader2,
-  Lock,
   User as UserIcon,
-  Moon,
-  Sun,
   Sliders,
-  BookOpen,
   Check,
   Save,
   Cpu,
@@ -24,7 +20,6 @@ import {
   EyeOff,
 } from "lucide-react";
 import { api, TelegramStatus, TelegramLinkToken, User, AIStatusResponse } from "@/lib/api";
-import { useTheme } from "@/components/ThemeProvider";
 
 interface LearningPreferences {
   explanationDepth: "concise" | "standard" | "detailed";
@@ -34,8 +29,6 @@ interface LearningPreferences {
 }
 
 export default function SettingsPage() {
-  const { theme, setTheme } = useTheme();
-
   const [user, setUser] = useState<User | null>(null);
   const [telegramStatus, setTelegramStatus] = useState<TelegramStatus | null>(null);
   const [linkToken, setLinkToken] = useState<TelegramLinkToken | null>(null);
@@ -164,7 +157,7 @@ export default function SettingsPage() {
     try {
       const tok = await api.createLinkToken();
       setLinkToken(tok);
-      setSuccessMsg("Deep link generated. Click the link to open Telegram.");
+      setSuccessMsg("Telegram deep link generated. Click the link to open Telegram.");
     } catch (err: unknown) {
       const error = err as { message?: string };
       setErrorMsg(error.message || "Failed to generate linking token.");
@@ -191,26 +184,26 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-8 w-full">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="page-heading border-b border-slate-200 dark:border-midnight-700 pb-5">
-        <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100 mt-1">
-          Settings
+      <div className="border-b border-[#2E333D] pb-5">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#E8EAF0] tracking-tight">
+          Settings & Account
         </h1>
-        <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Manage your account, study preferences, appearance, and Telegram connection.
+        <p className="text-xs sm:text-sm text-[#A0A6B4] mt-0.5">
+          Manage your learning preferences, AI backend, account, and Telegram synchronization.
         </p>
       </div>
 
       {errorMsg && (
-        <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 rounded-xl text-xs flex items-center gap-2">
+        <div className="p-4 bg-[#FF5C6C]/10 border border-[#FF5C6C]/30 text-[#FF5C6C] rounded-2xl text-xs flex items-center gap-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {successMsg && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs flex items-center gap-2">
+        <div className="p-4 bg-[#3DDC97]/10 border border-[#3DDC97]/30 text-[#3DDC97] rounded-2xl text-xs flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
           <span>{successMsg}</span>
         </div>
@@ -218,35 +211,35 @@ export default function SettingsPage() {
 
       <div className="grid grid-cols-1 gap-8">
         {/* Section 1: Learning Preferences */}
-        <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+        <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="flex items-center justify-between border-b border-[#262A33] pb-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-midnight-800 flex items-center justify-center text-scholar-emerald">
+              <div className="w-8 h-8 rounded-xl bg-[#14161A] border border-[#2E333D] flex items-center justify-center text-[#3B6CFF]">
                 <Sliders className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="text-base font-serif font-semibold text-slate-900 dark:text-slate-100">
-                  Pedagogical & Reasoning Preferences
+                <h2 className="text-sm font-semibold text-[#E8EAF0]">
+                  Study & Reasoning Preferences
                 </h2>
-                <p className="text-xs text-slate-400">
-                  Customize the default rigor, depth, and presentation style for the Solve Questions engine.
+                <p className="text-xs text-[#A0A6B4]">
+                  Customize explanation depth, default difficulty, and answer formatting.
                 </p>
               </div>
             </div>
 
             <button
               onClick={handleSavePreferences}
-              className="px-3.5 py-1.5 bg-slate-900 dark:bg-scholar-emerald hover:bg-slate-800 dark:hover:bg-emerald-600 text-white dark:text-slate-950 text-xs font-semibold rounded-lg transition flex items-center gap-1.5 shadow-sm"
+              className="px-3.5 py-1.5 bg-[#3B6CFF] hover:bg-[#5A82FF] active:bg-[#2A55D9] text-white text-xs font-semibold rounded-xl shadow-[0_0_10px_rgba(59,108,255,0.3)] transition flex items-center gap-1.5"
             >
               {prefSaved ? <Check className="w-3.5 h-3.5" /> : <Save className="w-3.5 h-3.5" />}
-              <span>{prefSaved ? "Saved" : "Save Preferences"}</span>
+              <span>{prefSaved ? "Saved" : "Save"}</span>
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Explanation Depth */}
             <div className="space-y-2">
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 font-semibold">
+              <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A6B4] font-semibold">
                 Explanation Depth
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -255,10 +248,10 @@ export default function SettingsPage() {
                     key={depth}
                     type="button"
                     onClick={() => setPreferences((p) => ({ ...p, explanationDepth: depth }))}
-                    className={`py-2 text-xs font-mono rounded-lg border transition capitalize ${
+                    className={`py-2 text-xs font-mono rounded-xl border transition capitalize ${
                       preferences.explanationDepth === depth
-                        ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100 font-semibold"
-                        : "bg-slate-50 dark:bg-midnight-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700"
+                        ? "bg-[#3B6CFF] text-white border-[#3B6CFF] shadow-[0_0_10px_rgba(59,108,255,0.3)] font-semibold"
+                        : "bg-[#14161A] border-[#2E333D] text-[#A0A6B4] hover:border-[#3B6CFF]/40 hover:text-[#E8EAF0]"
                     }`}
                   >
                     {depth}
@@ -269,7 +262,7 @@ export default function SettingsPage() {
 
             {/* Answer Style */}
             <div className="space-y-2">
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 font-semibold">
+              <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A6B4] font-semibold">
                 Answer Style
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -282,10 +275,10 @@ export default function SettingsPage() {
                     key={s.id}
                     type="button"
                     onClick={() => setPreferences((p) => ({ ...p, answerStyle: s.id as any }))}
-                    className={`py-2 text-xs font-mono rounded-lg border transition ${
+                    className={`py-2 text-xs font-mono rounded-xl border transition ${
                       preferences.answerStyle === s.id
-                        ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100 font-semibold"
-                        : "bg-slate-50 dark:bg-midnight-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700"
+                        ? "bg-[#3B6CFF] text-white border-[#3B6CFF] shadow-[0_0_10px_rgba(59,108,255,0.3)] font-semibold"
+                        : "bg-[#14161A] border-[#2E333D] text-[#A0A6B4] hover:border-[#3B6CFF]/40 hover:text-[#E8EAF0]"
                     }`}
                   >
                     {s.label}
@@ -296,7 +289,7 @@ export default function SettingsPage() {
 
             {/* Default Difficulty */}
             <div className="space-y-2">
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 font-semibold">
+              <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A6B4] font-semibold">
                 Default Difficulty
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -305,10 +298,10 @@ export default function SettingsPage() {
                     key={diff}
                     type="button"
                     onClick={() => setPreferences((p) => ({ ...p, defaultDifficulty: diff }))}
-                    className={`py-2 text-xs font-mono rounded-lg border transition capitalize ${
+                    className={`py-2 text-xs font-mono rounded-xl border transition capitalize ${
                       preferences.defaultDifficulty === diff
-                        ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100 font-semibold"
-                        : "bg-slate-50 dark:bg-midnight-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700"
+                        ? "bg-[#3B6CFF] text-white border-[#3B6CFF] shadow-[0_0_10px_rgba(59,108,255,0.3)] font-semibold"
+                        : "bg-[#14161A] border-[#2E333D] text-[#A0A6B4] hover:border-[#3B6CFF]/40 hover:text-[#E8EAF0]"
                     }`}
                   >
                     {diff}
@@ -319,23 +312,25 @@ export default function SettingsPage() {
 
             {/* Language Preference */}
             <div className="space-y-2">
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 font-semibold">
+              <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A6B4] font-semibold">
                 Output Language
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { id: "auto", label: "Auto Detect" },
+                  { id: "auto", label: "Auto" },
                   { id: "english", label: "English" },
                   { id: "bengali", label: "Bengali" },
                 ].map((lang) => (
                   <button
                     key={lang.id}
                     type="button"
-                    onClick={() => setPreferences((p) => ({ ...p, preferredLanguage: lang.id as any }))}
-                    className={`py-2 text-xs font-mono rounded-lg border transition ${
+                    onClick={() =>
+                      setPreferences((p) => ({ ...p, preferredLanguage: lang.id as any }))
+                    }
+                    className={`py-2 text-xs font-mono rounded-xl border transition ${
                       preferences.preferredLanguage === lang.id
-                        ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100 font-semibold"
-                        : "bg-slate-50 dark:bg-midnight-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700"
+                        ? "bg-[#3B6CFF] text-white border-[#3B6CFF] shadow-[0_0_10px_rgba(59,108,255,0.3)] font-semibold"
+                        : "bg-[#14161A] border-[#2E333D] text-[#A0A6B4] hover:border-[#3B6CFF]/40 hover:text-[#E8EAF0]"
                     }`}
                   >
                     {lang.label}
@@ -346,73 +341,18 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Section 2: Visual Theme & Appearance */}
-        <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
-          <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-4">
-            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-midnight-800 flex items-center justify-center text-scholar-emerald">
-              {theme === "dark" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-            </div>
-            <div>
-              <h2 className="text-base font-serif font-semibold text-slate-900 dark:text-slate-100">
-                Visual Theme & Reading Mode
-              </h2>
-              <p className="text-xs text-slate-400">
-                Choose between Midnight Blue dark academic mode and crisp paper-inspired light mode.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div
-              onClick={() => setTheme("dark")}
-              className={`p-4 rounded-xl border cursor-pointer transition flex items-center justify-between ${
-                theme === "dark"
-                  ? "bg-midnight-950 border-scholar-emerald text-white"
-                  : "bg-slate-50 dark:bg-midnight-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <Moon className="w-5 h-5 text-scholar-emerald" />
-                <div>
-                  <div className="text-xs font-semibold font-mono">Midnight Dark (Default)</div>
-                  <div className="text-[11px] text-slate-400">Deep navy academic workspace</div>
-                </div>
-              </div>
-              {theme === "dark" && <CheckCircle2 className="w-4 h-4 text-scholar-emerald" />}
-            </div>
-
-            <div
-              onClick={() => setTheme("light")}
-              className={`p-4 rounded-xl border cursor-pointer transition flex items-center justify-between ${
-                theme === "light"
-                  ? "bg-white border-slate-900 text-slate-900 shadow-sm"
-                  : "bg-slate-50 dark:bg-midnight-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <Sun className="w-5 h-5 text-amber-500" />
-                <div>
-                  <div className="text-xs font-semibold font-mono">Editorial Light</div>
-                  <div className="text-[11px] text-slate-400">Clean parchment reading contrast</div>
-                </div>
-              </div>
-              {theme === "light" && <CheckCircle2 className="w-4 h-4 text-slate-900" />}
-            </div>
-          </div>
-        </div>
-
-        {/* Section 3: AI Provider & API Key Integration */}
-        <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
-          <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-4">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-scholar-emerald">
+        {/* Section 2: AI Provider & API Key Integration */}
+        <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="flex items-center gap-2.5 border-b border-[#262A33] pb-4">
+            <div className="w-8 h-8 rounded-xl bg-[#14161A] border border-[#2E333D] flex items-center justify-center text-[#3B6CFF]">
               <Cpu className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-serif font-semibold text-slate-900 dark:text-slate-100">
+              <h2 className="text-sm font-semibold text-[#E8EAF0]">
                 AI Intelligence Engine & API Keys
               </h2>
-              <p className="text-xs text-slate-400">
-                Select your backend AI provider and configure API keys for live synthesis, solving, and multimodal vision.
+              <p className="text-xs text-[#A0A6B4]">
+                Choose the backend AI provider for question solving, synthesis, and vision.
               </p>
             </div>
           </div>
@@ -423,20 +363,20 @@ export default function SettingsPage() {
               {
                 id: "mock",
                 name: "Mock Engine",
-                badge: "Offline / Free",
-                desc: "Instant deterministic responses for testing without external credentials",
+                badge: "Offline / Fast",
+                desc: "Deterministic test responses without external credentials.",
               },
               {
                 id: "gemini",
                 name: "Google Gemini",
                 badge: "Multimodal Vision",
-                desc: "Live reasoning and image analysis",
+                desc: "Full multimodal reasoning and image text analysis.",
               },
               {
                 id: "groq",
-                name: "Groq",
+                name: "Groq Cloud",
                 badge: "Ultra Low-Latency",
-                desc: "High-speed live text generation",
+                desc: "High-speed text question answering.",
               },
             ].map((p) => {
               const isSelected = selectedProvider === p.id;
@@ -448,32 +388,32 @@ export default function SettingsPage() {
                   onClick={() => setSelectedProvider(p.id)}
                   className={`p-4 rounded-xl border cursor-pointer transition flex flex-col justify-between ${
                     isSelected
-                      ? "bg-slate-50 dark:bg-midnight-950 border-scholar-emerald shadow-xs"
-                      : "bg-white dark:bg-midnight-850 border-slate-200 dark:border-midnight-700 hover:border-slate-300 dark:hover:border-midnight-600"
+                      ? "bg-[#242832] border-[#3B6CFF] shadow-[0_0_12px_rgba(59,108,255,0.2)]"
+                      : "bg-[#14161A] border-[#2E333D] hover:border-[#3B6CFF]/40"
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between gap-1 mb-1">
-                      <span className="font-semibold text-xs text-slate-900 dark:text-slate-100">
+                      <span className="font-semibold text-xs text-[#E8EAF0]">
                         {p.name}
                       </span>
                       {isCurrentActive && (
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#3DDC97]/15 text-[#3DDC97] border border-[#3DDC97]/30">
                           Active
                         </span>
                       )}
                     </div>
-                    <div className="text-[10px] font-mono text-scholar-emerald mb-2">{p.badge}</div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+                    <div className="text-[10px] font-mono text-[#3B6CFF] mb-2">{p.badge}</div>
+                    <p className="text-[11px] text-[#A0A6B4] leading-snug">
                       {p.desc}
                     </p>
                   </div>
 
-                  <div className="mt-3 pt-2 border-t border-slate-100 dark:border-midnight-800 flex items-center justify-between text-[11px] font-mono">
-                    <span className="text-slate-400">
-                      {p.id === "mock" ? "Offline testing" : aiStatus?.providers?.[p.id]?.model}
+                  <div className="mt-3 pt-2 border-t border-[#262A33] flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-[#6B7280]">
+                      {p.id === "mock" ? "Offline" : aiStatus?.providers?.[p.id]?.model || "Ready"}
                     </span>
-                    {isSelected && <Check className="w-3.5 h-3.5 text-scholar-emerald" />}
+                    {isSelected && <Check className="w-3.5 h-3.5 text-[#3B6CFF]" />}
                   </div>
                 </div>
               );
@@ -481,34 +421,25 @@ export default function SettingsPage() {
           </div>
 
           {/* Configuration Form for Selected Provider */}
-          {selectedProvider === "mock" ? (
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                  {aiStatus?.active_provider === "mock" ? "Mock Engine Activated" : "Mock Engine"}
-                </div>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  For offline testing, set AI_DEFAULT_PROVIDER=mock in the backend environment and restart the backend.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 space-y-4">
+          {selectedProvider !== "mock" && (
+            <div className="p-4 rounded-xl bg-[#14161A] border border-[#2E333D] space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                    <Key className="w-3.5 h-3.5 text-scholar-emerald" />
-                    <span>{selectedProvider === "gemini" ? "Google Gemini API Key" : "Groq Cloud API Key"}</span>
+                  <h3 className="text-xs font-semibold text-[#E8EAF0] flex items-center gap-1.5">
+                    <Key className="w-3.5 h-3.5 text-[#3B6CFF]" />
+                    <span>
+                      {selectedProvider === "gemini" ? "Google Gemini API Key" : "Groq Cloud API Key"}
+                    </span>
                   </h3>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
+                  <p className="text-[11px] text-[#A0A6B4] mt-0.5">
                     {selectedProvider === "gemini" ? (
                       <>
-                        Provides live answers and image OCR. Free keys available at{" "}
+                        Get a free API key at{" "}
                         <a
                           href="https://aistudio.google.com/app/apikey"
                           target="_blank"
                           rel="noreferrer"
-                          className="text-scholar-emerald underline hover:opacity-80"
+                          className="text-[#3B6CFF] underline hover:opacity-80"
                         >
                           Google AI Studio
                         </a>
@@ -516,12 +447,12 @@ export default function SettingsPage() {
                       </>
                     ) : (
                       <>
-                        Provides fast text generation. API keys are available at{" "}
+                        Get an API key at{" "}
                         <a
                           href="https://console.groq.com/keys"
                           target="_blank"
                           rel="noreferrer"
-                          className="text-scholar-emerald underline hover:opacity-80"
+                          className="text-[#3B6CFF] underline hover:opacity-80"
                         >
                           Groq Console
                         </a>
@@ -532,8 +463,8 @@ export default function SettingsPage() {
                 </div>
 
                 {aiStatus?.providers?.[selectedProvider]?.configured && (
-                  <span className="px-2 py-0.5 text-[11px] font-mono rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 self-start sm:self-auto">
-                    Key Stored
+                  <span className="px-2 py-0.5 text-[11px] font-mono rounded bg-[#3DDC97]/15 text-[#3DDC97] border border-[#3DDC97]/30 self-start sm:self-auto">
+                    Key Configured
                   </span>
                 )}
               </div>
@@ -551,12 +482,12 @@ export default function SettingsPage() {
                         ? "AIzaSy..."
                         : "gsk_..."
                     }
-                    className="w-full px-3 py-2 pr-10 text-xs bg-white dark:bg-midnight-900 border border-slate-200 dark:border-midnight-700 rounded-lg text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-scholar-emerald font-mono"
+                    className="w-full px-3 py-2 pr-10 text-xs bg-[#1C1F26] border border-[#2E333D] rounded-xl text-[#E8EAF0] placeholder:text-[#6B7280] focus:border-[#3B6CFF] outline-none font-mono"
                   />
                   <button
                     type="button"
                     onClick={() => setShowApiKey(!showApiKey)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A0A6B4] hover:text-[#E8EAF0]"
                     title={showApiKey ? "Hide key" : "Show key"}
                   >
                     {showApiKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -566,13 +497,16 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => handleConfigureAI(selectedProvider, apiKeyInput || undefined)}
-                  disabled={aiSaving || (!apiKeyInput.trim() && !aiStatus?.providers?.[selectedProvider]?.configured)}
-                  className="px-4 py-2 bg-slate-900 dark:bg-scholar-emerald hover:bg-slate-800 dark:hover:bg-emerald-600 disabled:opacity-50 text-white dark:text-slate-950 text-xs font-semibold rounded-lg transition flex items-center justify-center gap-1.5 flex-shrink-0"
+                  disabled={
+                    aiSaving ||
+                    (!apiKeyInput.trim() && !aiStatus?.providers?.[selectedProvider]?.configured)
+                  }
+                  className="px-4 py-2 bg-[#3B6CFF] hover:bg-[#5A82FF] active:bg-[#2A55D9] disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5 flex-shrink-0 shadow-[0_0_12px_rgba(59,108,255,0.25)]"
                 >
                   {aiSaving ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Verifying...</span>
+                      <span>Saving...</span>
                     </>
                   ) : (
                     <>
@@ -586,37 +520,37 @@ export default function SettingsPage() {
           )}
         </div>
 
-        {/* Section 4: Telegram Account Synchronization */}
-        <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
-          <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-4">
-            <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-500">
+        {/* Section 3: Telegram Account Synchronization */}
+        <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="flex items-center gap-2.5 border-b border-[#262A33] pb-4">
+            <div className="w-8 h-8 rounded-xl bg-[#14161A] border border-[#2E333D] flex items-center justify-center text-[#3B6CFF]">
               <Send className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-serif font-semibold text-slate-900 dark:text-slate-100">
-                Telegram Cross-Platform Integration
+              <h2 className="text-sm font-semibold text-[#E8EAF0]">
+                Telegram Bot Synchronization
               </h2>
-              <p className="text-xs text-slate-400">
-                Synchronize your learning workspace with the official Telegram study bot.
+              <p className="text-xs text-[#A0A6B4]">
+                Link your Telegram account to sync questions, answers, and study history.
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-[#14161A] border border-[#2E333D]">
             <div>
-              <div className="text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+              <div className="text-xs font-mono font-semibold text-[#E8EAF0] flex items-center gap-2">
                 <span>Account Status:</span>
                 {telegramStatus?.is_linked ? (
-                  <span className="text-scholar-emerald flex items-center gap-1">
+                  <span className="text-[#3DDC97] flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Synchronized (ID: {telegramStatus.telegram_id})</span>
+                    <span>Linked (ID: {telegramStatus.telegram_id})</span>
                   </span>
                 ) : (
-                  <span className="text-slate-400 font-normal">Not Connected</span>
+                  <span className="text-[#6B7280] font-normal">Not Connected</span>
                 )}
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                When connected, questions and summaries generated on Telegram automatically sync to this web history.
+              <p className="text-[11px] text-[#A0A6B4] mt-1">
+                Study questions submitted to @StudyMate_Bot sync automatically to your web account.
               </p>
             </div>
 
@@ -624,7 +558,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleUnlink}
                 disabled={loading}
-                className="px-3.5 py-1.5 border border-red-500/30 text-red-500 hover:bg-red-500/10 text-xs font-semibold rounded-lg transition flex items-center gap-1.5 self-start sm:self-auto"
+                className="px-3.5 py-1.5 border border-[#FF5C6C]/30 text-[#FF5C6C] hover:bg-[#FF5C6C]/10 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 self-start sm:self-auto"
               >
                 <Unlink className="w-3.5 h-3.5" />
                 <span>Disconnect</span>
@@ -633,7 +567,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleGenerateToken}
                 disabled={loading}
-                className="px-4 py-2 bg-slate-900 dark:bg-scholar-emerald hover:bg-slate-800 dark:hover:bg-emerald-600 text-white dark:text-slate-950 text-xs font-semibold rounded-lg transition flex items-center gap-1.5 self-start sm:self-auto shadow-sm"
+                className="px-4 py-2 bg-[#3B6CFF] hover:bg-[#5A82FF] active:bg-[#2A55D9] text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 self-start sm:self-auto shadow-[0_0_12px_rgba(59,108,255,0.25)]"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span>Connect Telegram</span>
@@ -642,22 +576,22 @@ export default function SettingsPage() {
           </div>
 
           {linkToken && (
-            <div className="p-4 rounded-xl bg-sky-500/10 border border-sky-500/20 text-xs space-y-2">
-              <span className="font-semibold text-sky-600 dark:text-sky-400">
-                Telegram Link Authorization Ready
+            <div className="p-4 rounded-xl bg-[#3B6CFF]/10 border border-[#3B6CFF]/30 text-xs space-y-2">
+              <span className="font-semibold text-[#3B6CFF]">
+                Authorization Token Generated
               </span>
-              <p className="text-slate-600 dark:text-slate-300">
-                Click below to launch Telegram and confirm synchronization. This single-use token expires in {Math.round(linkToken.expires_in_seconds / 60)} minutes.
+              <p className="text-[#A0A6B4]">
+                Click below to open Telegram and confirm your single-use connection token (expires in {Math.round(linkToken.expires_in_seconds / 60)} minutes).
               </p>
               <div className="pt-1">
                 <a
                   href={linkToken.deep_link}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg transition"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#3B6CFF] hover:bg-[#5A82FF] text-white font-semibold rounded-xl transition shadow-[0_0_12px_rgba(59,108,255,0.3)]"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>Open @StudyMate_Bot</span>
+                  <span>Launch @StudyMate_Bot</span>
                 </a>
               </div>
             </div>
@@ -665,32 +599,32 @@ export default function SettingsPage() {
         </div>
 
         {/* Section 4: Identity & Authentication */}
-        <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
-          <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-4">
-            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-midnight-800 flex items-center justify-center text-scholar-emerald">
+        <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="flex items-center gap-2.5 border-b border-[#262A33] pb-4">
+            <div className="w-8 h-8 rounded-xl bg-[#14161A] border border-[#2E333D] flex items-center justify-center text-[#3B6CFF]">
               <UserIcon className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-serif font-semibold text-slate-900 dark:text-slate-100">
-                User Identity & Security
+              <h2 className="text-sm font-semibold text-[#E8EAF0]">
+                User Account
               </h2>
-              <p className="text-xs text-slate-400">
-                {user ? "Authenticated account details." : "Sign in or register for a persistent research profile."}
+              <p className="text-xs text-[#A0A6B4]">
+                {user ? "Currently signed in." : "Sign in or register for persistent history and cross-platform sync."}
               </p>
             </div>
           </div>
 
           {user ? (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-[#14161A] border border-[#2E333D]">
               <div className="space-y-1">
-                <div className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                  {user.name || "Academic Scholar"}
+                <div className="text-sm font-semibold text-[#E8EAF0]">
+                  {user.name || "Student / Scholar"}
                 </div>
-                <div className="text-xs font-mono text-slate-400">{user.email}</div>
+                <div className="text-xs font-mono text-[#A0A6B4]">{user.email}</div>
               </div>
               <button
                 onClick={handleLogout}
-                className="px-3.5 py-1.5 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-midnight-800 rounded-lg text-xs font-semibold transition self-start sm:self-auto"
+                className="px-3.5 py-1.5 border border-[#2E333D] text-[#A0A6B4] hover:text-[#FF5C6C] hover:bg-[#242832] rounded-xl text-xs font-semibold transition self-start sm:self-auto"
               >
                 Sign Out
               </button>
@@ -699,34 +633,34 @@ export default function SettingsPage() {
             <form onSubmit={handleAuthSubmit} className="space-y-4 max-w-md">
               {isRegistering && (
                 <div>
-                  <label className="block text-xs font-mono text-slate-500 mb-1">Full Name</label>
+                  <label className="block text-xs font-mono text-[#A0A6B4] mb-1">Full Name</label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-scholar-emerald"
+                    className="w-full px-3 py-2 text-xs bg-[#14161A] border border-[#2E333D] rounded-xl text-[#E8EAF0] focus:border-[#3B6CFF] outline-none"
                   />
                 </div>
               )}
               <div>
-                <label className="block text-xs font-mono text-slate-500 mb-1">Email Address</label>
+                <label className="block text-xs font-mono text-[#A0A6B4] mb-1">Email Address</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-scholar-emerald"
+                  className="w-full px-3 py-2 text-xs bg-[#14161A] border border-[#2E333D] rounded-xl text-[#E8EAF0] focus:border-[#3B6CFF] outline-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-mono text-slate-500 mb-1">Password</label>
+                <label className="block text-xs font-mono text-[#A0A6B4] mb-1">Password</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-scholar-emerald"
+                  className="w-full px-3 py-2 text-xs bg-[#14161A] border border-[#2E333D] rounded-xl text-[#E8EAF0] focus:border-[#3B6CFF] outline-none"
                 />
               </div>
 
@@ -734,7 +668,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setIsRegistering(!isRegistering)}
-                  className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                  className="text-xs text-[#A0A6B4] hover:text-[#E8EAF0] transition"
                 >
                   {isRegistering ? "Existing account? Sign in" : "Need an account? Register"}
                 </button>
@@ -742,9 +676,9 @@ export default function SettingsPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 bg-slate-900 dark:bg-scholar-emerald hover:bg-slate-800 dark:hover:bg-emerald-600 text-white dark:text-slate-950 text-xs font-semibold rounded-lg transition"
+                  className="px-5 py-2 bg-[#3B6CFF] hover:bg-[#5A82FF] active:bg-[#2A55D9] text-white text-xs font-semibold rounded-xl transition shadow-[0_0_12px_rgba(59,108,255,0.25)]"
                 >
-                  {loading ? "Processing..." : isRegistering ? "Create Profile" : "Sign In"}
+                  {loading ? "Processing..." : isRegistering ? "Register" : "Sign In"}
                 </button>
               </div>
             </form>

@@ -730,51 +730,64 @@ Use short opaque callback identifiers. Do not place sensitive data or full promp
 
 ---
 
-## 17. F-13 — Website interfaces (Academic Workspace Redesign)
+## 17. F-13 — Website interfaces (Flocus-Inspired Dark Charcoal & Royal Blue Redesign)
 
-The web frontend is implemented in Next.js 14 App Router, TypeScript, and Tailwind CSS. It follows a **Dark Academic / Midnight Blue** editorial visual identity (`#070a12`, `#0b0f19`, `#0f1524`, `#10b981` emerald accents) designed for serious research and focused study, completely avoiding generic AI gradients, glowing borders, or glassmorphism.
+The web frontend is implemented in Next.js 14 App Router, TypeScript, Tailwind CSS, Lucide React, and KaTeX. It follows a **Dark Charcoal and Royal/Electric Blue** visual and UX design inspired by Flocus (`#14161A` app background, `#1C1F26` card surface, `#242832` raised surface, `#2E333D` borders, `#3B6CFF` royal/electric blue accent), replacing the traditional sidebar with a floating bottom dock and distraction-free focus workspace.
 
 ### Design System & Theme Engine
-- **Midnight Blue Palette**: Academic palette with deep midnight layers (`midnight-950` to `midnight-600`), restrained scholar emerald accents (`#10b981`), and subtle border dividers.
-- **Dual Theme Support**: System dark mode by default with full, high-contrast Light Mode support. Theme preference is persisted client-side via `ThemeProvider` and `localStorage` (`studymate_theme`).
-- **Collapsible Sidebar**: Clean editorial navigation bar with collapsible state, section headers, active route highlights, user profile badge, and one-click dark/light theme toggle.
+- **Dark Charcoal & Royal Blue Palette**: Semantic tokens in `tailwind.config.js` and `globals.css`:
+  - App background: `#14161A`
+  - Cards / surfaces: `#1C1F26` (raised: `#242832`)
+  - Borders: `#2E333D` (subtle dividers: `#262A33`)
+  - Text: Primary `#E8EAF0`, Secondary `#A0A6B4`, Muted `#6B7280`
+  - Primary Accent: Royal / Electric blue `#3B6CFF` (hover `#5A82FF`, pressed `#2A55D9`, glow `rgba(59,108,255,0.35)`)
+  - Status: Success `#3DDC97`, Warning `#F5B84B`, Error `#FF5C6C`
+- **KaTeX Dark Restyling**: Math formulas inherit text colors (`#E8EAF0`) and block equations render on dark surfaces (`#14161A` / `#1C1F26`) with subtle borders and smooth horizontal scrolling.
+- **Accessible WCAG AA Contrast**: Clear hierarchy, 12-16px card radii, 8-10px button/input radii, visible blue focus rings (`focus-visible:ring-2 focus-visible:ring-[#3B6CFF]`).
 
-### Workspace Homepage (`/`)
-- Academic workspace-first layout with instant Quick Solve input box.
-- Direct jump links to Solve Questions, Chat, Summaries, Quizzes, and Upload.
-- Real-time recent activity feeds (Conversations, Summaries, Quizzes) fetched from the shared backend.
-- Learning stats and quick system status.
+### Navigation Shell & Replaced Features
+- **Floating Bottom Dock (`BottomDock.tsx`)** [Status: NEW]:
+  - Replaces traditional sidebar. Pill-shaped dock fixed at bottom center (`bottom-4 sm:bottom-6`), `#1C1F26` at ~85% opacity with `backdrop-blur-xl`, 1px border `#2E333D`.
+  - Icon buttons (Lucide, 22px, 1.75 stroke): Timer (`/`), Solve (`/solve`), Quizzes (`/quizzes`), Chat (`/chat`), Notes (`/summaries`), History (`/history`), Scenes (modal trigger), Settings (`/settings`).
+  - Active item: blue icon, soft blue pill background, tiny dot indicator. Inactive: secondary text color, brighter on hover.
+  - Hover tooltips with page names, 1.1 scale-up with smooth spring transition.
+  - Full keyboard accessibility (Arrow Left/Right, Home, End), `aria-label`, `aria-current="page"`.
+  - Mobile safe-area support (`env(safe-area-inset-bottom)`) with min 44px touch targets.
+- **Auto-Hide in Focus Mode (`FocusContext.tsx`)** [Status: NEW]:
+  - When focus timer is running, dock and top bar fade and slide down after 3 seconds of inactivity.
+  - Reappears on mouse movement near bottom edge, keypress, touch, or timer pause/finish.
+  - Stays visible when modals, popovers, or tooltips are open.
+  - Respects `prefers-reduced-motion` with simple fade (no slide).
+- **Floating Quick-Action Button (`QuickActionButton.tsx`)** [Status: NEW]:
+  - Circular blue (`#3B6CFF`) button with Plus icon and soft glow fixed at bottom right (`bottom-20 sm:bottom-6 right-4 sm:right-8`), sitting above dock on mobile.
+  - Popover menu: Add task, Start focus session, Change scene.
+- **Top Bar (`TopBar.tsx`)** [Status: NEW]:
+  - Minimal top header with StudyMate brand/breadcrumb on the left, completed session streak, scene picker trigger, and profile avatar on the right.
+- **Traditional Collapsible Sidebar (`Navbar.tsx`)** [Status: REMOVED]:
+  - Removed and replaced by the Floating Bottom Dock to reclaim horizontal space and create a distraction-free centered layout.
 
-### Unified Solve Questions Workspace (`/solve`)
-- Split-screen workspace layout: input and configuration on the left/top, structured solution and conversation on the right.
-- Multi-input support: direct mathematical equations, logic problems, educational passages, or direct drag-and-drop image upload.
-- Context-aware presentation: renders LaTeX formulas, step-by-step logic derivations, structured summary sections, or pedagogical concept points based on detected `task_type`.
-- Threaded follow-up discussion composer preserving context.
+### Focus Workspace Homepage (`/`) [Status: CHANGED]
+- **Focus Timer**:
+  - Circular SVG progress ring in electric blue on dark track with tabular countdown numerals (`font-mono text-5xl sm:text-6xl`).
+  - Segmented control: Focus (25m), Short Break (5m), Long Break (15m).
+  - Primary Start/Pause blue button, ghost Reset button, completed session counter.
+- **Interactive Task List**:
+  - "Add task" input, custom royal blue checkboxes, active-task highlight linked to timer countdown, completed tasks dimmed with strikethrough, edit/delete actions, reordering controls, empty state.
+- **Background Scenes (`BackgroundScene.tsx` & `ScenePicker.tsx`)**:
+  - Atmospheric dark scenes (Night Sky, Deep Ocean, Dim City, Abstract Mesh, Minimal Charcoal) with 55-70% dark overlay for readability, persisted in `localStorage`.
+- **Instant Solver Search Bar & Study Tools Shelf**:
+  - Direct query bar routing to `/solve`, and fast links to quizzes, chat, summaries, and OCR.
 
-### Quiz Generator & Workspace (`/quizzes`)
-- Dual Quiz Modes:
-  - **Examination Mode**: Formal timed exam mode with clean radio options, progress bar, answer secrecy enforcement, and authoritative review upon final submission.
-  - **Practice Mode**: Interactive study mode with immediate step-by-step explanations and answer review per question.
-- Quiz creation by topic or passage source, configurable difficulty, and question count.
-
-### AI Chat Interface (`/chat`)
-- Editorial conversational layout with distinct user/assistant typography.
-- Markdown rendering with code blocks, tables, and LaTeX math notation.
-- Thread management and message history.
-
-### Summary Workspace (`/summaries`)
-- Structured multi-style summary generator (Short, Detailed, Exam Notes).
-- Deep reading view with key terms glossary, revision points, and one-click copy to clipboard.
-
-### Chronological Learning History (`/history`)
-- Grouped activity timeline: Today, Yesterday, Last 7 Days, and Older.
-- Real-time search filtering across conversations, quizzes, and summaries.
-- Direct resource linking and secure delete actions.
-
-### Settings & Preferences (`/settings`)
-- Profile overview and quota usage indicators.
-- Practical Learning Preferences: default difficulty, summary style, and math domain.
-- Telegram Account Linking workflow with deep-link generation and one-click copy.
+### Restyled Application Pages [Status: CHANGED]
+- **Unified Solve Workspace (`/solve`)**: Dark charcoal composer, royal blue submit button, KaTeX mathematical derivation cards, truth table, follow-up thread.
+- **Quiz Workspace (`/quizzes`)**: Dark exam and practice modes, blue option selection pills, progress metrics, server-verified scoring.
+- **AI Tutor Chat (`/chat`)**: Multi-turn dialogue, blue user speech bubbles, dark assistant response cards with KaTeX math and follow-up actions.
+- **Study Notes & Summaries (`/summaries`)**: Style selector (Short, Detailed, Exam Notes), structured markdown, one-click copy, print/PDF.
+- **Image Reader (`/upload`)**: Dark dropzone with royal blue accents, OCR status bar, concept and equation extraction cards.
+- **History & Archive (`/history`)**: Chronological grouping (Today, Yesterday, This Week, Earlier), real-time query search, delete actions.
+- **Settings & Preferences (`/settings`)**: Learning preferences, AI provider keys (Gemini, Groq, Mock), Telegram account sync.
+- **Auth (`/login`, `/register`)**: Dark authentication cards with royal blue primary buttons.
+- **Error 404 (`/not-found`)**: Dark not-found card with link back to focus workspace.
 
 ### General UI requirements
 

@@ -41,7 +41,7 @@ export function MathBlock({ content, block = false, className = "" }: MathRender
 
   if (!html) {
     return (
-      <code className={`font-mono text-emerald-400 bg-slate-900/60 px-1.5 py-0.5 rounded text-sm ${className}`}>
+      <code className={`font-mono text-[#3B6CFF] bg-[#14161A] border border-[#2E333D] px-2 py-0.5 rounded-md text-sm ${className}`}>
         {content}
       </code>
     );
@@ -49,7 +49,7 @@ export function MathBlock({ content, block = false, className = "" }: MathRender
 
   return (
     <span
-      className={`katex-rendered inline-block ${block ? "my-2 overflow-x-auto max-w-full py-1 text-center" : ""} ${className}`}
+      className={`katex-rendered inline-block text-[#E8EAF0] ${block ? "my-3 overflow-x-auto max-w-full py-2 px-3 rounded-xl bg-[#14161A] border border-[#2E333D] text-center" : ""} ${className}`}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

@@ -18,8 +18,6 @@ import {
   Lightbulb,
   ArrowRight,
   RefreshCw,
-  FileCode,
-  Table,
   Check,
   Download,
   Printer,
@@ -241,50 +239,52 @@ function SolveWorkspaceContent() {
         return {
           icon: Calculator,
           label: "Mathematics",
-          badgeClass: "bg-blue-950/70 text-blue-300 border-blue-800/80",
+          badgeClass: "bg-[#3B6CFF]/15 text-[#3B6CFF] border-[#3B6CFF]/40",
         };
       case "logical_reasoning":
         return {
           icon: Binary,
           label: "Logical Reasoning",
-          badgeClass: "bg-purple-950/70 text-purple-300 border-purple-800/80",
+          badgeClass: "bg-[#8E5BFF]/15 text-[#C4A8FF] border-[#8E5BFF]/40",
         };
       case "summarization":
         return {
           icon: BookOpen,
           label: "Study Summary",
-          badgeClass: "bg-emerald-950/70 text-emerald-300 border-emerald-800/80",
+          badgeClass: "bg-[#3DDC97]/15 text-[#3DDC97] border-[#3DDC97]/40",
         };
       case "general_educational":
       default:
         return {
           icon: Lightbulb,
           label: "Explanation",
-          badgeClass: "bg-amber-950/70 text-amber-300 border-amber-800/80",
+          badgeClass: "bg-[#F5B84B]/15 text-[#F5B84B] border-[#F5B84B]/40",
         };
     }
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6 text-slate-800 dark:text-slate-200">
+    <div className="space-y-6">
       {/* Workspace Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-midnight-700 pb-4">
-        <div className="page-heading">
-          <h1 className="font-serif text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#2E333D] pb-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-[#E8EAF0] tracking-tight">
             Solve Questions
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Type a question or upload a photo to get an answer and worked steps.
+          <p className="text-xs sm:text-sm text-[#A0A6B4] mt-0.5">
+            Type an academic question or upload a photo to get direct answers and worked steps.
           </p>
         </div>
 
         {/* Mobile View Switcher */}
-        <div className="flex lg:hidden rounded-lg border border-slate-200 dark:border-midnight-700 bg-white dark:bg-midnight-850 p-1 text-sm">
+        <div className="flex lg:hidden rounded-xl border border-[#2E333D] bg-[#1C1F26] p-1 text-xs">
           <button
             onClick={() => setMobileTab("composer")}
             aria-pressed={mobileTab === "composer"}
-            className={`px-3 py-1 rounded font-medium transition ${
-              mobileTab === "composer" ? "bg-white dark:bg-midnight-750 text-scholar-emerald shadow-sm font-semibold" : "text-slate-500 dark:text-slate-400"
+            className={`px-3 py-1.5 rounded-lg font-medium transition ${
+              mobileTab === "composer"
+                ? "bg-[#3B6CFF] text-white shadow-sm font-semibold"
+                : "text-[#A0A6B4] hover:text-[#E8EAF0]"
             }`}
           >
             Question
@@ -292,8 +292,10 @@ function SolveWorkspaceContent() {
           <button
             onClick={() => setMobileTab("solution")}
             aria-pressed={mobileTab === "solution"}
-            className={`px-3 py-1 rounded font-medium transition ${
-              mobileTab === "solution" ? "bg-white dark:bg-midnight-750 text-scholar-emerald shadow-sm font-semibold" : "text-slate-500 dark:text-slate-400"
+            className={`px-3 py-1.5 rounded-lg font-medium transition ${
+              mobileTab === "solution"
+                ? "bg-[#3B6CFF] text-white shadow-sm font-semibold"
+                : "text-[#A0A6B4] hover:text-[#E8EAF0]"
             }`}
           >
             Answer
@@ -302,21 +304,21 @@ function SolveWorkspaceContent() {
       </div>
 
       {/* Split Workspace Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(17rem,0.65fr)_minmax(0,1.35fr)] gap-5 items-start">
-        {/* ================= LEFT PANEL: COMPOSER ================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(18rem,0.75fr)_minmax(0,1.25fr)] gap-6 items-start">
+        {/* LEFT PANEL: COMPOSER */}
         <div
           className={`min-w-0 space-y-4 ${
             mobileTab === "solution" ? "hidden lg:block" : "block"
           }`}
         >
-          <div className="workspace-panel p-5 space-y-4">
+          <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-5 space-y-4 shadow-xl">
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold">Your question</h2>
+              <h2 className="text-sm font-semibold text-[#E8EAF0]">Your question</h2>
               {(inputText || selectedFile) && (
                 <button
                   type="button"
                   onClick={handleClearAll}
-                  className="text-[11px] font-mono text-slate-400 hover:text-red-500 transition"
+                  className="text-[11px] font-mono text-[#A0A6B4] hover:text-[#FF5C6C] transition"
                 >
                   Clear all
                 </button>
@@ -330,35 +332,35 @@ function SolveWorkspaceContent() {
               </label>
               <textarea
                 id="problem-textarea"
-                rows={5}
+                rows={6}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="For example, why does increasing the clock rate reduce execution time?"
-                className="w-full p-3.5 bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-midnight-700 rounded-lg text-xs font-mono text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-scholar-emerald focus:ring-1 focus:ring-scholar-emerald leading-relaxed resize-y"
+                placeholder="Enter a formula, mathematical equation, or logic problem..."
+                className="w-full p-3.5 bg-[#14161A] border border-[#2E333D] rounded-xl text-xs sm:text-sm font-mono text-[#E8EAF0] placeholder:text-[#6B7280] focus:border-[#3B6CFF] outline-none leading-relaxed resize-y transition"
               />
             </div>
 
             {/* Attached Image Preview */}
             {selectedFile && (
-              <div className="relative border border-slate-200 dark:border-midnight-700 rounded-lg p-2.5 bg-slate-50 dark:bg-midnight-950 flex items-center justify-between">
+              <div className="relative border border-[#2E333D] rounded-xl p-2.5 bg-[#14161A] flex items-center justify-between">
                 <div className="flex items-center gap-2.5 overflow-hidden">
                   {filePreview ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={filePreview}
                       alt="Source preview"
-                      className="w-10 h-10 object-cover rounded border border-slate-200 dark:border-midnight-700"
+                      className="w-10 h-10 object-cover rounded-lg border border-[#2E333D]"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded bg-slate-200 dark:bg-midnight-800 flex items-center justify-center">
-                      <ImageIcon className="w-4 h-4 text-slate-400" />
+                    <div className="w-10 h-10 rounded-lg bg-[#242832] flex items-center justify-center">
+                      <ImageIcon className="w-4 h-4 text-[#A0A6B4]" />
                     </div>
                   )}
                   <div className="overflow-hidden leading-tight">
-                    <span className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate block">
+                    <span className="text-xs font-medium text-[#E8EAF0] truncate block">
                       {selectedFile.name}
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 block">
+                    <span className="text-[10px] font-mono text-[#6B7280] block">
                       {(selectedFile.size / 1024).toFixed(1)} KB • Image source
                     </span>
                   </div>
@@ -366,7 +368,7 @@ function SolveWorkspaceContent() {
                 <button
                   type="button"
                   onClick={handleClearFile}
-                  className="p-1 rounded text-slate-400 hover:text-red-500 transition"
+                  className="p-1 rounded-lg text-[#A0A6B4] hover:text-[#FF5C6C] transition"
                   aria-label="Remove attached image"
                 >
                   <X className="w-4 h-4" />
@@ -375,7 +377,7 @@ function SolveWorkspaceContent() {
             )}
 
             {/* Upload Controls & Preferences */}
-            <div className="pt-2 border-t border-slate-200 dark:border-midnight-700 flex flex-wrap items-center justify-between gap-3">
+            <div className="pt-2 border-t border-[#262A33] flex flex-wrap items-center justify-between gap-3">
               <div>
                 <input
                   type="file"
@@ -387,21 +389,20 @@ function SolveWorkspaceContent() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-midnight-700 bg-slate-50 dark:bg-midnight-800 hover:bg-slate-100 dark:hover:bg-midnight-700 text-xs font-medium text-slate-700 dark:text-slate-300 transition"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#2E333D] bg-[#14161A] hover:bg-[#242832] text-xs font-medium text-[#A0A6B4] hover:text-[#E8EAF0] transition"
                 >
-                  <Upload className="w-3.5 h-3.5 text-scholar-emerald" />
-                  <span>Upload a photo</span>
+                  <Upload className="w-3.5 h-3.5 text-[#3B6CFF]" />
+                  <span>Attach photo</span>
                 </button>
               </div>
 
-              {/* Advanced Context Options (collapsed/minimal) */}
               <div className="flex items-center gap-2 text-xs">
                 <select
                   value={preferredStyle}
                   onChange={(e) => setPreferredStyle(e.target.value as any)}
                   aria-label="Summary style preference"
-                  className="bg-slate-50 dark:bg-midnight-800 border border-slate-200 dark:border-midnight-700 rounded px-2 py-1 text-[11px] font-mono text-slate-700 dark:text-slate-300 focus:outline-none"
-                  title="Preferred summary depth if passage is detected"
+                  className="bg-[#14161A] border border-[#2E333D] rounded-lg px-2.5 py-1 text-[11px] font-mono text-[#A0A6B4] focus:outline-none"
+                  title="Preferred summary depth"
                 >
                   <option value="exam_notes">Exam Notes</option>
                   <option value="detailed">Detailed</option>
@@ -412,8 +413,8 @@ function SolveWorkspaceContent() {
 
             {/* Error Message */}
             {errorMsg && (
-              <div role="alert" className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/80 text-red-700 dark:text-red-300 rounded-lg text-sm flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+              <div role="alert" className="p-3 bg-[#FF5C6C]/10 border border-[#FF5C6C]/30 text-[#FF5C6C] rounded-xl text-xs flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-[#FF5C6C] flex-shrink-0 mt-0.5" />
                 <span className="leading-relaxed">{errorMsg}</span>
               </div>
             )}
@@ -423,24 +424,24 @@ function SolveWorkspaceContent() {
               type="button"
               onClick={handleSolve}
               disabled={loading}
-              className="w-full min-h-11 py-2.5 px-4 bg-scholar-emerald disabled:opacity-50 text-white font-semibold text-sm rounded-lg transition flex items-center justify-center gap-2"
+              className="w-full min-h-11 py-2.5 px-4 bg-[#3B6CFF] hover:bg-[#5A82FF] active:bg-[#2A55D9] disabled:opacity-50 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-[0_0_15px_rgba(59,108,255,0.35)] transition flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>Working on it…</span>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Solving problem…</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Solve question</span>
+                  <Sparkles className="w-4 h-4" />
+                  <span>Solve Question</span>
                 </>
               )}
             </button>
           </div>
         </div>
 
-        {/* ================= RIGHT PANEL: AI ANSWER & EXPLANATION ================= */}
+        {/* RIGHT PANEL: AI ANSWER & EXPLANATION */}
         <div
           aria-busy={loading}
           className={`min-w-0 space-y-5 ${
@@ -448,147 +449,141 @@ function SolveWorkspaceContent() {
           }`}
         >
           {loading ? (
-            /* Contextual Loading State */
-            <div role="status" className="workspace-panel p-8 text-center space-y-4">
-              <Loader2 className="w-7 h-7 text-scholar-emerald animate-spin mx-auto" />
+            <div role="status" className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-10 text-center space-y-4 shadow-xl">
+              <Loader2 className="w-8 h-8 text-[#3B6CFF] animate-spin mx-auto" />
               <div>
-                <div className="text-sm font-serif font-semibold text-slate-900 dark:text-slate-200">
-                  {selectedFile ? "Reading your photo" : "Working on your answer"}
+                <div className="text-base font-semibold text-[#E8EAF0]">
+                  {selectedFile ? "Analyzing visual contents" : "Computing derivation & steps"}
                 </div>
-                <p className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1">
-                  {selectedFile ? "We’ll read the text, then work through the questions." : "Your answer and worked steps will appear here."}
+                <p className="text-xs text-[#A0A6B4] mt-1">
+                  {selectedFile ? "Extracting mathematical symbols and problem context." : "Verifying algebraic consistency."}
                 </p>
               </div>
             </div>
           ) : !solution ? (
-            /* Empty State */
-            <div className="workspace-panel p-8 sm:p-12 text-center space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-midnight-800 border border-slate-200 dark:border-midnight-700 flex items-center justify-center text-slate-400 mx-auto">
-                <Calculator className="w-5 h-5 text-scholar-emerald" />
+            <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-10 sm:p-14 text-center space-y-3 shadow-xl">
+              <div className="w-12 h-12 rounded-xl bg-[#14161A] border border-[#2E333D] flex items-center justify-center text-[#3B6CFF] mx-auto">
+                <Calculator className="w-6 h-6" />
               </div>
-              <h2 className="text-sm font-serif font-semibold text-slate-900 dark:text-slate-200">
-                Your answer will appear here
+              <h2 className="text-base font-semibold text-[#E8EAF0]">
+                Your solution will appear here
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
-                Start with a written question or a clear photo of the problem.
+              <p className="text-xs text-[#A0A6B4] max-w-sm mx-auto leading-relaxed">
+                Enter an equation or upload a photo to receive a verified result and worked derivations.
               </p>
             </div>
           ) : solution.clarification_needed ? (
-            <div className="workspace-panel p-5 space-y-3" role="status">
-              <h2 ref={answerHeadingRef} tabIndex={-1} className="flex items-center gap-2 font-semibold">
-                <HelpCircle className="w-5 h-5 text-amber-500" />
-                A detail is missing
+            <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-6 space-y-3 shadow-xl" role="status">
+              <h2 ref={answerHeadingRef} tabIndex={-1} className="flex items-center gap-2 font-semibold text-[#F5B84B]">
+                <HelpCircle className="w-5 h-5 text-[#F5B84B]" />
+                Additional information needed
               </h2>
-              <p className="leading-relaxed">{solution.clarification_question || solution.summary_or_answer}</p>
-              <button type="button" onClick={() => setMobileTab("composer")} className="lg:hidden text-sm font-semibold text-scholar-emerald">
-                Edit question
+              <p className="text-sm leading-relaxed text-[#E8EAF0]">{solution.clarification_question || solution.summary_or_answer}</p>
+              <button type="button" onClick={() => setMobileTab("composer")} className="lg:hidden text-xs font-semibold text-[#3B6CFF]">
+                Edit Question
               </button>
             </div>
           ) : (
-            <div className="space-y-5">
-
+            <div className="space-y-6">
               {/* Main Solution Card */}
-              <div className="workspace-panel p-4 sm:p-6 space-y-6">
-                <section aria-labelledby="answer-heading" className="answer-panel p-4 sm:p-6">
-                  <h2 id="answer-heading" ref={answerHeadingRef} tabIndex={-1} className="text-xl font-semibold tracking-tight mb-3">
-                    {solution.task_type === "summarization" ? "Summary" : "Answer"}
-                  </h2>
-                  <SolutionText text={solution.summary_or_answer} />
-                </section>
+              <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-6 space-y-6 shadow-xl">
                 {/* Header: Task Badge & Title */}
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-midnight-700 pb-4">
-                  <div>
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#262A33] pb-4">
+                  <div className="flex items-center gap-2">
                     {(() => {
                       const task = getTaskInfo(solution.task_type);
                       const Icon = task.icon;
                       return (
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono border ${task.badgeClass}`}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border ${task.badgeClass}`}
                         >
-                          <Icon className="w-3 h-3" />
+                          <Icon className="w-3.5 h-3.5" />
                           <span>{task.label}</span>
                         </span>
                       );
                     })()}
                     {solution.math_solution?.verification?.status === "passed" && (
-                      <span className="ml-2 inline-flex items-center gap-1.5 text-xs font-medium text-scholar-emerald">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Checked with SymPy
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-[#3DDC97]">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> SymPy Verified
                       </span>
                     )}
                   </div>
 
-                  {/* Actions & Verification Bar */}
+                  {/* Actions Bar */}
                   <div className="flex flex-wrap items-center gap-2">
-                    {/* Copy Solution Button */}
                     <button
                       type="button"
                       onClick={handleCopySolution}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-50 dark:bg-midnight-800 hover:bg-slate-100 dark:hover:bg-midnight-700 border border-slate-200 dark:border-midnight-700 text-[11px] font-mono text-slate-700 dark:text-slate-300 transition"
-                      title="Copy full solution as Markdown"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#14161A] hover:bg-[#242832] border border-[#2E333D] text-[11px] font-mono text-[#A0A6B4] hover:text-[#E8EAF0] transition"
+                      title="Copy solution markdown"
                     >
                       {copiedSolution ? (
                         <>
-                          <Check className="w-3.5 h-3.5 text-scholar-emerald" />
-                          <span className="text-scholar-emerald">Copied</span>
+                          <Check className="w-3.5 h-3.5 text-[#3DDC97]" />
+                          <span className="text-[#3DDC97]">Copied</span>
                         </>
                       ) : (
                         <>
-                          <Copy className="w-3.5 h-3.5 text-slate-400" />
+                          <Copy className="w-3.5 h-3.5" />
                           <span>Copy</span>
                         </>
                       )}
                     </button>
 
-                    {/* Export Markdown Button */}
                     <button
                       type="button"
                       onClick={handleExportMarkdown}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-50 dark:bg-midnight-800 hover:bg-slate-100 dark:hover:bg-midnight-700 border border-slate-200 dark:border-midnight-700 text-[11px] font-mono text-slate-700 dark:text-slate-300 transition"
-                      title="Export solution as .md file"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#14161A] hover:bg-[#242832] border border-[#2E333D] text-[11px] font-mono text-[#A0A6B4] hover:text-[#E8EAF0] transition"
+                      title="Export solution as markdown"
                     >
-                      <Download className="w-3.5 h-3.5 text-slate-400" />
+                      <Download className="w-3.5 h-3.5" />
                       <span>Export .md</span>
                     </button>
 
-                    {/* Print / PDF Button */}
                     <button
                       type="button"
                       onClick={handlePrint}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-50 dark:bg-midnight-800 hover:bg-slate-100 dark:hover:bg-midnight-700 border border-slate-200 dark:border-midnight-700 text-[11px] font-mono text-slate-700 dark:text-slate-300 transition"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#14161A] hover:bg-[#242832] border border-[#2E333D] text-[11px] font-mono text-[#A0A6B4] hover:text-[#E8EAF0] transition"
                       title="Print or save as PDF"
                     >
-                      <Printer className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Print / PDF</span>
+                      <Printer className="w-3.5 h-3.5" />
+                      <span>Print</span>
                     </button>
-
                   </div>
                 </div>
 
-                {/* Task-Specific Renderings */}
-                {/* 1. Mathematics Steps */}
+                {/* Primary Answer Panel */}
+                <section aria-labelledby="answer-heading" className="bg-[#14161A] border border-[#2E333D] rounded-xl p-5 sm:p-6 space-y-3">
+                  <h2 id="answer-heading" ref={answerHeadingRef} tabIndex={-1} className="text-lg font-semibold text-[#E8EAF0]">
+                    {solution.task_type === "summarization" ? "Key Takeaways" : "Direct Answer"}
+                  </h2>
+                  <SolutionText text={solution.summary_or_answer} />
+                </section>
+
+                {/* Mathematics Steps */}
                 {solution.task_type === "mathematics" && solution.math_solution && (
-                  <div className="space-y-3">
-                    <h3 className="text-lg font-semibold">
-                      Worked steps
+                  <div className="space-y-4">
+                    <h3 className="text-base font-semibold text-[#E8EAF0]">
+                      Worked Mathematical Steps
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {solution.math_solution.steps?.map((step: any, idx: number) => (
                         <div
                           key={idx}
-                          className="p-3 rounded-lg border border-slate-200 dark:border-midnight-700 bg-slate-50 dark:bg-midnight-800 space-y-1.5"
+                          className="p-4 rounded-xl border border-[#2E333D] bg-[#14161A] space-y-2"
                         >
-                          <div className="flex items-start gap-2 text-xs font-medium text-slate-800 dark:text-slate-200">
-                            <span className="w-4 h-4 rounded bg-slate-200 dark:bg-midnight-950 border border-slate-300 dark:border-midnight-700 flex items-center justify-center font-mono text-[10px] text-scholar-emerald flex-shrink-0 mt-0.5">
+                          <div className="flex items-start gap-2.5 text-xs sm:text-sm font-medium text-[#E8EAF0]">
+                            <span className="w-5 h-5 rounded-md bg-[#242832] border border-[#2E333D] flex items-center justify-center font-mono text-xs text-[#3B6CFF] flex-shrink-0 mt-0.5">
                               {step.step || idx + 1}
                             </span>
                             <FormattedTextWithMath text={step.explanation} className="leading-relaxed" />
                           </div>
                           {step.expression && (
-                            <div className="pl-6 py-1">
+                            <div className="pl-7 py-1">
                               <MathBlock
                                 content={step.expression}
                                 block={true}
-                                className="text-slate-900 dark:text-slate-100 bg-white dark:bg-midnight-950 p-3 rounded border border-slate-200 dark:border-midnight-700 shadow-xs"
+                                className="text-[#E8EAF0]"
                               />
                             </div>
                           )}
@@ -598,16 +593,16 @@ function SolveWorkspaceContent() {
                   </div>
                 )}
 
-                {/* 2. Logical Reasoning */}
+                {/* Logical Reasoning */}
                 {solution.task_type === "logical_reasoning" && solution.logic_solution && (
-                  <div className="space-y-3">
-                    <h3 className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                      Formal Reasoning & Truth Table
+                  <div className="space-y-4">
+                    <h3 className="text-base font-semibold text-[#E8EAF0]">
+                      Formal Logical Steps
                     </h3>
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       {solution.logic_solution.reasoning_steps?.map((step: string, idx: number) => (
-                        <div key={idx} className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
-                          <ArrowRight className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+                        <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#E8EAF0] p-3 rounded-xl bg-[#14161A] border border-[#2E333D]">
+                          <ArrowRight className="w-4 h-4 text-[#3B6CFF] flex-shrink-0 mt-0.5" />
                           <span className="leading-relaxed">{step}</span>
                         </div>
                       ))}
@@ -615,25 +610,25 @@ function SolveWorkspaceContent() {
 
                     {/* Truth Table */}
                     {solution.logic_solution.truth_table && (
-                      <div className="mt-3 border border-slate-200 dark:border-midnight-700 rounded-lg overflow-x-auto">
+                      <div className="mt-4 border border-[#2E333D] rounded-xl overflow-x-auto bg-[#14161A]">
                         <table className="w-full text-xs text-left">
-                          <thead className="bg-slate-50 dark:bg-midnight-950 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-midnight-700">
+                          <thead className="bg-[#1C1F26] text-[#A0A6B4] border-b border-[#2E333D]">
                             <tr>
                               {solution.logic_solution.truth_table.variables?.map((v: string) => (
-                                <th key={v} className="p-2 font-mono">{v}</th>
+                                <th key={v} className="p-3 font-mono">{v}</th>
                               ))}
-                              <th className="p-2 font-mono text-scholar-emerald">Result</th>
+                              <th className="p-3 font-mono text-[#3B6CFF]">Result</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-200 dark:divide-midnight-700">
+                          <tbody className="divide-y divide-[#262A33]">
                             {solution.logic_solution.truth_table.rows?.map((row: any, rIdx: number) => (
-                              <tr key={rIdx} className="hover:bg-slate-100 dark:hover:bg-midnight-800">
+                              <tr key={rIdx} className="hover:bg-[#242832]">
                                 {solution.logic_solution.truth_table.variables?.map((v: string) => (
-                                  <td key={v} className="p-2 font-mono text-slate-700 dark:text-slate-300">
+                                  <td key={v} className="p-3 font-mono text-[#E8EAF0]">
                                     {row.assignment[v] ? "T" : "F"}
                                   </td>
                                 ))}
-                                <td className="p-2 font-mono font-bold text-scholar-emerald">
+                                <td className="p-3 font-mono font-bold text-[#3B6CFF]">
                                   {row.result ? "T" : "F"}
                                 </td>
                               </tr>
@@ -645,52 +640,35 @@ function SolveWorkspaceContent() {
                   </div>
                 )}
 
-                {/* 3. Summarization */}
+                {/* Summarization */}
                 {solution.task_type === "summarization" && solution.summary_solution && (
                   <div className="space-y-4">
                     {solution.summary_solution.content?.sections?.map((sec: any, idx: number) => (
-                      <div key={idx} className="space-y-1.5">
-                        <h4 className="text-xs font-mono uppercase tracking-wider text-slate-800 dark:text-slate-300 flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-scholar-emerald"></span>
+                      <div key={idx} className="space-y-2 p-4 rounded-xl bg-[#14161A] border border-[#2E333D]">
+                        <h4 className="text-xs font-mono uppercase tracking-wider text-[#3B6CFF] flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#3B6CFF]"></span>
                           <span>{sec.heading}</span>
                         </h4>
-                        <ul className="list-disc pl-5 space-y-1 text-xs text-slate-600 dark:text-slate-400">
+                        <ul className="list-disc pl-5 space-y-1.5 text-xs sm:text-sm text-[#A0A6B4]">
                           {sec.points?.map((pt: string, pIdx: number) => (
-                            <li key={pIdx} className="leading-relaxed">{pt}</li>
+                            <li key={pIdx} className="leading-relaxed text-[#E8EAF0]">{pt}</li>
                           ))}
                         </ul>
                       </div>
                     ))}
-
-                    {/* Key Terms */}
-                    {solution.summary_solution.content?.key_terms?.length > 0 && (
-                      <div className="pt-2 border-t border-slate-200 dark:border-midnight-700">
-                        <h4 className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                          Key Definitions & Nomenclature
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {solution.summary_solution.content.key_terms.map((kt: any, idx: number) => (
-                            <div key={idx} className="p-2.5 rounded border border-slate-200 dark:border-midnight-700 bg-slate-50 dark:bg-midnight-950 text-xs">
-                              <span className="font-semibold text-slate-900 dark:text-slate-200">{kt.term}: </span>
-                              <span className="text-slate-600 dark:text-slate-400">{kt.definition}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 )}
 
-                {/* 4. Pedagogical QA */}
+                {/* Pedagogical QA */}
                 {solution.task_type === "general_educational" && solution.educational_solution && (
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">
-                      How to get there
+                    <h3 className="text-base font-semibold text-[#E8EAF0]">
+                      Key Concept Breakdown
                     </h3>
-                    <div className="space-y-2.5">
+                    <div className="space-y-3">
                       {solution.educational_solution.steps?.map((st, idx) => (
-                        <div key={idx} className="p-3 rounded-lg border border-slate-200 dark:border-midnight-700 bg-slate-50 dark:bg-midnight-800 space-y-1">
-                          <div className="text-sm font-semibold text-scholar-emerald">
+                        <div key={idx} className="p-4 rounded-xl border border-[#2E333D] bg-[#14161A] space-y-1.5">
+                          <div className="text-sm font-semibold text-[#3B6CFF]">
                             {st.step}. {st.title}
                           </div>
                           <SolutionText text={st.explanation} />
@@ -701,35 +679,34 @@ function SolveWorkspaceContent() {
                 )}
               </div>
 
-              {/* Conversational Follow-Up Thread */}
-              <div className="workspace-panel p-5 space-y-4">
-                <h2 className="flex items-center gap-2 text-base font-semibold">
-                  <RefreshCw className="w-3.5 h-3.5 text-scholar-emerald" />
-                  <span>Ask a follow-up</span>
+              {/* Follow-up thread */}
+              <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-5 space-y-4 shadow-xl">
+                <h2 className="flex items-center gap-2 text-sm font-semibold text-[#E8EAF0]">
+                  <RefreshCw className="w-4 h-4 text-[#3B6CFF]" />
+                  <span>Ask a follow-up question</span>
                 </h2>
 
                 {followUpThread.length > 0 && (
-                  <div className="space-y-2.5 pt-1">
+                  <div className="space-y-3">
                     {followUpThread.map((msg, idx) => (
                       <div
                         key={idx}
-                        className={`p-3 rounded-lg text-xs leading-relaxed ${
+                        className={`p-3.5 rounded-xl text-xs sm:text-sm leading-relaxed ${
                           msg.role === "user"
-                            ? "bg-slate-100 dark:bg-midnight-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-midnight-700 ml-6"
-                            : "bg-slate-50 dark:bg-midnight-950 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-midnight-700 mr-6"
+                            ? "bg-[#242832] text-[#E8EAF0] border border-[#2E333D] ml-6"
+                            : "bg-[#14161A] text-[#A0A6B4] border border-[#262A33] mr-6"
                         }`}
                       >
-                        <span className="text-[10px] font-mono uppercase text-slate-400 block mb-1">
-                          {msg.role === "user" ? "Query" : "Explanation"}
+                        <span className="text-[10px] font-mono uppercase text-[#3B6CFF] block mb-1">
+                          {msg.role === "user" ? "You" : "StudyMate"}
                         </span>
-                        <FormattedTextWithMath text={msg.content} className="whitespace-pre-wrap" />
+                        <FormattedTextWithMath text={msg.content} className="whitespace-pre-wrap text-[#E8EAF0]" />
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* Follow-up input */}
-                <div className="flex gap-2 pt-1">
+                <div className="flex gap-2">
                   <input
                     type="text"
                     aria-label="Follow-up question"
@@ -741,21 +718,21 @@ function SolveWorkspaceContent() {
                         handleSendFollowUp();
                       }
                     }}
-                    placeholder="Ask a clarifying follow-up question..."
-                    className="min-w-0 flex-1 px-3 py-2 bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-midnight-700 rounded-lg text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-scholar-emerald"
+                    placeholder="Ask a clarifying question about this answer..."
+                    className="min-w-0 flex-1 px-3.5 py-2.5 bg-[#14161A] border border-[#2E333D] rounded-xl text-xs sm:text-sm text-[#E8EAF0] placeholder:text-[#6B7280] focus:border-[#3B6CFF] outline-none"
                   />
                   <button
                     type="button"
                     onClick={handleSendFollowUp}
                     disabled={followUpLoading || !followUpInput.trim()}
-                    className="px-3.5 py-2 bg-slate-100 dark:bg-midnight-800 hover:bg-slate-200 dark:hover:bg-midnight-700 border border-slate-200 dark:border-midnight-700 text-xs font-medium text-slate-700 dark:text-slate-200 rounded-lg transition disabled:opacity-50 flex items-center gap-1.5 flex-shrink-0"
+                    className="px-4 py-2.5 bg-[#3B6CFF] hover:bg-[#5A82FF] active:bg-[#2A55D9] disabled:opacity-50 text-white text-xs font-semibold rounded-xl shadow-[0_0_12px_rgba(59,108,255,0.25)] transition flex items-center gap-1.5 flex-shrink-0"
                   >
                     {followUpLoading ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
-                      <Send className="w-3.5 h-3.5 text-scholar-emerald" />
+                      <Send className="w-4 h-4" />
                     )}
-                    <span>Ask</span>
+                    <span className="hidden sm:inline">Ask</span>
                   </button>
                 </div>
               </div>
@@ -771,7 +748,7 @@ export default function SolveWorkspacePage() {
   return (
     <Suspense
       fallback={
-        <div className="flex-1 flex items-center justify-center p-8 text-slate-400 text-xs font-mono">
+        <div className="flex-1 flex items-center justify-center p-8 text-[#A0A6B4] text-xs font-mono">
           Loading Unified Solve Workspace...
         </div>
       }

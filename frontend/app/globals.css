@@ -2,86 +2,101 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg-primary: #f2f5f3;
-  --bg-surface: #ffffff;
-  --bg-surface-elevated: #f1f5f9;
-  --border-subtle: #e2e8f0;
-  --border-hover: #cbd5e1;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  --accent-emerald: #0f7364;
-  --workspace-accent: #0f7364;
-  --workspace-tint: #e7f4ee;
-  --workspace-answer-border: #b2d6c8;
-}
-
+:root,
 .dark {
-  --bg-primary: #141d20;
-  --bg-surface: #1a2529;
-  --bg-surface-elevated: #212f33;
-  --border-subtle: #324449;
-  --border-hover: #40575d;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --accent-emerald: #80dbc2;
-  --workspace-accent: #80dbc2;
-  --workspace-tint: #1c3330;
-  --workspace-answer-border: #40665d;
+  --app-bg: #14161A;
+  --app-surface: #1C1F26;
+  --app-raised: #242832;
+  --app-border: #2E333D;
+  --app-divider: #262A33;
+  --text-primary: #E8EAF0;
+  --text-secondary: #A0A6B4;
+  --text-muted: #6B7280;
+  --accent-primary: #3B6CFF;
+  --accent-hover: #5A82FF;
+  --accent-pressed: #2A55D9;
+  --accent-glow: rgba(59, 108, 255, 0.35);
+  --status-success: #3DDC97;
+  --status-warning: #F5B84B;
+  --status-error: #FF5C6C;
+  --workspace-tint: rgba(59, 108, 255, 0.08);
+  --workspace-answer-border: #2E333D;
+  --accent-emerald: #3B6CFF;
+  --workspace-accent: #3B6CFF;
 }
 
-body {
+html, body {
   color: var(--text-primary);
-  background-color: var(--bg-primary);
+  background-color: var(--app-bg);
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
-.workspace-main :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), textarea, select) {
+/* Accessible focus ring */
+*:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Form input font styling */
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+textarea,
+select {
   font-family: inherit;
-  font-size: 0.9375rem;
 }
 
-.workspace-main .bg-scholar-emerald.text-white,
-header .bg-scholar-emerald.text-white,
-aside .bg-scholar-emerald.text-white {
-  background-color: #126a5d;
-  color: #fff;
+/* KaTeX styling to inherit dark theme text color and proper dark surfaces */
+.katex {
+  color: var(--text-primary) !important;
+  font-size: 1.05em;
 }
 
-.workspace-main .bg-scholar-emerald.text-white:hover {
-  background-color: #0e584d;
+.katex-display {
+  margin: 1rem 0 !important;
+  padding: 0.75rem 1rem !important;
+  background: var(--app-surface) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: 0.75rem !important;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-:root:not(.dark) .workspace-main .bg-scholar-emerald.text-slate-950 {
-  color: #fff;
+.katex-html {
+  color: inherit;
 }
 
-.page-heading h1 {
-  font-size: clamp(1.75rem, 2.6vw, 2.5rem);
-  line-height: 1.15;
-  letter-spacing: -0.035em;
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-.page-heading p {
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
+::-webkit-scrollbar-thumb {
+  background: rgba(160, 166, 180, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(160, 166, 180, 0.4);
+}
+
+/* Workspace styling helpers */
 .workspace-panel {
   min-width: 0;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-radius: 1rem;
 }
 
 .answer-panel {
-  background: var(--workspace-tint);
-  border: 1px solid var(--workspace-answer-border);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-radius: 0.875rem;
   color: var(--text-primary);
   overflow-wrap: anywhere;
@@ -97,40 +112,15 @@ aside .bg-scholar-emerald.text-white {
   white-space: pre;
   overflow-x: auto;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--app-border);
   border-radius: 0.625rem;
-  background: var(--bg-surface);
+  background: var(--app-bg);
   font-size: 0.875rem;
 }
 
-/* Accessible focus ring */
-*:focus-visible {
-  outline: 2px solid var(--accent-emerald);
-  outline-offset: 2px;
-}
-
-/* Custom Scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.2);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.4);
-}
-
-/* Print Stylesheet for Academic Papers & Solved Solutions */
+/* Print Stylesheet */
 @media print {
-  nav, aside, header, button, .no-print {
+  nav, aside, header, button, .no-print, .dock-container, .quick-action-btn {
     display: none !important;
   }
   body, main {
@@ -140,13 +130,4 @@ aside .bg-scholar-emerald.text-white {
     margin: 0 !important;
     overflow: visible !important;
   }
-  .print-clean {
-    border: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    padding: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
 }
-

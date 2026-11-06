@@ -4,15 +4,11 @@ import React, { useState, useRef } from "react";
 import Link from "next/link";
 import {
   UploadCloud,
-  FileImage,
   CheckCircle2,
   AlertTriangle,
   Loader2,
-  FileText,
-  Award,
   Sparkles,
   ArrowRight,
-  BookOpen,
 } from "lucide-react";
 import { api, ExtractedContent, BackgroundJob } from "@/lib/api";
 
@@ -89,14 +85,14 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-8 w-full">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="page-heading border-b border-slate-200 dark:border-midnight-700 pb-5">
-        <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100 mt-1">
-          Image reader
+      <div className="border-b border-[#2E333D] pb-5">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#E8EAF0] tracking-tight">
+          Image Reader & OCR
         </h1>
-        <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Extract text and equations from a photo, scan, or slide.
+        <p className="text-xs sm:text-sm text-[#A0A6B4] mt-0.5">
+          Extract text, diagrams, and mathematical symbols from photos, lecture slides, or scans.
         </p>
       </div>
 
@@ -105,7 +101,7 @@ export default function UploadPage() {
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed border-slate-300 dark:border-slate-800 hover:border-scholar-emerald dark:hover:border-scholar-emerald rounded-2xl p-8 md:p-12 text-center cursor-pointer bg-white dark:bg-midnight-900 transition flex flex-col items-center justify-center space-y-3 shadow-sm group"
+        className="border-2 border-dashed border-[#2E333D] hover:border-[#3B6CFF] rounded-2xl p-8 sm:p-14 text-center cursor-pointer bg-[#1C1F26] hover:bg-[#242832]/60 transition-all flex flex-col items-center justify-center space-y-3 shadow-xl group"
       >
         <input
           type="file"
@@ -114,15 +110,15 @@ export default function UploadPage() {
           accept="image/png,image/jpeg,image/webp"
           className="hidden"
         />
-        <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-midnight-800 text-scholar-emerald flex items-center justify-center group-hover:scale-105 transition">
-          <UploadCloud className="w-6 h-6" />
+        <div className="w-14 h-14 rounded-2xl bg-[#14161A] border border-[#2E333D] text-[#3B6CFF] flex items-center justify-center group-hover:scale-105 group-hover:shadow-[0_0_15px_rgba(59,108,255,0.3)] transition">
+          <UploadCloud className="w-7 h-7" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-            {file ? file.name : "Select an academic image or drag and drop file"}
+          <p className="text-sm font-semibold text-[#E8EAF0]">
+            {file ? file.name : "Select an image or drop file here"}
           </p>
-          <p className="text-xs text-slate-400 mt-1 font-mono">
-            Accepted: PNG, JPEG, WEBP (Maximum 10MB)
+          <p className="text-xs text-[#6B7280] mt-1 font-mono">
+            Accepted: PNG, JPEG, WEBP (Max 10MB)
           </p>
         </div>
       </div>
@@ -131,9 +127,9 @@ export default function UploadPage() {
         <div className="flex justify-end">
           <button
             onClick={handleUpload}
-            className="px-6 py-2.5 bg-slate-900 dark:bg-scholar-emerald hover:bg-slate-800 dark:hover:bg-emerald-600 text-white dark:text-slate-950 rounded-xl text-xs font-semibold transition flex items-center gap-2 shadow-sm"
+            className="px-6 py-2.5 bg-[#3B6CFF] hover:bg-[#5A82FF] active:bg-[#2A55D9] text-white rounded-xl text-xs font-semibold transition flex items-center gap-2 shadow-[0_0_15px_rgba(59,108,255,0.35)]"
           >
-            <span>Execute OCR & Structural Parsing</span>
+            <span>Extract & Parse Contents</span>
             <Sparkles className="w-4 h-4" />
           </button>
         </div>
@@ -141,17 +137,19 @@ export default function UploadPage() {
 
       {/* Processing Status Indicator */}
       {loading && job && (
-        <div className="p-5 bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs space-y-3 shadow-sm">
-          <div className="flex items-center justify-between text-slate-800 dark:text-slate-200 font-medium">
+        <div className="p-5 bg-[#1C1F26] border border-[#2E333D] rounded-2xl text-xs space-y-3 shadow-xl">
+          <div className="flex items-center justify-between text-[#E8EAF0] font-medium">
             <span className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-scholar-emerald" />
-              <span>Parsing layout, mathematical expressions, and visual tokens...</span>
+              <Loader2 className="w-4 h-4 animate-spin text-[#3B6CFF]" />
+              <span>Analyzing image contents and mathematical expressions...</span>
             </span>
-            <span className="font-mono text-[11px] uppercase text-scholar-emerald">{job.status}</span>
+            <span className="font-mono text-[11px] uppercase text-[#3B6CFF] font-semibold">
+              {job.status}
+            </span>
           </div>
-          <div className="w-full bg-slate-100 dark:bg-midnight-950 rounded-full h-1.5 overflow-hidden">
+          <div className="w-full bg-[#14161A] rounded-full h-2 overflow-hidden border border-[#2E333D]">
             <div
-              className="bg-scholar-emerald h-full transition-all duration-300"
+              className="bg-[#3B6CFF] h-full transition-all duration-300"
               style={{ width: `${Math.max(job.progress || 35, 25)}%` }}
             />
           </div>
@@ -160,7 +158,7 @@ export default function UploadPage() {
 
       {/* Error Banner */}
       {errorMsg && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded-xl text-xs flex items-center gap-2">
+        <div className="p-4 bg-[#FF5C6C]/10 border border-[#FF5C6C]/30 text-[#FF5C6C] rounded-2xl text-xs flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 flex-shrink-0" />
           <span>{errorMsg}</span>
         </div>
@@ -168,26 +166,25 @@ export default function UploadPage() {
 
       {/* Extracted Content Result */}
       {extracted && (
-        <div className="workspace-panel p-6 md:p-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+        <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#262A33] pb-5">
             <div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-scholar-emerald mb-1">
-                <CheckCircle2 className="w-4 h-4 text-scholar-emerald" />
-                <span>Extracted Structural Context Ready</span>
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#3DDC97] mb-1">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Text and Concepts Extracted</span>
               </div>
-              <h2 className="text-xl font-serif font-bold text-slate-900 dark:text-slate-100">
+              <h2 className="text-xl font-bold text-[#E8EAF0]">
                 {extracted.title}
               </h2>
-              <p className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs font-mono text-[#A0A6B4] mt-0.5">
                 {extracted.subject} → {extracted.topic}
               </p>
             </div>
 
-            {/* Quick Actions for Reusable Context */}
             <div className="flex items-center gap-2">
               <Link
-                href={`/solve`}
-                className="px-3.5 py-1.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
+                href="/solve"
+                className="px-4 py-2 bg-[#3B6CFF] hover:bg-[#5A82FF] active:bg-[#2A55D9] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-[0_0_12px_rgba(59,108,255,0.25)]"
               >
                 <span>Solve in Workspace</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -197,18 +194,20 @@ export default function UploadPage() {
 
           {/* Uncertainty Warnings */}
           {extracted.uncertainties && extracted.uncertainties.length > 0 && (
-            <div className="p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-600 dark:text-amber-400 space-y-1">
-              <span className="font-semibold uppercase tracking-wider font-mono">Attention (Low OCR Confidence):</span>
+            <div className="p-3.5 bg-[#F5B84B]/10 border border-[#F5B84B]/30 rounded-xl text-xs text-[#F5B84B] space-y-1">
+              <span className="font-semibold uppercase tracking-wider font-mono">
+                Notice:
+              </span>
               <p>{extracted.uncertainties.join("; ")}</p>
             </div>
           )}
 
           {/* Extracted Text */}
-          <div>
-            <h3 className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-2">
-              Extracted Manuscript / Problem Text
+          <div className="space-y-2">
+            <h3 className="text-xs font-mono uppercase tracking-wider text-[#3B6CFF] font-semibold">
+              Extracted Problem Text
             </h3>
-            <div className="p-4 bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs md:text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap leading-relaxed font-sans">
+            <div className="p-4 bg-[#14161A] border border-[#2E333D] rounded-xl text-xs sm:text-sm text-[#E8EAF0] whitespace-pre-wrap leading-relaxed font-sans">
               {extracted.extracted_text}
             </div>
           </div>
@@ -216,24 +215,24 @@ export default function UploadPage() {
           {/* Key Concepts & Equations */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {extracted.key_concepts && extracted.key_concepts.length > 0 && (
-              <div className="p-4 bg-slate-50 dark:bg-midnight-950 rounded-xl border border-slate-200 dark:border-slate-800">
-                <h4 className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-2">
+              <div className="p-4 bg-[#14161A] rounded-xl border border-[#2E333D] space-y-2">
+                <h4 className="text-xs font-mono uppercase tracking-wider text-[#3B6CFF] font-semibold">
                   Identified Concepts
                 </h4>
-                <ul className="list-disc list-inside text-xs text-slate-700 dark:text-slate-300 space-y-1">
+                <ul className="list-disc list-inside text-xs sm:text-sm text-[#A0A6B4] space-y-1">
                   {extracted.key_concepts.map((kc, i) => (
-                    <li key={i}>{kc}</li>
+                    <li key={i} className="text-[#E8EAF0]">{kc}</li>
                   ))}
                 </ul>
               </div>
             )}
 
             {extracted.equations && extracted.equations.length > 0 && (
-              <div className="p-4 bg-slate-50 dark:bg-midnight-950 rounded-xl border border-slate-200 dark:border-slate-800">
-                <h4 className="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-2">
-                  Formulas & Expressions
+              <div className="p-4 bg-[#14161A] rounded-xl border border-[#2E333D] space-y-2">
+                <h4 className="text-xs font-mono uppercase tracking-wider text-[#3B6CFF] font-semibold">
+                  Equations & Formulas
                 </h4>
-                <ul className="list-disc list-inside text-xs text-slate-700 dark:text-slate-300 space-y-1 font-mono">
+                <ul className="list-disc list-inside text-xs sm:text-sm text-[#E8EAF0] space-y-1 font-mono">
                   {extracted.equations.map((eq, i) => (
                     <li key={i}>{eq}</li>
                   ))}

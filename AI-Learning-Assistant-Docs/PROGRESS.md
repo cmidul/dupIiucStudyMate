@@ -83,20 +83,32 @@ Do not use **Passed** just because code has been written.
 
 ## 4. Current work
 
-- **Current milestone:** M15 — Release Readiness
-- **Current feature ID and name:** Final Release Gate & Documentation
-- **Objective:** Final verification across all components, clean test runs, quality reporting.
-- **Work completed:** M0 through M14 passed. 118 automated tests passing with zero errors. Full Next.js frontend redesigned, built, typechecked, and verified (11/11 routes). Theme persistence, split solve workspace, dual quiz modes, and full cross-platform flows verified.
-- **Work remaining:** Final release gate verification and commit.
-- **Files/modules being changed:** `PROGRESS.md`, `QUALITY_REPORT.md`, `AI-Learning-Assistant-Docs/`.
-- **Current test status:** 118 passed in 111.69s; Next.js 11/11 pages compiled statically.
+- **Current milestone:** M16 — Flocus-Inspired Dark Charcoal & Royal Blue Frontend Redesign
+- **Current feature ID and name:** F-20 / Redesign — Floating Bottom Dock, Focus Timer & Dark Theme Overhaul
+- **Objective:** Redesign the entire Next.js web application with visual/UX inspiration from Flocus (charcoal #14161A, royal/electric blue #3B6CFF, floating bottom dock replacing the sidebar, auto-hide in focus mode, floating quick-action button, background scenes, and dark styling across all pages and KaTeX).
+- **Work completed:**
+  1. Design system tokens added to `tailwind.config.js` and `globals.css` (charcoal `#14161A`, surface `#1C1F26`, raised `#242832`, borders `#2E333D`, text `#E8EAF0`/`#A0A6B4`/`#6B7280`, royal/electric blue `#3B6CFF`, glow `rgba(59,108,255,0.35)`, status colors).
+  2. Traditional sidebar (`Navbar.tsx`) removed and replaced with floating pill Bottom Dock (`BottomDock.tsx`) fixed at bottom center with 22px Lucide icons, hover tooltips, keyboard arrow navigation, active route dot, and mobile safe-area padding.
+  3. Shared Focus Context (`FocusContext.tsx`) built with timer logic, task CRUD/reordering, scene management, and 3-second dock/topbar auto-hide during active focus sessions.
+  4. Floating Quick-Action Button (`QuickActionButton.tsx`) created at bottom right with popover menu (Add task, Start focus session, Change scene).
+  5. Minimal Top Bar (`TopBar.tsx`) built with brand, breadcrumbs, streak counter, and user profile.
+  6. Focus Workspace Homepage (`app/page.tsx`) redesigned with circular electric blue progress ring, tabular numerals, segmented mode switcher, interactive task list, and instant solver.
+  7. Background Scene Engine (`BackgroundScene.tsx` & `ScenePicker.tsx`) created with dark atmospheric scenes and dark readability overlay.
+  8. All remaining pages restyled to charcoal & royal blue: `/solve`, `/quizzes`, `/chat`, `/summaries`, `/upload`, `/history`, `/settings`, `/login`, `/register`, and `/not-found`.
+  9. KaTeX math formulas restyled to inherit text color `#E8EAF0` on dark surfaces.
+  10. Verification: `npm run typecheck` passed (0 errors), `next build` passed (13/13 static routes generated cleanly).
+- **Work remaining:** None. Redesign fully implemented and verified.
+- **Files/modules being changed:** `PROGRESS.md`, `frontend/tailwind.config.js`, `frontend/app/globals.css`, `frontend/app/layout.tsx`, `frontend/components/`, `frontend/app/`.
+- **Current test status:** Next.js static build 13/13 routes generated; typecheck 0 errors.
 - **Current blockers:** None.
-- **Next action:** Commit M11 redesign and M14 integration test suite.
+- **Next action:** Final summary report and Git commands for user.
 
 ## 5. Completed work log
 
 | Date | Feature / Task | Commit | Tests and evaluation | Result | Notes |
 |---|---|---|---|---|---|
+| 2026-11-06 | Flocus-Inspired Redesign (F-20 / M16) | pending | `tsc --noEmit` & `next build` (13/13 routes) | Passed | Floating bottom dock, auto-hide in focus mode, quick-action button, focus timer, task list, background scenes, and dark charcoal/royal blue theme across all pages. |
+| 2026-11-06 | Redesign Plan & Reconnaissance | pending | `next build` baseline (13/13 routes) | Passed | Reconnaissance complete; agent.md rules reviewed; Flocus-inspired charcoal & royal blue redesign plan recorded. |
 | 2026-11-03 | M0: Reconnaissance & Setup | fed8e84 | Repository & environment checks | Passed | Initial report approved; .gitignore created |
 | 2026-11-03 | M1: Backend Foundation & Auth (F-01, F-14) | fed8e84 | `pytest -v` (9 passed) | Passed | AUTH-001..007, Health check, Alembic migration |
 | 2026-11-03 | M4: AI Provider Foundation (F-16) | c7ca976 | `pytest -v` (16 passed) | Passed | AI-001..007, Router, Mock/Gemini/Groq adapters |

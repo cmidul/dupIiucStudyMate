@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Award,
   CheckCircle2,
   XCircle,
-  HelpCircle,
   ArrowRight,
   ArrowLeft,
   Sparkles,
@@ -14,10 +13,8 @@ import {
   Clock,
   Flag,
   BookOpen,
-  Check,
-  AlertCircle,
   FileCheck,
-  BarChart2,
+  AlertCircle,
 } from "lucide-react";
 import { api, QuizDelivery, QuizAttemptResult } from "@/lib/api";
 
@@ -28,15 +25,17 @@ export default function QuizzesPage() {
   const [topicInput, setTopicInput] = useState("");
   const [difficulty, setDifficulty] = useState<"beginner" | "intermediate" | "advanced">("intermediate");
   const [questionCount, setQuestionCount] = useState(5);
-  
+
   // Quiz state
   const [quiz, setQuiz] = useState<QuizDelivery | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
   const [flaggedQuestions, setFlaggedQuestions] = useState<Record<string, boolean>>({});
   const [attemptResult, setAttemptResult] = useState<QuizAttemptResult | null>(null);
-  const [practiceReviews, setPracticeReviews] = useState<Record<string, { is_correct: boolean; correct_option_id: string; explanation: string }>>({});
-  
+  const [practiceReviews, setPracticeReviews] = useState<
+    Record<string, { is_correct: boolean; correct_option_id: string; explanation: string }>
+  >({});
+
   // Timer state for Exam Mode
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
@@ -46,7 +45,6 @@ export default function QuizzesPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [reviewFilter, setReviewFilter] = useState<"all" | "incorrect" | "correct">("all");
 
-  // Timer interval
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (timerActive) {
@@ -94,7 +92,7 @@ export default function QuizzesPage() {
   };
 
   const handleSelectOption = (questionId: string, optionId: string) => {
-    if (attemptResult) return; // Locked after final submission
+    if (attemptResult) return;
     setSelectedAnswers((prev) => ({
       ...prev,
       [questionId]: optionId,
@@ -108,7 +106,6 @@ export default function QuizzesPage() {
     }));
   };
 
-  // Practice Mode: Check immediate answer
   const handleCheckPracticeAnswer = async (questionId: string) => {
     const chosen = selectedAnswers[questionId];
     if (!quiz || !chosen) return;
@@ -136,7 +133,6 @@ export default function QuizzesPage() {
     }
   };
 
-  // Exam Mode: Submit entire attempt
   const handleSubmitExamination = async () => {
     if (!quiz) return;
     const answeredCount = Object.keys(selectedAnswers).length;
@@ -178,32 +174,31 @@ export default function QuizzesPage() {
   };
 
   const activeQuestion = quiz?.questions[currentIndex];
-  const activeReview = attemptResult?.reviews.find((r) => r.question_id === activeQuestion?.id);
   const activePracticeReview = activeQuestion ? practiceReviews[activeQuestion.id] : undefined;
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-8 w-full">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="page-heading flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-midnight-700 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#2E333D] pb-5">
         <div>
-          <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100 mt-1">
-            Quizzes
+          <h1 className="text-xl sm:text-2xl font-bold text-[#E8EAF0] tracking-tight">
+            Quizzes & Practice
           </h1>
-          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Practice a topic at your own pace or take a timed quiz.
+          <p className="text-xs sm:text-sm text-[#A0A6B4] mt-0.5">
+            Practice study topics interactively or test yourself with timed examinations.
           </p>
         </div>
 
         {/* Mode Selector */}
         {!quiz && (
-          <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-lg self-start sm:self-auto">
+          <div className="flex items-center gap-1.5 p-1 bg-[#1C1F26] border border-[#2E333D] rounded-full self-start sm:self-auto">
             <button
               type="button"
               onClick={() => setMode("examination")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${
+              className={`px-3.5 py-1.5 text-xs font-medium rounded-full transition ${
                 mode === "examination"
-                  ? "bg-white dark:bg-midnight-800 text-slate-900 dark:text-slate-100 shadow-sm border border-slate-200 dark:border-slate-700 font-semibold"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                  ? "bg-[#3B6CFF] text-white shadow-[0_0_10px_rgba(59,108,255,0.3)] font-semibold"
+                  : "text-[#A0A6B4] hover:text-[#E8EAF0]"
               }`}
             >
               Examination Mode
@@ -211,10 +206,10 @@ export default function QuizzesPage() {
             <button
               type="button"
               onClick={() => setMode("practice")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${
+              className={`px-3.5 py-1.5 text-xs font-medium rounded-full transition ${
                 mode === "practice"
-                  ? "bg-white dark:bg-midnight-800 text-slate-900 dark:text-slate-100 shadow-sm border border-slate-200 dark:border-slate-700 font-semibold"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                  ? "bg-[#3B6CFF] text-white shadow-[0_0_10px_rgba(59,108,255,0.3)] font-semibold"
+                  : "text-[#A0A6B4] hover:text-[#E8EAF0]"
               }`}
             >
               Practice Mode
@@ -224,7 +219,7 @@ export default function QuizzesPage() {
       </div>
 
       {errorMsg && (
-        <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 rounded-xl text-xs flex items-center gap-2.5">
+        <div className="p-4 bg-[#FF5C6C]/10 border border-[#FF5C6C]/30 text-[#FF5C6C] rounded-2xl text-xs flex items-center gap-2.5">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{errorMsg}</span>
         </div>
@@ -232,25 +227,28 @@ export default function QuizzesPage() {
 
       {/* Generator Configuration Panel */}
       {!quiz && (
-        <div className="workspace-panel p-6 md:p-8 space-y-6">
+        <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
           <div className="space-y-2">
-            <label htmlFor="quiz-topic" className="block text-xs font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 font-semibold">
-              Subject Domain or Study Topic
+            <label
+              htmlFor="quiz-topic"
+              className="block text-xs font-mono uppercase tracking-wider text-[#3B6CFF] font-semibold"
+            >
+              Study Topic or Subject
             </label>
             <input
               id="quiz-topic"
               type="text"
               value={topicInput}
               onChange={(e) => setTopicInput(e.target.value)}
-              placeholder="e.g., Computer Architecture: Cache Coherence & MESI Protocol"
-              className="w-full px-4 py-3 text-sm bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:bg-white dark:focus:bg-midnight-900 focus:outline-none focus:ring-1 focus:ring-scholar-emerald text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+              placeholder="e.g. Discrete Mathematics: Graph Theory and Dijkstra's Algorithm"
+              className="w-full px-4 py-3 text-sm bg-[#14161A] border border-[#2E333D] rounded-xl focus:border-[#3B6CFF] outline-none text-[#E8EAF0] placeholder:text-[#6B7280] transition"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 font-semibold mb-2">
-                Academic Rigor / Difficulty
+              <label className="block text-xs font-mono uppercase tracking-wider text-[#A0A6B4] font-semibold mb-2">
+                Difficulty Level
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {(["beginner", "intermediate", "advanced"] as const).map((d) => (
@@ -258,10 +256,10 @@ export default function QuizzesPage() {
                     key={d}
                     type="button"
                     onClick={() => setDifficulty(d)}
-                    className={`py-2 text-xs font-medium rounded-lg border transition capitalize ${
+                    className={`py-2 text-xs font-medium rounded-xl border transition capitalize ${
                       difficulty === d
-                        ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100 font-semibold"
-                        : "bg-slate-50 dark:bg-midnight-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700"
+                        ? "bg-[#3B6CFF] text-white border-[#3B6CFF] shadow-[0_0_10px_rgba(59,108,255,0.3)] font-semibold"
+                        : "bg-[#14161A] border-[#2E333D] text-[#A0A6B4] hover:text-[#E8EAF0] hover:border-[#3B6CFF]/40"
                     }`}
                   >
                     {d}
@@ -272,10 +270,13 @@ export default function QuizzesPage() {
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label htmlFor="q-count" className="text-xs font-mono uppercase tracking-wider text-slate-600 dark:text-slate-400 font-semibold">
-                  Assessment Volume
+                <label
+                  htmlFor="q-count"
+                  className="text-xs font-mono uppercase tracking-wider text-[#A0A6B4] font-semibold"
+                >
+                  Number of Questions
                 </label>
-                <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-300">
+                <span className="text-xs font-mono font-bold text-[#3B6CFF]">
                   {questionCount} Questions
                 </span>
               </div>
@@ -286,9 +287,9 @@ export default function QuizzesPage() {
                 max={15}
                 value={questionCount}
                 onChange={(e) => setQuestionCount(Number(e.target.value))}
-                className="w-full accent-scholar-emerald cursor-pointer"
+                className="w-full accent-[#3B6CFF] cursor-pointer"
               />
-              <div className="flex justify-between text-[10px] font-mono text-slate-400 mt-1">
+              <div className="flex justify-between text-[10px] font-mono text-[#6B7280] mt-1">
                 <span>3 (Brief)</span>
                 <span>8 (Standard)</span>
                 <span>15 (Comprehensive)</span>
@@ -297,15 +298,15 @@ export default function QuizzesPage() {
           </div>
 
           {/* Mode Explanatory Banner */}
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 space-y-1">
-            <span className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-scholar-emerald" />
-              {mode === "examination" ? "Examination Mode Details" : "Practice Mode Details"}
+          <div className="p-4 rounded-xl bg-[#14161A] border border-[#2E333D] text-xs text-[#A0A6B4] space-y-1">
+            <span className="font-semibold text-[#E8EAF0] flex items-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-[#3B6CFF]" />
+              {mode === "examination" ? "Formal Exam Mode" : "Interactive Practice Mode"}
             </span>
             <p className="leading-relaxed">
               {mode === "examination"
-                ? "Timed simulation. Answer keys and detailed derivations remain strictly sealed on the server until submission. Questions can be flagged and reviewed prior to grading."
-                : "Interactive study workflow. Immediate answers and full step explanations can be validated question-by-question as you learn."}
+                ? "Timed simulation. Answer keys and derivations remain sealed on the server until final submission."
+                : "Interactive study workflow. Immediate answers and full explanations are validated question-by-question."}
             </p>
           </div>
 
@@ -313,17 +314,17 @@ export default function QuizzesPage() {
             <button
               onClick={handleGenerate}
               disabled={loading}
-              className="px-6 py-2.5 bg-slate-900 dark:bg-scholar-emerald hover:bg-slate-800 dark:hover:bg-emerald-600 disabled:opacity-50 text-white dark:text-slate-950 text-xs font-semibold rounded-xl transition flex items-center gap-2 shadow-sm"
+              className="px-6 py-2.5 bg-[#3B6CFF] hover:bg-[#5A82FF] active:bg-[#2A55D9] disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition flex items-center gap-2 shadow-[0_0_15px_rgba(59,108,255,0.35)]"
             >
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Synthesizing Assessment...</span>
+                  <span>Generating Assessment...</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  <span>Generate Assessment</span>
+                  <span>Generate Quiz</span>
                 </>
               )}
             </button>
@@ -335,48 +336,52 @@ export default function QuizzesPage() {
       {quiz && activeQuestion && !attemptResult && (
         <div className="space-y-6">
           {/* Top Status Bar: Topic, Timer & Progress */}
-          <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm">
+          <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-5 md:p-6 shadow-xl space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 dark:bg-midnight-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                  <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-[#14161A] text-[#A0A6B4] border border-[#2E333D]">
                     {quiz.difficulty}
                   </span>
-                  <span className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border ${
-                    mode === "examination"
-                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                      : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                  }`}>
-                    {mode === "examination" ? "Formal Examination" : "Practice Mode"}
+                  <span
+                    className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border ${
+                      mode === "examination"
+                        ? "bg-[#F5B84B]/10 text-[#F5B84B] border-[#F5B84B]/30"
+                        : "bg-[#3DDC97]/10 text-[#3DDC97] border-[#3DDC97]/30"
+                    }`}
+                  >
+                    {mode === "examination" ? "Examination" : "Practice"}
                   </span>
                 </div>
-                <h2 className="text-lg md:text-xl font-serif font-bold text-slate-900 dark:text-slate-100 mt-1">
+                <h2 className="text-lg md:text-xl font-bold text-[#E8EAF0] mt-1">
                   {quiz.title}
                 </h2>
               </div>
 
               {/* Timer in Exam Mode */}
               {mode === "examination" && (
-                <div className="flex items-center gap-2 px-3.5 py-1.5 bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300 font-mono text-sm self-start sm:self-auto">
-                  <Clock className="w-4 h-4 text-scholar-emerald" />
+                <div className="flex items-center gap-2 px-3.5 py-1.5 bg-[#14161A] border border-[#2E333D] rounded-xl text-[#E8EAF0] font-mono text-xs self-start sm:self-auto">
+                  <Clock className="w-4 h-4 text-[#3B6CFF]" />
                   <span>Elapsed: {formatTime(secondsElapsed)}</span>
                 </div>
               )}
             </div>
 
             {/* Question Navigation Palette */}
-            <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <div className="pt-3 border-t border-[#262A33] flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-1.5">
                 {quiz.questions.map((q, idx) => {
                   const isCurrent = idx === currentIndex;
                   const isAnswered = selectedAnswers[q.id] !== undefined;
                   const isFlagged = flaggedQuestions[q.id];
 
-                  let pillStyle = "bg-slate-50 dark:bg-midnight-950 border-slate-200 dark:border-slate-800 text-slate-500";
+                  let pillStyle = "bg-[#14161A] border-[#2E333D] text-[#A0A6B4]";
                   if (isCurrent) {
-                    pillStyle = "ring-2 ring-scholar-emerald font-bold border-transparent bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900";
+                    pillStyle =
+                      "ring-2 ring-[#3B6CFF] font-bold border-[#3B6CFF] bg-[#3B6CFF]/20 text-white";
                   } else if (isAnswered) {
-                    pillStyle = "bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-medium";
+                    pillStyle =
+                      "bg-[#3B6CFF]/10 border-[#3B6CFF]/30 text-[#3B6CFF] font-medium";
                   }
 
                   return (
@@ -387,27 +392,27 @@ export default function QuizzesPage() {
                     >
                       <span>{idx + 1}</span>
                       {isFlagged && (
-                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-500 rounded-full border border-white dark:border-midnight-900" />
+                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#F5B84B] rounded-full" />
                       )}
                     </button>
                   );
                 })}
               </div>
 
-              <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+              <div className="text-xs text-[#A0A6B4] font-mono">
                 Answered: {Object.keys(selectedAnswers).length} / {quiz.questions.length}
               </div>
             </div>
           </div>
 
           {/* Question Card */}
-          <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
+          <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <span className="text-xs font-mono text-scholar-emerald font-semibold uppercase">
-                  Item {currentIndex + 1} of {quiz.questions.length} • 1.0 Point
+                <span className="text-xs font-mono text-[#3B6CFF] font-semibold uppercase">
+                  Question {currentIndex + 1} of {quiz.questions.length}
                 </span>
-                <div className="text-base md:text-lg font-serif font-medium text-slate-900 dark:text-slate-100 mt-2 leading-relaxed">
+                <div className="text-base md:text-lg font-medium text-[#E8EAF0] mt-2 leading-relaxed">
                   {activeQuestion.question}
                 </div>
               </div>
@@ -416,11 +421,15 @@ export default function QuizzesPage() {
                 <button
                   type="button"
                   onClick={() => handleToggleFlag(activeQuestion.id)}
-                  title={flaggedQuestions[activeQuestion.id] ? "Unflag question" : "Flag for review"}
-                  className={`p-2 rounded-lg border transition ${
+                  title={
                     flaggedQuestions[activeQuestion.id]
-                      ? "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400"
-                      : "bg-slate-50 dark:bg-midnight-950 border-slate-200 dark:border-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      ? "Unflag question"
+                      : "Flag for review"
+                  }
+                  className={`p-2 rounded-xl border transition ${
+                    flaggedQuestions[activeQuestion.id]
+                      ? "bg-[#F5B84B]/10 border-[#F5B84B]/30 text-[#F5B84B]"
+                      : "bg-[#14161A] border-[#2E333D] text-[#6B7280] hover:text-[#E8EAF0]"
                   }`}
                 >
                   <Flag className="w-4 h-4" />
@@ -433,20 +442,24 @@ export default function QuizzesPage() {
               {activeQuestion.options.map((opt) => {
                 const isSelected = selectedAnswers[activeQuestion.id] === opt.id;
                 const isPracticeChecked = activePracticeReview !== undefined;
-                const isPracticeCorrect = isPracticeChecked && activePracticeReview.correct_option_id === opt.id;
-                const isPracticeWrong = isPracticeChecked && isSelected && !activePracticeReview.is_correct;
+                const isPracticeCorrect =
+                  isPracticeChecked && activePracticeReview.correct_option_id === opt.id;
+                const isPracticeWrong =
+                  isPracticeChecked && isSelected && !activePracticeReview.is_correct;
 
-                let optStyle = "bg-slate-50 dark:bg-midnight-950/60 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-600";
+                let optStyle =
+                  "bg-[#14161A] border-[#2E333D] text-[#E8EAF0] hover:border-[#3B6CFF]/40";
                 if (isSelected && !isPracticeChecked) {
-                  optStyle = "bg-slate-900 text-white dark:bg-midnight-800 dark:text-scholar-emerald border-slate-900 dark:border-scholar-emerald";
+                  optStyle =
+                    "bg-[#3B6CFF]/15 border-[#3B6CFF] text-white shadow-[0_0_10px_rgba(59,108,255,0.15)]";
                 }
                 if (isPracticeChecked) {
                   if (isPracticeCorrect) {
-                    optStyle = "bg-emerald-500/10 border-emerald-500 text-emerald-900 dark:text-emerald-300 font-medium";
+                    optStyle = "bg-[#3DDC97]/15 border-[#3DDC97] text-[#3DDC97] font-medium";
                   } else if (isPracticeWrong) {
-                    optStyle = "bg-red-500/10 border-red-500 text-red-900 dark:text-red-300";
+                    optStyle = "bg-[#FF5C6C]/15 border-[#FF5C6C] text-[#FF5C6C]";
                   } else {
-                    optStyle = "opacity-50 border-slate-200 dark:border-slate-800";
+                    optStyle = "opacity-40 border-[#2E333D]";
                   }
                 }
 
@@ -457,11 +470,13 @@ export default function QuizzesPage() {
                     className={`p-4 rounded-xl border flex items-center justify-between cursor-pointer transition ${optStyle}`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className={`w-6 h-6 rounded-md border flex items-center justify-center text-xs font-mono font-bold ${
-                        isSelected
-                          ? "bg-scholar-emerald text-slate-950 border-scholar-emerald"
-                          : "border-slate-300 dark:border-slate-700 text-slate-500"
-                      }`}>
+                      <span
+                        className={`w-6 h-6 rounded-md border flex items-center justify-center text-xs font-mono font-bold ${
+                          isSelected
+                            ? "bg-[#3B6CFF] text-white border-[#3B6CFF]"
+                            : "border-[#2E333D] text-[#A0A6B4]"
+                        }`}
+                      >
                         {opt.id}
                       </span>
                       <span className="text-sm leading-relaxed">{opt.text}</span>
@@ -469,8 +484,12 @@ export default function QuizzesPage() {
 
                     {isPracticeChecked && (
                       <div>
-                        {isPracticeCorrect && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
-                        {isPracticeWrong && <XCircle className="w-5 h-5 text-red-500" />}
+                        {isPracticeCorrect && (
+                          <CheckCircle2 className="w-5 h-5 text-[#3DDC97]" />
+                        )}
+                        {isPracticeWrong && (
+                          <XCircle className="w-5 h-5 text-[#FF5C6C]" />
+                        )}
                       </div>
                     )}
                   </div>
@@ -486,18 +505,22 @@ export default function QuizzesPage() {
                     type="button"
                     onClick={() => handleCheckPracticeAnswer(activeQuestion.id)}
                     disabled={!selectedAnswers[activeQuestion.id] || gradingLoading}
-                    className="px-4 py-2 bg-slate-900 dark:bg-midnight-800 text-white dark:text-slate-200 text-xs font-semibold rounded-lg hover:bg-slate-800 dark:hover:bg-midnight-700 disabled:opacity-40 transition border border-slate-700 flex items-center gap-2"
+                    className="px-4 py-2 bg-[#242832] text-[#E8EAF0] text-xs font-semibold rounded-xl hover:bg-[#2E333D] disabled:opacity-40 transition border border-[#2E333D] flex items-center gap-2"
                   >
-                    {gradingLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileCheck className="w-3.5 h-3.5" />}
+                    {gradingLoading ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <FileCheck className="w-3.5 h-3.5 text-[#3B6CFF]" />
+                    )}
                     <span>Check Answer & View Explanation</span>
                   </button>
                 ) : (
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 text-xs space-y-1.5">
-                    <span className="font-mono uppercase tracking-wider font-semibold text-scholar-emerald flex items-center gap-1.5">
+                  <div className="p-4 rounded-xl bg-[#14161A] border border-[#2E333D] text-xs space-y-1.5">
+                    <span className="font-mono uppercase tracking-wider font-semibold text-[#3B6CFF] flex items-center gap-1.5">
                       <BookOpen className="w-3.5 h-3.5" />
-                      Pedagogical Explanation:
+                      Explanation:
                     </span>
-                    <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    <p className="text-[#E8EAF0] leading-relaxed">
                       {activePracticeReview.explanation}
                     </p>
                   </div>
@@ -506,35 +529,35 @@ export default function QuizzesPage() {
             )}
 
             {/* Navigation & Submit Bar */}
-            <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between pt-6 border-t border-[#262A33]">
               <button
                 onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
                 disabled={currentIndex === 0}
-                className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-midnight-950 disabled:opacity-30 transition flex items-center gap-1.5"
+                className="px-4 py-2 border border-[#2E333D] rounded-xl text-xs font-semibold text-[#A0A6B4] hover:bg-[#242832] hover:text-[#E8EAF0] disabled:opacity-30 transition flex items-center gap-1.5"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Previous Item</span>
+                <span>Previous</span>
               </button>
 
               <div className="flex items-center gap-3">
                 {currentIndex < quiz.questions.length - 1 ? (
                   <button
                     onClick={() => setCurrentIndex((prev) => prev + 1)}
-                    className="px-5 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-xs font-semibold hover:bg-slate-800 dark:hover:bg-white transition flex items-center gap-1.5"
+                    className="px-5 py-2 bg-[#242832] hover:bg-[#2E333D] text-[#E8EAF0] rounded-xl text-xs font-semibold transition flex items-center gap-1.5 border border-[#2E333D]"
                   >
-                    <span>Next Item</span>
+                    <span>Next</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 ) : mode === "examination" ? (
                   <button
                     onClick={handleSubmitExamination}
                     disabled={gradingLoading}
-                    className="px-6 py-2 bg-scholar-emerald hover:bg-emerald-600 text-slate-950 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-2"
+                    className="px-6 py-2 bg-[#3B6CFF] hover:bg-[#5A82FF] active:bg-[#2A55D9] text-white rounded-xl text-xs font-bold transition shadow-[0_0_15px_rgba(59,108,255,0.35)] flex items-center gap-2"
                   >
                     {gradingLoading ? (
                       <>
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Evaluating...</span>
+                        <span>Submitting...</span>
                       </>
                     ) : (
                       <>
@@ -547,7 +570,7 @@ export default function QuizzesPage() {
                   <button
                     onClick={handleSubmitExamination}
                     disabled={gradingLoading}
-                    className="px-6 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-xs font-bold transition flex items-center gap-2"
+                    className="px-6 py-2 bg-[#3B6CFF] hover:bg-[#5A82FF] text-white rounded-xl text-xs font-bold transition flex items-center gap-2"
                   >
                     <span>Complete Practice</span>
                   </button>
@@ -562,56 +585,56 @@ export default function QuizzesPage() {
       {attemptResult && quiz && (
         <div className="space-y-6">
           {/* Certificate / Result Header */}
-          <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-6">
+          <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#262A33] pb-6">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-scholar-emerald font-semibold">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#3B6CFF] font-semibold">
                   Evaluation Report • {mode === "examination" ? "Formal Exam" : "Practice Session"}
                 </span>
-                <h2 className="text-xl md:text-2xl font-serif font-bold text-slate-900 dark:text-slate-100 mt-1">
+                <h2 className="text-xl md:text-2xl font-bold text-[#E8EAF0] mt-1">
                   {quiz.title}
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Completed in {formatTime(secondsElapsed)} • Evaluated server-side against canonical keys
+                <p className="text-xs text-[#A0A6B4] mt-1">
+                  Completed in {formatTime(secondsElapsed)} • Evaluated server-side
                 </p>
               </div>
 
               {/* Grade Badge */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 text-right min-w-[140px]">
-                <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+              <div className="p-4 rounded-2xl bg-[#14161A] border border-[#2E333D] text-right min-w-[140px]">
+                <div className="text-[10px] font-mono text-[#A0A6B4] uppercase tracking-wider">
                   Final Score
                 </div>
-                <div className="text-2xl font-serif font-bold text-slate-900 dark:text-slate-100 mt-0.5">
+                <div className="text-2xl font-bold text-[#E8EAF0] mt-0.5">
                   {attemptResult.score} / {attemptResult.total_questions}
                 </div>
-                <div className="text-xs font-mono font-semibold text-scholar-emerald">
-                  {attemptResult.percentage}% Mastery
+                <div className="text-xs font-mono font-semibold text-[#3B6CFF]">
+                  {attemptResult.percentage}% Score
                 </div>
               </div>
             </div>
 
             {/* Performance Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-midnight-950/60 border border-slate-200 dark:border-slate-800">
-                <span className="text-[10px] font-mono text-slate-400 uppercase">Correct Answers</span>
-                <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+              <div className="p-4 rounded-xl bg-[#14161A] border border-[#2E333D]">
+                <span className="text-[10px] font-mono text-[#A0A6B4] uppercase">Correct</span>
+                <div className="text-lg font-bold text-[#3DDC97] mt-1">
                   {attemptResult.score} Items
                 </div>
               </div>
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-midnight-950/60 border border-slate-200 dark:border-slate-800">
-                <span className="text-[10px] font-mono text-slate-400 uppercase">Incorrect Items</span>
-                <div className="text-lg font-bold text-red-500 mt-1">
+              <div className="p-4 rounded-xl bg-[#14161A] border border-[#2E333D]">
+                <span className="text-[10px] font-mono text-[#A0A6B4] uppercase">Incorrect</span>
+                <div className="text-lg font-bold text-[#FF5C6C] mt-1">
                   {attemptResult.total_questions - attemptResult.score} Items
                 </div>
               </div>
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-midnight-950/60 border border-slate-200 dark:border-slate-800">
-                <span className="text-[10px] font-mono text-slate-400 uppercase">Academic Standing</span>
-                <div className="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-1">
+              <div className="p-4 rounded-xl bg-[#14161A] border border-[#2E333D]">
+                <span className="text-[10px] font-mono text-[#A0A6B4] uppercase">Performance</span>
+                <div className="text-sm font-semibold text-[#E8EAF0] mt-1">
                   {attemptResult.percentage >= 85
-                    ? "Distinction"
+                    ? "Excellent Mastery"
                     : attemptResult.percentage >= 70
-                    ? "Commendable"
-                    : "Revision Recommended"}
+                    ? "Good Understanding"
+                    : "Review Recommended"}
                 </div>
               </div>
             </div>
@@ -625,8 +648,8 @@ export default function QuizzesPage() {
                     onClick={() => setReviewFilter(filter)}
                     className={`px-3 py-1 rounded-lg text-xs font-mono capitalize transition ${
                       reviewFilter === filter
-                        ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold"
-                        : "bg-slate-100 dark:bg-midnight-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+                        ? "bg-[#3B6CFF] text-white font-semibold"
+                        : "bg-[#14161A] text-[#A0A6B4] hover:text-[#E8EAF0]"
                     }`}
                   >
                     {filter}
@@ -636,7 +659,7 @@ export default function QuizzesPage() {
 
               <button
                 onClick={handleResetQuiz}
-                className="px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-xs font-semibold hover:bg-slate-800 dark:hover:bg-white transition flex items-center gap-2"
+                className="px-4 py-2 bg-[#242832] hover:bg-[#2E333D] text-[#E8EAF0] border border-[#2E333D] rounded-xl text-xs font-semibold transition flex items-center gap-2"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>New Assessment</span>
@@ -660,27 +683,29 @@ export default function QuizzesPage() {
               .map(({ question, index, review, isCorrect }) => (
                 <div
                   key={question.id}
-                  className={`bg-white dark:bg-midnight-900 border rounded-2xl p-6 md:p-7 space-y-4 shadow-sm transition ${
+                  className={`bg-[#1C1F26] border rounded-2xl p-6 md:p-7 space-y-4 shadow-xl transition ${
                     isCorrect
-                      ? "border-emerald-500/30 dark:border-emerald-500/20"
-                      : "border-red-500/30 dark:border-red-500/20"
+                      ? "border-[#3DDC97]/30"
+                      : "border-[#FF5C6C]/30"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1">
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#A0A6B4]">
                         Question {index + 1}
                       </span>
-                      <h3 className="text-base font-serif font-semibold text-slate-900 dark:text-slate-100">
+                      <h3 className="text-base font-semibold text-[#E8EAF0]">
                         {question.question}
                       </h3>
                     </div>
 
-                    <span className={`px-2.5 py-1 rounded-md text-xs font-mono font-semibold flex items-center gap-1.5 ${
-                      isCorrect
-                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                        : "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20"
-                    }`}>
+                    <span
+                      className={`px-2.5 py-1 rounded-md text-xs font-mono font-semibold flex items-center gap-1.5 ${
+                        isCorrect
+                          ? "bg-[#3DDC97]/10 text-[#3DDC97] border border-[#3DDC97]/20"
+                          : "bg-[#FF5C6C]/10 text-[#FF5C6C] border border-[#FF5C6C]/20"
+                      }`}
+                    >
                       {isCorrect ? (
                         <>
                           <CheckCircle2 className="w-3.5 h-3.5" />
@@ -701,11 +726,14 @@ export default function QuizzesPage() {
                       const wasSelected = review?.selected_option_id === opt.id;
                       const isCanonicalCorrect = review?.correct_option_id === opt.id;
 
-                      let style = "bg-slate-50 dark:bg-midnight-950/40 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400";
+                      let style =
+                        "bg-[#14161A] border-[#2E333D] text-[#A0A6B4]";
                       if (isCanonicalCorrect) {
-                        style = "bg-emerald-500/10 border-emerald-500/40 text-emerald-900 dark:text-emerald-300 font-medium";
+                        style =
+                          "bg-[#3DDC97]/15 border-[#3DDC97]/40 text-[#3DDC97] font-medium";
                       } else if (wasSelected && !isCanonicalCorrect) {
-                        style = "bg-red-500/10 border-red-500/40 text-red-900 dark:text-red-300 line-through";
+                        style =
+                          "bg-[#FF5C6C]/15 border-[#FF5C6C]/40 text-[#FF5C6C] line-through";
                       }
 
                       return (
@@ -718,12 +746,12 @@ export default function QuizzesPage() {
                             <span>{opt.text}</span>
                           </div>
                           {isCanonicalCorrect && (
-                            <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold uppercase">
-                              Canonical Answer
+                            <span className="text-[10px] font-mono text-[#3DDC97] font-semibold uppercase">
+                              Correct Answer
                             </span>
                           )}
                           {wasSelected && !isCanonicalCorrect && (
-                            <span className="text-[10px] font-mono text-red-500 font-semibold uppercase">
+                            <span className="text-[10px] font-mono text-[#FF5C6C] font-semibold uppercase">
                               Your Answer
                             </span>
                           )}
@@ -734,11 +762,11 @@ export default function QuizzesPage() {
 
                   {/* Explanation Derivation */}
                   {review?.explanation && (
-                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-slate-800 text-xs space-y-1">
-                      <span className="font-mono uppercase tracking-wider font-semibold text-scholar-emerald">
-                        Derivation & Analysis:
+                    <div className="p-4 rounded-xl bg-[#14161A] border border-[#2E333D] text-xs space-y-1">
+                      <span className="font-mono uppercase tracking-wider font-semibold text-[#3B6CFF]">
+                        Analysis:
                       </span>
-                      <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                      <p className="text-[#E8EAF0] leading-relaxed">
                         {review.explanation}
                       </p>
                     </div>

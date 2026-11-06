@@ -5,15 +5,12 @@ import Link from "next/link";
 import {
   History as HistoryIcon,
   MessageSquare,
-  FileText,
   Search,
   Trash2,
   Calendar,
   ExternalLink,
   Loader2,
-  BookOpen,
   ArrowRight,
-  Filter,
 } from "lucide-react";
 import { api, Conversation } from "@/lib/api";
 
@@ -43,7 +40,7 @@ export default function HistoryPage() {
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!confirm("Are you sure you want to permanently delete this academic session?")) return;
+    if (!confirm("Are you sure you want to permanently delete this study session?")) return;
     setDeletingId(id);
     try {
       await api.deleteConversation(id);
@@ -55,7 +52,6 @@ export default function HistoryPage() {
     }
   };
 
-  // Chronological grouping helper
   const groupedConversations = useMemo(() => {
     const filtered = conversations.filter((c) => {
       if (!searchQuery.trim()) return true;
@@ -101,60 +97,60 @@ export default function HistoryPage() {
     groupedConversations.Earlier.length;
 
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-8 w-full">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="page-heading flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-midnight-700 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#2E333D] pb-5">
         <div>
-          <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100 mt-1">
-            History
+          <h1 className="text-xl sm:text-2xl font-bold text-[#E8EAF0] tracking-tight">
+            History & Activity Archive
           </h1>
-          <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Reopen past questions and conversations from the web or Telegram.
+          <p className="text-xs sm:text-sm text-[#A0A6B4] mt-0.5">
+            Access previous study queries, chats, and solution threads across web and Telegram.
           </p>
         </div>
 
-        {/* Live Search Input */}
+        {/* Search */}
         <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search queries and topics..."
-            className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-scholar-emerald"
+            placeholder="Search past queries..."
+            className="w-full pl-9 pr-3 py-2 text-xs bg-[#1C1F26] border border-[#2E333D] rounded-xl text-[#E8EAF0] placeholder:text-[#6B7280] focus:border-[#3B6CFF] outline-none"
           />
         </div>
       </div>
 
       {loading ? (
-        <div className="py-16 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
-          <Loader2 className="w-4 h-4 animate-spin text-scholar-emerald" />
-          <span>Retrieving archived learning sessions...</span>
+        <div className="py-16 text-center text-[#A0A6B4] text-xs flex items-center justify-center gap-2">
+          <Loader2 className="w-4 h-4 animate-spin text-[#3B6CFF]" />
+          <span>Loading historical study sessions...</span>
         </div>
       ) : conversations.length === 0 ? (
-        /* Empty State */
-        <div className="py-16 text-center bg-white dark:bg-midnight-900 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-8">
-          <HistoryIcon className="w-10 h-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
-          <h3 className="font-serif font-semibold text-slate-800 dark:text-slate-200 text-base mb-1">
+        <div className="py-16 text-center bg-[#1C1F26] border border-dashed border-[#2E333D] rounded-2xl p-8 space-y-3 shadow-xl">
+          <HistoryIcon className="w-10 h-10 text-[#6B7280] mx-auto mb-2" />
+          <h3 className="font-semibold text-[#E8EAF0] text-base">
             No Historical Records Found
           </h3>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto mb-5">
-            Past questions solved on the web or through connected Telegram accounts will be cataloged here automatically.
+          <p className="text-xs text-[#A0A6B4] max-w-sm mx-auto">
+            Questions solved on the web or through connected Telegram accounts will appear here automatically.
           </p>
-          <Link
-            href="/solve"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-scholar-emerald hover:bg-slate-800 dark:hover:bg-emerald-600 text-white dark:text-slate-950 rounded-xl text-xs font-semibold transition"
-          >
-            <span>Solve a Question</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+          <div className="pt-2">
+            <Link
+              href="/solve"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#3B6CFF] hover:bg-[#5A82FF] active:bg-[#2A55D9] text-white rounded-xl text-xs font-semibold transition shadow-[0_0_12px_rgba(59,108,255,0.3)]"
+            >
+              <span>Solve a Question</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
       ) : totalFilteredCount === 0 ? (
-        <div className="py-12 text-center text-slate-400 text-xs">
+        <div className="py-12 text-center text-[#A0A6B4] text-xs">
           No records match your query &quot;{searchQuery}&quot;.
         </div>
       ) : (
-        /* Chronological Sections */
         <div className="space-y-8">
           {(["Today", "Yesterday", "This Week", "Earlier"] as TimeBucket[]).map((bucket) => {
             const items = groupedConversations[bucket];
@@ -163,37 +159,42 @@ export default function HistoryPage() {
             return (
               <div key={bucket} className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#3B6CFF]">
                     {bucket}
                   </span>
-                  <div className="flex-1 h-px bg-slate-100 dark:bg-midnight-800" />
-                  <span className="text-[10px] font-mono text-slate-400">
+                  <div className="flex-1 h-px bg-[#262A33]" />
+                  <span className="text-[10px] font-mono text-[#6B7280]">
                     {items.length} {items.length === 1 ? "entry" : "entries"}
                   </span>
                 </div>
 
-                <div className="bg-white dark:bg-midnight-900 border border-slate-200 dark:border-slate-800 rounded-2xl divide-y divide-slate-100 dark:divide-slate-800/60 shadow-sm overflow-hidden">
+                <div className="bg-[#1C1F26] border border-[#2E333D] rounded-2xl divide-y divide-[#262A33] shadow-xl overflow-hidden">
                   {items.map((item) => (
                     <div
                       key={item.id}
-                      className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-midnight-800/40 transition group"
+                      className="p-4 flex items-center justify-between hover:bg-[#242832]/60 transition group"
                     >
                       <div className="flex items-center gap-3.5 min-w-0 pr-4">
-                        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-midnight-800 text-slate-600 dark:text-slate-400 flex items-center justify-center flex-shrink-0">
-                          <MessageSquare className="w-4 h-4 text-scholar-emerald" />
+                        <div className="w-8 h-8 rounded-lg bg-[#14161A] border border-[#2E333D] text-[#3B6CFF] flex items-center justify-center flex-shrink-0">
+                          <MessageSquare className="w-4 h-4" />
                         </div>
 
                         <div className="min-w-0">
                           <Link
                             href={`/chat?id=${item.id}`}
-                            className="text-xs md:text-sm font-medium text-slate-800 dark:text-slate-200 hover:text-scholar-emerald dark:hover:text-scholar-emerald transition flex items-center gap-1.5 truncate"
+                            className="text-xs sm:text-sm font-medium text-[#E8EAF0] hover:text-[#3B6CFF] transition flex items-center gap-1.5 truncate"
                           >
                             <span className="truncate">{item.title}</span>
-                            <ExternalLink className="w-3 h-3 text-slate-400 flex-shrink-0 opacity-0 group-hover:opacity-100 transition" />
+                            <ExternalLink className="w-3 h-3 text-[#6B7280] flex-shrink-0 opacity-0 group-hover:opacity-100 transition" />
                           </Link>
-                          <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400 mt-0.5">
+                          <div className="flex items-center gap-2 text-[11px] font-mono text-[#6B7280] mt-0.5">
                             <Calendar className="w-3 h-3" />
-                            <span>{new Date(item.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                            <span>
+                              {new Date(item.created_at).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
                             <span>•</span>
                             <span>{new Date(item.created_at).toLocaleDateString()}</span>
                           </div>
@@ -203,7 +204,7 @@ export default function HistoryPage() {
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/chat?id=${item.id}`}
-                          className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-midnight-800 transition"
+                          className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-mono text-[#A0A6B4] hover:text-[#E8EAF0] hover:bg-[#14161A] transition"
                         >
                           <span>Review</span>
                           <ArrowRight className="w-3 h-3" />
@@ -213,11 +214,11 @@ export default function HistoryPage() {
                           type="button"
                           onClick={(e) => handleDelete(item.id, e)}
                           disabled={deletingId === item.id}
-                          title="Delete archived conversation"
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition"
+                          title="Delete conversation"
+                          className="p-1.5 rounded-lg text-[#6B7280] hover:text-[#FF5C6C] hover:bg-[#FF5C6C]/10 transition"
                         >
                           {deletingId === item.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-red-500" />
+                            <Loader2 className="w-4 h-4 animate-spin text-[#FF5C6C]" />
                           ) : (
                             <Trash2 className="w-4 h-4" />
                           )}

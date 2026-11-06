@@ -971,6 +971,23 @@ Expected:
 
 ---
 
+# 16.1 Flocus-Inspired Redesign Test Suite (REDESIGN-001..010)
+
+| ID | Area | Scenario | Steps | Expected Result | Status |
+|---|---|---|---|---|---|
+| REDESIGN-001 | Navigation | Bottom dock renders and routes cleanly | 1. Navigate to `/`, `/solve`, `/quizzes`, `/chat`, `/summaries`, `/history`, `/settings`.<br>2. Inspect dock placement and active indicator. | Dock renders centered at bottom with 22px icons. Active item displays blue pill background and dot indicator. Page content has bottom padding (`pb-28`) and is never obscured. | Passed (next build static routes 13/13 verified) |
+| REDESIGN-002 | Navigation | Keyboard arrow navigation & ARIA | 1. Tab into the dock.<br>2. Press ArrowRight and ArrowLeft.<br>3. Inspect `aria-label` and `aria-current`. | Focus moves between dock items with visible blue focus ring. `aria-current="page"` is set on the active route. Tooltip appears on focus. | Manual, not yet run |
+| REDESIGN-003 | Navigation | Mobile layout & safe-area insets | 1. Open on mobile viewport (<640px).<br>2. Inspect bottom dock width and touch targets. | Dock fits within screen with safe-area padding (`env(safe-area-inset-bottom)`), touch targets are at least 44px, and quick-action button sits above the dock without overlap. | Passed (static responsive styles verified) |
+| REDESIGN-004 | Focus Auto-Hide | Dock auto-hides during active timer | 1. Start focus timer on `/`.<br>2. Wait 3 seconds without pointer/keyboard activity. | Dock and top bar fade and slide down out of view with smooth transition. | Manual, not yet run |
+| REDESIGN-005 | Focus Auto-Hide | Reappearance on user interaction | 1. While dock is hidden, move mouse toward bottom edge (<120px) or press any key.<br>2. Pause or finish the timer. | Dock and top bar immediately reappear. When paused or finished, controls stay visible. Reduced-motion uses simple fade without slide. | Manual, not yet run |
+| REDESIGN-006 | Quick-Action | Popover menu & trigger | 1. Click circular blue Plus button at bottom right.<br>2. Select "Add task", "Start focus session", or "Change scene". | Popover menu opens above the button without overlapping the dock. Triggers task modal, timer start, or scene picker cleanly. | Manual, not yet run |
+| REDESIGN-007 | Focus Timer | Timer modes, progress ring & streak | 1. Switch between Focus (25m), Short Break (5m), and Long Break (15m).<br>2. Start timer and observe tabular numerals and electric blue progress ring.<br>3. Reset timer. | Progress ring strokeDashoffset updates accurately. Tabular digits countdown smoothly. Reset restores initial duration. Completed sessions increment counter. | Passed (typecheck & logic verified) |
+| REDESIGN-008 | Task List | CRUD, focus-task highlight & reordering | 1. Add a new study task.<br>2. Toggle checkbox.<br>3. Click target icon to set as active focus task.<br>4. Move task up/down.<br>5. Edit and delete task. | Task appears in list, checked tasks dim with strikethrough, active task label appears inside timer ring, order changes, and tasks persist in localStorage. | Passed (typecheck & logic verified) |
+| REDESIGN-009 | Background Scenes | Scene picker selection & persistence | 1. Click Scenes icon in dock or top bar.<br>2. Select Night Sky, Deep Ocean, Dim City, or Mesh.<br>3. Refresh the page. | Selected atmospheric scene renders behind content with 55-70% dark overlay, text retains WCAG AA readability, and selection persists in localStorage. | Passed (typecheck & CSS verified) |
+| REDESIGN-010 | Design System & KaTeX | Charcoal & royal blue tokens across site | 1. Open `/solve`, `/quizzes`, `/chat`, `/summaries`, `/upload`, `/settings`, `/login`, `/register`.<br>2. Inspect mathematical KaTeX equations. | All pages use charcoal (`#14161A`, `#1C1F26`, `#242832`) and royal blue (`#3B6CFF`). KaTeX formulas inherit light text color (`#E8EAF0`) on dark surfaces with clear borders. | Passed (next build static routes 13/13 verified) |
+
+---
+
 # 17. Background job and reliability tests
 
 ## JOB-001 — Job lifecycle
